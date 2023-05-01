@@ -8,4 +8,4 @@ import {basicAuthMiddleware} from "../middlewares/basic-auth";
 export const blogsRouter = Router();
 
 blogsRouter.route('/').get(getAllBlogs).post(basicAuthMiddleware, blogValidateSchema, inputValidationMiddleware, createBlog);
-blogsRouter.route('/:blogId').get(getBlog).put(basicAuthMiddleware, blogValidateSchema, inputValidationMiddleware, updateBlog).delete(deleteBlog);
+blogsRouter.route('/:blogId').get(getBlog).put(basicAuthMiddleware, blogValidateSchema, inputValidationMiddleware, updateBlog).delete(basicAuthMiddleware, deleteBlog);
