@@ -1,4 +1,5 @@
 import {checkSchema} from "express-validator";
+import {blogsRepository} from "../repositories/blogs-repository";
 
 
 export const postValidateSchema = checkSchema({
@@ -32,6 +33,12 @@ export const postValidateSchema = checkSchema({
         notEmpty: true,
         isLength: {options: {max: 100000}, errorMessage: "Field blogId should be length maximum 100"},
         escape: true,
-        errorMessage: "Field blogId should be exist and have type string"
+        errorMessage: "Field blogId should be exist and have type string",
+        custom: {
+            options: (value: string) => {
+                const blog = blogsRepository.findBlogById(value);
+                return !!blog;
+            }
+        }
     },
 }, ['body'])
