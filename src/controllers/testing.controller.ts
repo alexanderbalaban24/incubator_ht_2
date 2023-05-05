@@ -1,8 +1,9 @@
 import {Request, Response} from "express";
-import {storage} from "../db/local-db";
+import {testingRepository} from "../repositories/testing-repository";
 
-export const deleteAllData = (req: Request, res: Response) => {
-    storage.blogs.length = 0;
-    storage.posts.length = 0;
+export const deleteAllData = async (req: Request, res: Response) => {
+    await testingRepository.deleteAllDB();
     res.sendStatus(204);
+
+
 }

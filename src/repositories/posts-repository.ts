@@ -1,25 +1,25 @@
-import {storage} from "../db/local-db";
-import {blogsRepository} from "./blogs-repository";
 import {Post} from "../models/post/Post";
-import {PostType} from "../shared/types";
+import {BlogType, PostType} from "../shared/types";
+import {postsCollections} from "../db/collections/postsCollections";
+import {blogsCollections} from "../db/collections/blogsCollections";
 
 export const postsRepository = {
-    findPost() {
-        return storage.posts;
+    async findPost() {
+        return await postsCollections.find<PostType>({}, {projection: {_id: 0}}).toArray();
     },
-    createPost(title: string, shortDescription: string, content: string, blogId: string) {
-        const blog = blogsRepository.findBlogById(blogId);
+    async createPost(title: string, shortDescription: string, content: string, blogId: string) {
+        const blog: BlogType | null = await blogsCollections.findOne({id: blogId}, {projection: {_id: 0}});
 
         if (blog) {
             const newPost = new Post(title, shortDescription, content, blogId, blog.name);
-            storage.posts.push(newPost);
+            await postsCollections.insertOne(newPost);
             return newPost;
         } else {
             return null;
         }
     },
-    findPostById(postId: string) {
-        const post = storage.posts.find(post => post.id === postId);
+    async findPostById(postId: string) {
+        const post = await postsCollections.findOne<PostType>({id: postId}, {projection: {_id: 0}});
 
         if (post) {
             return post;
@@ -27,29 +27,24 @@ export const postsRepository = {
             return null;
         }
     },
-    updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string) {
-        const blog = blogsRepository.findBlogById(blogId);
+    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string) {
+        const blog = await blogsCollections.findOne({id: blogId});
         if (!blog) return false;
 
-        const post = this.findPostById(postId);
-        if (post) {
-            post.title = title;
-            post.shortDescription = shortDescription;
-            post.content = content;
-            post.blogId = blogId;
-            return true;
-        } else {
-            return false;
-        }
-    },
-    deletePostById(postId: string) {
-        const index = storage.posts.findIndex(post => post.id === postId);
+        const result = await postsCollections.updateOne({id: postId}, {
+            $set: {
+                title,
+                shortDescription,
+                content,
+                blogId
+            }
+        });
 
-        if (index !== -1) {
-            storage.posts.splice(index, 1);
-            return true;
-        } else {
-            return false;
-        }
+        return result.matchedCount === 1;
+    },
+    async deletePostById(postId: string) {
+        const result = await postsCollections.deleteOne({id: postId});
+
+        return result.deletedCount === 1;
     }
 }

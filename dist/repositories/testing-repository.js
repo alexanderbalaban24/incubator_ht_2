@@ -9,19 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const dotenv_1 = require("dotenv");
-const app_1 = require("./app");
-const db_1 = require("./db");
-(0, dotenv_1.config)();
-const PORT = process.env.PORT;
-const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, db_1.runDB)();
-        app_1.app.listen(PORT, () => {
-            console.log(`Server running on port : ${PORT}`);
+exports.testingRepository = void 0;
+const blogsCollections_1 = require("../db/collections/blogsCollections");
+const postsCollections_1 = require("../db/collections/postsCollections");
+exports.testingRepository = {
+    deleteAllDB() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resDeletedBlogs = yield blogsCollections_1.blogsCollections.deleteMany({});
+            const resDeletedPosts = yield postsCollections_1.postsCollections.deleteMany({});
+            return resDeletedBlogs.deletedCount === 1 && resDeletedPosts.deletedCount === 1;
         });
     }
-    catch (e) {
-    }
-});
-startApp();
+};

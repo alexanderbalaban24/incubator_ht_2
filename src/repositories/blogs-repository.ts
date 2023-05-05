@@ -1,44 +1,32 @@
-import {storage} from "../db/local-db";
 import {Blog} from "../models/blog/Blog";
+import {blogsCollections} from "../db/collections/blogsCollections";
 
 export const blogsRepository = {
-    findBlogs () {
-        return storage.blogs;
+    async findBlogs() {
+        return await blogsCollections.find({}, {projection: {_id: 0}}).toArray();
     },
-    createBlog (name: string, description: string, websiteUrl: string) {
+    async createBlog(name: string, description: string, websiteUrl: string) {
         const newBlog = new Blog(name, description, websiteUrl);
-        storage.blogs.push(newBlog);
+        await blogsCollections.insertOne(newBlog);
         return newBlog;
     },
-    findBlogById(blogId: string) {
-        const blog = storage.blogs.find(blog => blog.id === blogId);
+    async findBlogById(blogId: string) {
+        const blog = await blogsCollections.findOne({id: blogId}, {projection: {_id: 0}});
         if (blog) {
             return blog;
         } else {
             return null;
         }
     },
-    deleteBlogById(blogId: string) {
-        const index = storage.blogs.findIndex(blog => blog.id === blogId);
+    async deleteBlogById(blogId: string) {
+        const result = await blogsCollections.deleteOne({id: blogId});
 
-        if (index !== -1) {
-            storage.blogs.splice(index, 1);
-            return true;
-        } else {
-            return false;
-        }
+        return result.deletedCount === 1;
     },
-    updateBlog(blogId: string, name: string, description: string, websiteUrl: string) {
-        const blog = storage.blogs.find(blog => blog.id === blogId);
+    async updateBlog(blogId: string, name: string, description: string, websiteUrl: string) {
+        const result = await blogsCollections.updateOne({id: blogId}, {$set: {name, description, websiteUrl}});
 
-        if (blog) {
-            blog.name = name;
-            blog.description = description;
-            blog.websiteUrl = websiteUrl;
-            return true;
-        } else {
-            return false;
-        }
+        return result.matchedCount === 1;
     }
 
 
