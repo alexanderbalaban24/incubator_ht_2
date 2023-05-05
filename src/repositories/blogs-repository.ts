@@ -7,7 +7,8 @@ export const blogsRepository = {
     },
     async createBlog(name: string, description: string, websiteUrl: string) {
         const newBlog = new Blog(name, description, websiteUrl);
-        await blogsCollections.insertOne(newBlog);
+        await blogsCollections.insertOne({...newBlog});
+
         return newBlog;
     },
     async findBlogById(blogId: string) {

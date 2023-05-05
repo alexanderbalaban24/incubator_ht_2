@@ -24,7 +24,7 @@ exports.postsRepository = {
             const blog = yield blogsCollections_1.blogsCollections.findOne({ id: blogId }, { projection: { _id: 0 } });
             if (blog) {
                 const newPost = new Post_1.Post(title, shortDescription, content, blogId, blog.name);
-                yield postsCollections_1.postsCollections.insertOne(newPost);
+                yield postsCollections_1.postsCollections.insertOne(Object.assign({}, newPost));
                 return newPost;
             }
             else {

@@ -21,7 +21,7 @@ exports.blogsRepository = {
     createBlog(name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             const newBlog = new Blog_1.Blog(name, description, websiteUrl);
-            yield blogsCollections_1.blogsCollections.insertOne(newBlog);
+            yield blogsCollections_1.blogsCollections.insertOne(Object.assign({}, newBlog));
             return newBlog;
         });
     },

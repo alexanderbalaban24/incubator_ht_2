@@ -12,7 +12,7 @@ export const postsRepository = {
 
         if (blog) {
             const newPost = new Post(title, shortDescription, content, blogId, blog.name);
-            await postsCollections.insertOne(newPost);
+            await postsCollections.insertOne({...newPost});
             return newPost;
         } else {
             return null;
