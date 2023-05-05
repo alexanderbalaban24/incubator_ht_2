@@ -1,5 +1,6 @@
 import {checkSchema} from "express-validator";
 import {blogsRepository} from "../repositories/blogs-repository";
+import {blogsCollections} from "../db/collections/blogsCollections";
 
 
 export const postValidateSchema = checkSchema({
@@ -35,9 +36,11 @@ export const postValidateSchema = checkSchema({
         escape: true,
         errorMessage: "Field blogId should be exist and have type string",
         custom: {
-            options: (value: string) => {
-                const blog = blogsRepository.findBlogById(value);
-                return !!blog;
+            options: async (value: string) => {
+                const blog = await blogsRepository.findBlogById(value);
+                if (!blog) {
+                    return Promise.reject();
+                }
             }
         }
     },
