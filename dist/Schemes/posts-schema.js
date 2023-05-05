@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postValidateSchema = void 0;
 const express_validator_1 = require("express-validator");
+const blogs_repository_1 = require("../repositories/blogs-repository");
 exports.postValidateSchema = (0, express_validator_1.checkSchema)({
     title: {
         isString: true,
@@ -33,6 +34,12 @@ exports.postValidateSchema = (0, express_validator_1.checkSchema)({
         notEmpty: true,
         isLength: { options: { max: 100000 }, errorMessage: "Field blogId should be length maximum 100" },
         escape: true,
-        errorMessage: "Field blogId should be exist and have type string"
+        errorMessage: "Field blogId should be exist and have type string",
+        custom: {
+            options: (value) => {
+                const blog = blogs_repository_1.blogsRepository.findBlogById(value);
+                return !!blog;
+            }
+        }
     },
 }, ['body']);
