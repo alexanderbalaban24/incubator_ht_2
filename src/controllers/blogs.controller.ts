@@ -74,5 +74,10 @@ export const createPostByBlogId = async (req: RequestWithParamsAndBody<{blogId: 
 
 export const getPostsByBlogId = async (req: RequestWithQueryParamsAndURI<{blogId: string}, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel>) => {
     const posts = await postsQueryRepository.findPost(req.query, req.params.blogId);
-    res.status(200).json(posts);
+
+    if (posts) {
+        res.status(200).json(posts);
+    } else {
+        res.sendStatus(404);
+    }
 }
