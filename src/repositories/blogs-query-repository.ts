@@ -20,7 +20,9 @@ export const blogsQueryRepository = {
             id: blog.id,
             name: blog.name,
             description: blog.description,
-            websiteUrl: blog.websiteUrl
+            websiteUrl: blog.websiteUrl,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership
         }
     }
 }

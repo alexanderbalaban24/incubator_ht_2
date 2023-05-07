@@ -4,5 +4,6 @@ export type ViewPostModel = {
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName: string
+    blogName: string,
+    createdAt: string
 }
