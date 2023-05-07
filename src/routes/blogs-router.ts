@@ -18,4 +18,4 @@ export const blogsRouter = Router();
 
 blogsRouter.route('/').get(getAllBlogs).post(basicAuthMiddleware, blogValidateSchema, inputValidationMiddleware, createBlog);
 blogsRouter.route('/:blogId').get(getBlog).put(basicAuthMiddleware, blogValidateSchema, inputValidationMiddleware, updateBlog).delete(basicAuthMiddleware, deleteBlog);
-blogsRouter.route('/:blogId/posts').get(getPostsByBlogId, uriParamsValidation).post(basicAuthMiddleware, uriParamsValidation, postValidateSchema, inputValidationMiddleware, createPostByBlogId);
+blogsRouter.route('/:blogId/posts').get(uriParamsValidation, getPostsByBlogId).post(basicAuthMiddleware, uriParamsValidation, postValidateSchema, inputValidationMiddleware, createPostByBlogId);
