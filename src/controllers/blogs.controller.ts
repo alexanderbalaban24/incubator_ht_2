@@ -61,7 +61,9 @@ export const updateBlog = async (req: RequestWithParamsAndBody<URIParamsBlogMode
     }
 }
 
-export const createPostByBlogId = async (req: RequestWithParamsAndBody<{blogId: string}, CreatePostModel>, res: Response<ViewPostModel>) => {
+export const createPostByBlogId = async (req: RequestWithParamsAndBody<{
+    blogId: string
+}, CreatePostModel>, res: Response<ViewPostModel>) => {
     const blogId = req.params.blogId;
     const postId = await postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, blogId);
     if (postId) {
@@ -72,12 +74,10 @@ export const createPostByBlogId = async (req: RequestWithParamsAndBody<{blogId: 
     }
 }
 
-export const getPostsByBlogId = async (req: RequestWithQueryParamsAndURI<{blogId: string}, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel>) => {
+export const getPostsByBlogId = async (req: RequestWithQueryParamsAndURI<{
+    blogId: string
+}, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel>) => {
     const posts = await postsQueryRepository.findPost(req.query, req.params.blogId);
 
-    if (posts) {
-        res.status(200).json(posts);
-    } else {
-        res.sendStatus(404);
-    }
+    res.status(200).json(posts);
 }

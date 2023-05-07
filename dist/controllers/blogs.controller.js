@@ -69,11 +69,6 @@ const createPostByBlogId = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.createPostByBlogId = createPostByBlogId;
 const getPostsByBlogId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const posts = yield posts_query_repository_1.postsQueryRepository.findPost(req.query, req.params.blogId);
-    if (posts) {
-        res.status(200).json(posts);
-    }
-    else {
-        res.sendStatus(404);
-    }
+    res.status(200).json(posts);
 });
 exports.getPostsByBlogId = getPostsByBlogId;

@@ -14,6 +14,7 @@ export const inputValidationMiddleware = (req: RequestEmpty, res: ResponseEmpty,
                     field: err.path
                 } as ErrorType
             }
+
         }) as ErrorType[]
         res.status(400).json({errorsMessages: resultError});
     }
