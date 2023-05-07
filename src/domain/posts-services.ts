@@ -1,20 +1,36 @@
-import {Post} from "../models/post/Post";
-import {BlogType} from "../shared/types";
 import {postsRepository} from "../repositories/posts-repository";
 import {blogsRepository} from "../repositories/blogs-repository";
 
+export type Post = {
+    id: string
+    title: string
+    shortDescription: string
+    content: string
+    blogId: string
+    blogName: string
+    createdAt: string
+}
+
 export const postsServices = {
-    async findPost() {
+    async findPost(): Promise<Post[]> {
         return await postsRepository.findPost();
     },
     async createPost(title: string, shortDescription: string, content: string, blogId: string) {
-        const blog: BlogType | null = await blogsRepository.findBlogById(blogId);
+        const blog = await blogsRepository.findBlogById(blogId);
+        if (!blog) return null;
 
-        if (blog) {
-            return await postsRepository.createPost(new Post(title, shortDescription, content, blogId, blog.name));
-        } else {
-            return null;
+        const newPost: Post = {
+            id: new Date().toISOString(),
+            title,
+            shortDescription,
+            content,
+            blogId,
+            blogName: blog.name,
+            createdAt: new Date().toISOString()
         }
+
+        return await postsRepository.createPost(newPost);
+
     },
     async findPostById(postId: string) {
         return await postsRepository.findPostById(postId);

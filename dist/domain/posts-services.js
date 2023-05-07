@@ -9,46 +9,48 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postsRepository = void 0;
-const postsCollections_1 = require("../db/collections/postsCollections");
-const blogsCollections_1 = require("../db/collections/blogsCollections");
-exports.postsRepository = {
+exports.postsServices = void 0;
+const posts_repository_1 = require("../repositories/posts-repository");
+const blogs_repository_1 = require("../repositories/blogs-repository");
+exports.postsServices = {
     findPost() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield postsCollections_1.postsCollections.find({}, { projection: { _id: 0 } }).toArray();
+            return yield posts_repository_1.postsRepository.findPost();
         });
     },
-    createPost(newPost) {
+    createPost(title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield postsCollections_1.postsCollections.insertOne(Object.assign({}, newPost));
-            return newPost;
+            const blog = yield blogs_repository_1.blogsRepository.findBlogById(blogId);
+            if (!blog)
+                return null;
+            const newPost = {
+                id: new Date().toISOString(),
+                title,
+                shortDescription,
+                content,
+                blogId,
+                blogName: blog.name,
+                createdAt: new Date().toISOString()
+            };
+            return yield posts_repository_1.postsRepository.createPost(newPost);
         });
     },
     findPostById(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield postsCollections_1.postsCollections.findOne({ id: postId }, { projection: { _id: 0 } });
+            return yield posts_repository_1.postsRepository.findPostById(postId);
         });
     },
     updatePost(postId, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield blogsCollections_1.blogsCollections.findOne({ id: blogId });
+            const blog = yield blogs_repository_1.blogsRepository.findBlogById(blogId);
             if (!blog)
                 return false;
-            const result = yield postsCollections_1.postsCollections.updateOne({ id: postId }, {
-                $set: {
-                    title,
-                    shortDescription,
-                    content,
-                    blogId
-                }
-            });
-            return result.matchedCount === 1;
+            return yield posts_repository_1.postsRepository.updatePost(postId, title, shortDescription, content, blogId);
         });
     },
     deletePostById(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield postsCollections_1.postsCollections.deleteOne({ id: postId });
-            return result.deletedCount === 1;
+            return yield posts_repository_1.postsRepository.deletePostById(postId);
         });
     }
 };

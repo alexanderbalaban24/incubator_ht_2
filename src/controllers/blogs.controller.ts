@@ -22,13 +22,13 @@ export const createBlog = async (req: RequestWithBody<CreateBlogModel>, res: Res
     res.status(201).json(newBlog);
 }
 
-export const getBlog = async (req: RequestWithParams<URIParamsBlogModel>, res: Response<ViewBlogModel | any>) => {
+export const getBlog = async (req: RequestWithParams<URIParamsBlogModel>, res: Response<ViewBlogModel>) => {
     const blog = await blogsServices.findBlogById(req.params.blogId);
 
     if (blog) {
         res.status(200).json(blog)
     } else {
-        res.status(404).json({message: "blog not found"})
+        res.sendStatus(404);
     }
 }
 

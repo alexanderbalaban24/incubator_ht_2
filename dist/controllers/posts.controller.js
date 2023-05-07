@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePost = exports.updatePost = exports.getPost = exports.createPost = exports.getAllPosts = void 0;
-const posts_repository_1 = require("../repositories/posts-repository");
+const posts_services_1 = require("../domain/posts-services");
 const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield posts_repository_1.postsRepository.findPost();
+    const posts = yield posts_services_1.postsServices.findPost();
     res.status(200).json(posts);
 });
 exports.getAllPosts = getAllPosts;
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newPost = yield posts_repository_1.postsRepository.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+    const newPost = yield posts_services_1.postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
     if (newPost) {
         res.status(201).json(newPost);
     }
@@ -27,7 +27,7 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.createPost = createPost;
 const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const post = yield posts_repository_1.postsRepository.findPostById(req.params.postId);
+    const post = yield posts_services_1.postsServices.findPostById(req.params.postId);
     if (post) {
         res.status(200).json(post);
     }
@@ -37,7 +37,7 @@ const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getPost = getPost;
 const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isUpdated = yield posts_repository_1.postsRepository.updatePost(req.params.postId, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+    const isUpdated = yield posts_services_1.postsServices.updatePost(req.params.postId, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
     if (isUpdated) {
         res.sendStatus(204);
     }
@@ -47,7 +47,7 @@ const updatePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.updatePost = updatePost;
 const deletePost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const isDeleted = yield posts_repository_1.postsRepository.deletePostById(req.params.postId);
+    const isDeleted = yield posts_services_1.postsServices.deletePostById(req.params.postId);
     if (isDeleted) {
         res.sendStatus(204);
     }

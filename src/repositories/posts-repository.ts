@@ -1,20 +1,19 @@
-import {Post} from "../models/post/Post";
-import {PostType} from "../shared/types";
 import {postsCollections} from "../db/collections/postsCollections";
 import {blogsCollections} from "../db/collections/blogsCollections";
+import {Post} from "../domain/posts-services";
 
 export const postsRepository = {
-    async findPost() {
-        return await postsCollections.find<PostType>({}, {projection: {_id: 0}}).toArray();
+    async findPost(): Promise<Post[]> {
+        return await postsCollections.find({}, {projection: {_id: 0}}).toArray();
     },
-    async createPost(newPost: Post) {
+    async createPost(newPost: Post): Promise<Post> {
             await postsCollections.insertOne({...newPost});
             return newPost;
     },
-    async findPostById(postId: string) {
-        return await postsCollections.findOne<PostType>({id: postId}, {projection: {_id: 0}});
+    async findPostById(postId: string): Promise<Post | null> {
+        return await postsCollections.findOne({id: postId}, {projection: {_id: 0}});
     },
-    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string) {
+    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
         const blog = await blogsCollections.findOne({id: blogId});
         if (!blog) return false;
 
@@ -29,7 +28,7 @@ export const postsRepository = {
 
         return result.matchedCount === 1;
     },
-    async deletePostById(postId: string) {
+    async deletePostById(postId: string): Promise<boolean> {
         const result = await postsCollections.deleteOne({id: postId});
 
         return result.deletedCount === 1;
