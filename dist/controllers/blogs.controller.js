@@ -11,18 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateBlog = exports.deleteBlog = exports.getBlog = exports.createBlog = exports.getAllBlogs = void 0;
 const blogs_services_1 = require("../domain/blogs-services");
+const blogs_query_repository_1 = require("../repositories/blogs-query-repository");
 const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const blogs = yield blogs_services_1.blogsServices.findBlogs();
+    const blogs = yield blogs_query_repository_1.blogsQueryRepository.findBlogs();
     res.status(200).json(blogs);
 });
 exports.getAllBlogs = getAllBlogs;
 const createBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newBlog = yield blogs_services_1.blogsServices.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
-    res.status(201).json(newBlog);
+    const blogId = yield blogs_services_1.blogsServices.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
+    const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(blogId);
+    res.status(201).json(blog);
 });
 exports.createBlog = createBlog;
 const getBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const blog = yield blogs_services_1.blogsServices.findBlogById(req.params.blogId);
+    const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(req.params.blogId);
     if (blog) {
         res.status(200).json(blog);
     }

@@ -3,15 +3,9 @@ import {blogsCollections} from "../db/collections/blogsCollections";
 import {Post} from "../domain/posts-services";
 
 export const postsRepository = {
-    async findPost(): Promise<Post[]> {
-        return await postsCollections.find({}, {projection: {_id: 0}}).toArray();
-    },
-    async createPost(newPost: Post): Promise<Post> {
-            await postsCollections.insertOne({...newPost});
-            return newPost;
-    },
-    async findPostById(postId: string): Promise<Post | null> {
-        return await postsCollections.findOne({id: postId}, {projection: {_id: 0}});
+    async createPost(newPost: Post): Promise<string> {
+        await postsCollections.insertOne(newPost);
+        return newPost.id;
     },
     async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
         const blog = await blogsCollections.findOne({id: blogId});

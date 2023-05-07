@@ -11,15 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePost = exports.updatePost = exports.getPost = exports.createPost = exports.getAllPosts = void 0;
 const posts_services_1 = require("../domain/posts-services");
+const posts_query_repository_1 = require("../repositories/posts-query-repository");
 const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const posts = yield posts_services_1.postsServices.findPost();
+    const posts = yield posts_query_repository_1.postsQueryRepository.findPost();
     res.status(200).json(posts);
 });
 exports.getAllPosts = getAllPosts;
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newPost = yield posts_services_1.postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
-    if (newPost) {
-        res.status(201).json(newPost);
+    const postId = yield posts_services_1.postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
+    if (postId) {
+        const post = yield posts_query_repository_1.postsQueryRepository.findPostById(postId);
+        res.status(201).json(post);
     }
     else {
         res.sendStatus(404);
@@ -27,7 +29,7 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.createPost = createPost;
 const getPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const post = yield posts_services_1.postsServices.findPostById(req.params.postId);
+    const post = yield posts_query_repository_1.postsQueryRepository.findPostById(req.params.postId);
     if (post) {
         res.status(200).json(post);
     }

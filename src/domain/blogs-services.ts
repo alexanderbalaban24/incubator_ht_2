@@ -10,10 +10,7 @@ export type Blog = {
 }
 
 export const blogsServices = {
-    async findBlogs(): Promise<Blog[]> {
-        return await blogsRepository.findBlogs();
-    },
-    async createBlog(name: string, description: string, websiteUrl: string): Promise<Blog> {
+    async createBlog(name: string, description: string, websiteUrl: string): Promise<string> {
         const newBlog: Blog = {
             id: new Date().toISOString(),
             name,
@@ -23,9 +20,6 @@ export const blogsServices = {
             isMembership: false
         }
         return await blogsRepository.createBlog(newBlog);
-    },
-    async findBlogById(blogId: string): Promise<Blog | null> {
-        return await blogsRepository.findBlogById(blogId);
     },
     async deleteBlogById(blogId: string): Promise<boolean> {
         return await blogsRepository.deleteBlogById(blogId);

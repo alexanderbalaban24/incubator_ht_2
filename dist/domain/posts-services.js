@@ -11,16 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsServices = void 0;
 const posts_repository_1 = require("../repositories/posts-repository");
-const blogs_repository_1 = require("../repositories/blogs-repository");
+const blogs_query_repository_1 = require("../repositories/blogs-query-repository");
 exports.postsServices = {
-    findPost() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield posts_repository_1.postsRepository.findPost();
-        });
-    },
     createPost(title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield blogs_repository_1.blogsRepository.findBlogById(blogId);
+            const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(blogId);
             if (!blog)
                 return null;
             const newPost = {
@@ -35,14 +30,9 @@ exports.postsServices = {
             return yield posts_repository_1.postsRepository.createPost(newPost);
         });
     },
-    findPostById(postId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield posts_repository_1.postsRepository.findPostById(postId);
-        });
-    },
     updatePost(postId, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield blogs_repository_1.blogsRepository.findBlogById(blogId);
+            const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(blogId);
             if (!blog)
                 return false;
             return yield posts_repository_1.postsRepository.updatePost(postId, title, shortDescription, content, blogId);

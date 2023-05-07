@@ -1,5 +1,5 @@
 import {postsRepository} from "../repositories/posts-repository";
-import {blogsRepository} from "../repositories/blogs-repository";
+import {blogsQueryRepository} from "../repositories/blogs-query-repository";
 
 export type Post = {
     id: string
@@ -12,11 +12,8 @@ export type Post = {
 }
 
 export const postsServices = {
-    async findPost(): Promise<Post[]> {
-        return await postsRepository.findPost();
-    },
-    async createPost(title: string, shortDescription: string, content: string, blogId: string) {
-        const blog = await blogsRepository.findBlogById(blogId);
+    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<string | null> {
+        const blog = await blogsQueryRepository.findBlogById(blogId);
         if (!blog) return null;
 
         const newPost: Post = {
@@ -32,16 +29,13 @@ export const postsServices = {
         return await postsRepository.createPost(newPost);
 
     },
-    async findPostById(postId: string) {
-        return await postsRepository.findPostById(postId);
-    },
-    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string) {
-        const blog = await blogsRepository.findBlogById(blogId);
+    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
+        const blog = await blogsQueryRepository.findBlogById(blogId);
         if (!blog) return false;
 
         return await postsRepository.updatePost(postId, title, shortDescription, content, blogId);
     },
-    async deletePostById(postId: string) {
+    async deletePostById(postId: string): Promise<boolean> {
         return await postsRepository.deletePostById(postId);
     }
 }

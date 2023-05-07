@@ -13,20 +13,10 @@ exports.postsRepository = void 0;
 const postsCollections_1 = require("../db/collections/postsCollections");
 const blogsCollections_1 = require("../db/collections/blogsCollections");
 exports.postsRepository = {
-    findPost() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield postsCollections_1.postsCollections.find({}, { projection: { _id: 0 } }).toArray();
-        });
-    },
     createPost(newPost) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield postsCollections_1.postsCollections.insertOne(Object.assign({}, newPost));
-            return newPost;
-        });
-    },
-    findPostById(postId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield postsCollections_1.postsCollections.findOne({ id: postId }, { projection: { _id: 0 } });
+            yield postsCollections_1.postsCollections.insertOne(newPost);
+            return newPost.id;
         });
     },
     updatePost(postId, title, shortDescription, content, blogId) {

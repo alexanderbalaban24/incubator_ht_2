@@ -11,19 +11,21 @@ import {CreateBlogModel} from "../models/blog/CreateBlogModel";
 import {URIParamsBlogModel} from "../models/blog/URIParamsBlogModel";
 import {UpdateBlogModel} from "../models/blog/UpdateBlogModel";
 import {blogsServices} from "../domain/blogs-services";
+import {blogsQueryRepository} from "../repositories/blogs-query-repository";
 
 export const getAllBlogs = async (req: RequestEmpty, res: Response<ViewBlogModel[]>) => {
-    const blogs = await blogsServices.findBlogs();
+    const blogs = await blogsQueryRepository.findBlogs();
     res.status(200).json(blogs);
 }
 
 export const createBlog = async (req: RequestWithBody<CreateBlogModel>, res: Response<ViewBlogModel>) => {
-    const newBlog = await blogsServices.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
-    res.status(201).json(newBlog);
+    const blogId = await blogsServices.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
+    const blog = await blogsQueryRepository.findBlogById(blogId);
+    res.status(201).json(blog!);
 }
 
 export const getBlog = async (req: RequestWithParams<URIParamsBlogModel>, res: Response<ViewBlogModel>) => {
-    const blog = await blogsServices.findBlogById(req.params.blogId);
+    const blog = await blogsQueryRepository.findBlogById(req.params.blogId);
 
     if (blog) {
         res.status(200).json(blog)

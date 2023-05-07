@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postValidateSchema = void 0;
 const express_validator_1 = require("express-validator");
-const blogs_repository_1 = require("../repositories/blogs-repository");
+const blogs_query_repository_1 = require("../repositories/blogs-query-repository");
 exports.postValidateSchema = (0, express_validator_1.checkSchema)({
     title: {
         isString: true,
@@ -46,7 +46,7 @@ exports.postValidateSchema = (0, express_validator_1.checkSchema)({
         errorMessage: "Field blogId should be exist and have type string",
         custom: {
             options: (value) => __awaiter(void 0, void 0, void 0, function* () {
-                const blog = yield blogs_repository_1.blogsRepository.findBlogById(value);
+                const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(value);
                 if (!blog) {
                     return Promise.reject();
                 }
