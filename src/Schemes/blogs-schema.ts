@@ -1,4 +1,5 @@
 import {checkSchema} from "express-validator";
+import {blogsQueryRepository} from "../repositories/blogs-query-repository";
 
 export const blogValidateSchema = checkSchema({
     name: {
@@ -29,3 +30,23 @@ export const blogValidateSchema = checkSchema({
         errorMessage: "Field name should be exist and have type string"
     },
 }, ['body'])
+
+export const blogIdValidateSchema = checkSchema({
+    blogId: {
+        isString: true,
+        trim: true,
+        notEmpty: true,
+        isLength: {options: {max: 100000}, errorMessage: "Field blogId should be length maximum 100"},
+        escape: true,
+        errorMessage: "Field blogId should be exist and have type string",
+        custom: {
+            options: async (value: string) => {
+                console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ", value)
+                const blog = await blogsQueryRepository.findBlogById(value);
+                if (!blog) {
+                    return Promise.reject();
+                }
+            }
+        }
+    }
+}, ['params'])
