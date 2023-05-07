@@ -1,5 +1,5 @@
 import {Post} from "../models/post/Post";
-import {BlogType, PostType} from "../shared/types";
+import {PostType} from "../shared/types";
 import {postsCollections} from "../db/collections/postsCollections";
 import {blogsCollections} from "../db/collections/blogsCollections";
 
@@ -7,25 +7,12 @@ export const postsRepository = {
     async findPost() {
         return await postsCollections.find<PostType>({}, {projection: {_id: 0}}).toArray();
     },
-    async createPost(title: string, shortDescription: string, content: string, blogId: string) {
-        const blog: BlogType | null = await blogsCollections.findOne({id: blogId}, {projection: {_id: 0}});
-
-        if (blog) {
-            const newPost = new Post(title, shortDescription, content, blogId, blog.name);
+    async createPost(newPost: Post) {
             await postsCollections.insertOne({...newPost});
             return newPost;
-        } else {
-            return null;
-        }
     },
     async findPostById(postId: string) {
-        const post = await postsCollections.findOne<PostType>({id: postId}, {projection: {_id: 0}});
-
-        if (post) {
-            return post;
-        } else {
-            return null;
-        }
+        return await postsCollections.findOne<PostType>({id: postId}, {projection: {_id: 0}});
     },
     async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string) {
         const blog = await blogsCollections.findOne({id: blogId});
