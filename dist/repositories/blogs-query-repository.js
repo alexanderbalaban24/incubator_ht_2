@@ -12,10 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsQueryRepository = void 0;
 const blogsCollections_1 = require("../db/collections/blogsCollections");
 exports.blogsQueryRepository = {
-    findBlogs() {
+    findBlogs(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blogs = yield blogsCollections_1.blogsCollections.find({}, { projection: { _id: 0 } }).toArray();
-            return blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
+            const cursor = blogsCollections_1.blogsCollections.find({}, { projection: { _id: 0 } });
+            const queryResult = yield this._findConstructor(query, cursor);
+            const blogs = yield cursor.toArray();
+            queryResult.items = blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
+            return queryResult;
         });
     },
     findBlogById(blogId) {
@@ -38,5 +41,27 @@ exports.blogsQueryRepository = {
             createdAt: blog.createdAt,
             isMembership: blog.isMembership
         };
+    },
+    _findConstructor(query, cursor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sortBy = query.sortBy ? query.sortBy : "createdAt";
+            const sortDirection = query.sortDirection ? query.sortDirection : "desc";
+            const pageNumber = query.pageNumber ? +query.pageNumber : 1;
+            const pageSize = query.pageSize ? +query.pageSize : 10;
+            const skip = pageSize * (pageNumber - 1);
+            if (query.searchNameTerm) {
+                cursor.filter({ name: { $regex: query.searchNameTerm, $options: 'i' } });
+            }
+            const totalCount = yield cursor.count();
+            cursor.sort({ [sortBy]: sortDirection }).skip(skip).limit(pageSize);
+            const pagesCount = Math.ceil(totalCount / pageSize);
+            return {
+                pagesCount: pagesCount,
+                page: pageNumber,
+                pageSize: pageSize,
+                totalCount: totalCount,
+                items: []
+            };
+        });
     }
 };

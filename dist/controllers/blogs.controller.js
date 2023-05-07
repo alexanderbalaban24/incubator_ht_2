@@ -9,11 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBlog = exports.deleteBlog = exports.getBlog = exports.createBlog = exports.getAllBlogs = void 0;
+exports.getPostsByBlogId = exports.createPostByBlogId = exports.updateBlog = exports.deleteBlog = exports.getBlog = exports.createBlog = exports.getAllBlogs = void 0;
 const blogs_services_1 = require("../domain/blogs-services");
 const blogs_query_repository_1 = require("../repositories/blogs-query-repository");
+const posts_services_1 = require("../domain/posts-services");
+const posts_query_repository_1 = require("../repositories/posts-query-repository");
 const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const blogs = yield blogs_query_repository_1.blogsQueryRepository.findBlogs();
+    const blogs = yield blogs_query_repository_1.blogsQueryRepository.findBlogs(req.query);
     res.status(200).json(blogs);
 });
 exports.getAllBlogs = getAllBlogs;
@@ -53,3 +55,20 @@ const updateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateBlog = updateBlog;
+const createPostByBlogId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const blogId = req.params.blogId;
+    const postId = yield posts_services_1.postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, blogId);
+    if (postId) {
+        const post = yield posts_query_repository_1.postsQueryRepository.findPostById(postId);
+        res.status(201).json(post);
+    }
+    else {
+        res.sendStatus(404);
+    }
+});
+exports.createPostByBlogId = createPostByBlogId;
+const getPostsByBlogId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const posts = yield posts_query_repository_1.postsQueryRepository.findPost(req.query, req.params.blogId);
+    res.status(200).json(posts);
+});
+exports.getPostsByBlogId = getPostsByBlogId;

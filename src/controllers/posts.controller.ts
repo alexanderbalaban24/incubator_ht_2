@@ -2,7 +2,7 @@ import {
     RequestEmpty,
     RequestWithBody,
     RequestWithParams,
-    RequestWithParamsAndBody,
+    RequestWithParamsAndBody, RequestWithQueryParams,
     ResponseEmpty
 } from "../shared/types";
 import {Response} from "express";
@@ -10,10 +10,12 @@ import {ViewPostModel} from "../models/post/ViewPostModel";
 import {CreatePostModel} from "../models/post/CreatePostModel";
 import {postsServices} from "../domain/posts-services";
 import {postsQueryRepository} from "../repositories/posts-query-repository";
+import {ViewWithQueryPostModel} from "../models/post/ViewWithQueryPostModel";
+import {QueryParamsPostModel} from "../models/post/QueryParamsPostModel";
 
 
-export const getAllPosts = async (req: RequestEmpty, res: Response<ViewPostModel[]>) => {
-    const posts = await postsQueryRepository.findPost();
+export const getAllPosts = async (req: RequestWithQueryParams<QueryParamsPostModel>, res: Response<ViewWithQueryPostModel>) => {
+    const posts = await postsQueryRepository.findPost(req.query);
     res.status(200).json(posts);
 }
 

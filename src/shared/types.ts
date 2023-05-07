@@ -6,6 +6,8 @@ export type ErrorType = {
 }
 
 export type RequestWithParams<T> = Request<T>;
+export type RequestWithQueryParams<T> = Request<{}, {}, {}, T>;
+export type RequestWithQueryParamsAndURI<T, C> = Request<T, {}, {}, C>;
 export type RequestWithParamsAndBody<T, C> = Request<T,{}, C>;
 export type RequestWithBody<T> = Request<{}, {}, T>;
 export type RequestEmpty = Request<{}, {}, {}, {}>;

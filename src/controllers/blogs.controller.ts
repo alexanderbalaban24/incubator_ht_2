@@ -1,9 +1,8 @@
 import {Request, Response} from "express";
 import {
-    RequestEmpty,
     RequestWithBody,
     RequestWithParams,
-    RequestWithParamsAndBody,
+    RequestWithParamsAndBody, RequestWithQueryParams, RequestWithQueryParamsAndURI,
     ResponseEmpty
 } from "../shared/types";
 import {ViewBlogModel} from "../models/blog/ViewBlogModel";
@@ -12,9 +11,17 @@ import {URIParamsBlogModel} from "../models/blog/URIParamsBlogModel";
 import {UpdateBlogModel} from "../models/blog/UpdateBlogModel";
 import {blogsServices} from "../domain/blogs-services";
 import {blogsQueryRepository} from "../repositories/blogs-query-repository";
+import {CreatePostModel} from "../models/post/CreatePostModel";
+import {ViewPostModel} from "../models/post/ViewPostModel";
+import {postsServices} from "../domain/posts-services";
+import {postsQueryRepository} from "../repositories/posts-query-repository";
+import {QueryParamsBlogModel} from "../models/blog/QueryParamsBlogModel";
+import {ViewWithQueryBlogModel} from "../models/blog/ViewWithQueryBlogModel";
+import {QueryParamsPostModel} from "../models/post/QueryParamsPostModel";
+import {ViewWithQueryPostModel} from "../models/post/ViewWithQueryPostModel";
 
-export const getAllBlogs = async (req: RequestEmpty, res: Response<ViewBlogModel[]>) => {
-    const blogs = await blogsQueryRepository.findBlogs();
+export const getAllBlogs = async (req: RequestWithQueryParams<QueryParamsBlogModel>, res: Response<ViewWithQueryBlogModel>) => {
+    const blogs = await blogsQueryRepository.findBlogs(req.query);
     res.status(200).json(blogs);
 }
 
@@ -52,4 +59,20 @@ export const updateBlog = async (req: RequestWithParamsAndBody<URIParamsBlogMode
     } else {
         res.sendStatus(404)
     }
+}
+
+export const createPostByBlogId = async (req: RequestWithParamsAndBody<{blogId: string}, CreatePostModel>, res: Response<ViewPostModel>) => {
+    const blogId = req.params.blogId;
+    const postId = await postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, blogId);
+    if (postId) {
+        const post = await postsQueryRepository.findPostById(postId);
+        res.status(201).json(post!);
+    } else {
+        res.sendStatus(404);
+    }
+}
+
+export const getPostsByBlogId = async (req: RequestWithQueryParamsAndURI<{blogId: string}, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel>) => {
+    const posts = await postsQueryRepository.findPost(req.query, req.params.blogId);
+    res.status(200).json(posts);
 }

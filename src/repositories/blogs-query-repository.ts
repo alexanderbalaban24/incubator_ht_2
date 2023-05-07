@@ -1,11 +1,17 @@
 import {BlogDB, blogsCollections} from "../db/collections/blogsCollections";
 import {ViewBlogModel} from "../models/blog/ViewBlogModel";
+import {QueryParamsBlogModel} from "../models/blog/QueryParamsBlogModel";
+import {FindCursor} from "mongodb";
+import {ViewWithQueryBlogModel} from "../models/blog/ViewWithQueryBlogModel";
 
 export const blogsQueryRepository = {
-    async findBlogs(): Promise<ViewBlogModel[]> {
-        const blogs = await blogsCollections.find({}, {projection: {_id: 0}}).toArray();
+    async findBlogs(query: QueryParamsBlogModel): Promise<ViewWithQueryBlogModel> {
+        const cursor = blogsCollections.find({}, {projection: {_id: 0}});
+        const queryResult = await this._findConstructor(query, cursor);
+        const blogs = await cursor.toArray();
 
-        return blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
+        queryResult.items = blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
+        return queryResult;
     },
     async findBlogById(blogId: string): Promise<ViewBlogModel | null> {
         const blog = await blogsCollections.findOne({id: blogId}, {projection: {_id: 0}});
@@ -23,6 +29,30 @@ export const blogsQueryRepository = {
             websiteUrl: blog.websiteUrl,
             createdAt: blog.createdAt,
             isMembership: blog.isMembership
+        }
+    },
+    async _findConstructor(query: QueryParamsBlogModel, cursor: FindCursor): Promise<ViewWithQueryBlogModel> {
+        const sortBy = query.sortBy ? query.sortBy : "createdAt";
+        const sortDirection = query.sortDirection ? query.sortDirection : "desc"
+        const pageNumber = query.pageNumber ? +query.pageNumber : 1
+        const pageSize = query.pageSize ? +query.pageSize : 10
+
+        const skip = pageSize * (pageNumber - 1);
+        if (query.searchNameTerm) {
+            cursor.filter({name: {$regex: query.searchNameTerm, $options: 'i'}});
+        }
+
+        const totalCount = await cursor.count();
+
+        cursor.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
+        const pagesCount = Math.ceil(totalCount / pageSize);
+
+        return {
+            pagesCount: pagesCount,
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount: totalCount,
+            items: []
         }
     }
 }

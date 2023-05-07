@@ -45,12 +45,14 @@ exports.postValidateSchema = (0, express_validator_1.checkSchema)({
         escape: true,
         errorMessage: "Field blogId should be exist and have type string",
         custom: {
-            options: (value) => __awaiter(void 0, void 0, void 0, function* () {
-                const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(value);
+            options: (value, { req }) => __awaiter(void 0, void 0, void 0, function* () {
+                var _a;
+                const blogId = value || ((_a = req.params) === null || _a === void 0 ? void 0 : _a.blogId);
+                const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(blogId);
                 if (!blog) {
                     return Promise.reject();
                 }
             })
         }
     },
-}, ['body']);
+}, ['body', 'params']);
