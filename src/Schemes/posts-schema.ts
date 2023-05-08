@@ -36,8 +36,7 @@ export const postValidateSchema = checkSchema({
         errorMessage: "Field blogId should be exist and have type string",
         custom: {
             options: async (value: string, {req}) => {
-                const blogId = value || req.params?.blogId
-                const blog = await blogsQueryRepository.findBlogById(blogId);
+                const blog = await blogsQueryRepository.findBlogById(value);
                 if (!blog) {
                     return Promise.reject();
                 }

@@ -1,5 +1,4 @@
 import {
-    RequestEmpty,
     RequestWithBody,
     RequestWithParams,
     RequestWithParamsAndBody, RequestWithQueryParams,
