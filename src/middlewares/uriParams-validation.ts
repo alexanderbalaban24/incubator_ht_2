@@ -1,7 +1,7 @@
 import {RequestWithParamsAndBody, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
 import {CreatePostModel} from "../models/post/CreatePostModel";
-import {blogsQueryRepository} from "../repositories/blogs-query-repository";
+import {blogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 
 export const uriParamsValidation = async (req: RequestWithParamsAndBody<{
     blogId: string

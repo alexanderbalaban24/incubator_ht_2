@@ -11,9 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPostsByBlogId = exports.createPostByBlogId = exports.updateBlog = exports.deleteBlog = exports.getBlog = exports.createBlog = exports.getAllBlogs = void 0;
 const blogs_services_1 = require("../domain/blogs-services");
-const blogs_query_repository_1 = require("../repositories/blogs-query-repository");
+const blogs_query_repository_1 = require("../repositories/blogs/blogs-query-repository");
 const posts_services_1 = require("../domain/posts-services");
-const posts_query_repository_1 = require("../repositories/posts-query-repository");
+const posts_query_repository_1 = require("../repositories/posts/posts-query-repository");
 const getAllBlogs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const blogs = yield blogs_query_repository_1.blogsQueryRepository.findBlogs(req.query);
     res.status(200).json(blogs);

@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePost = exports.updatePost = exports.getPost = exports.createPost = exports.getAllPosts = void 0;
 const posts_services_1 = require("../domain/posts-services");
-const posts_query_repository_1 = require("../repositories/posts-query-repository");
+const posts_query_repository_1 = require("../repositories/posts/posts-query-repository");
 const getAllPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const posts = yield posts_query_repository_1.postsQueryRepository.findPost(req.query);
     res.status(200).json(posts);

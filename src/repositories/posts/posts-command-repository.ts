@@ -1,8 +1,8 @@
-import {postsCollections} from "../db/collections/postsCollections";
-import {blogsCollections} from "../db/collections/blogsCollections";
-import {Post} from "../domain/posts-services";
+import {postsCollections} from "../../db/collections/postsCollections";
+import {blogsCollections} from "../../db/collections/blogsCollections";
+import {Post} from "../../domain/posts-services";
 
-export const postsRepository = {
+export const postsCommandRepository = {
     async createPost(newPost: Post): Promise<string> {
         await postsCollections.insertOne(newPost);
         return newPost.id;

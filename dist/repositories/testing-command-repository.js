@@ -9,16 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uriParamsValidation = void 0;
-const blogs_query_repository_1 = require("../repositories/blogs/blogs-query-repository");
-const uriParamsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const blogId = req.params.blogId;
-    const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(blogId);
-    if (blog) {
-        next();
+exports.testingCommandRepository = void 0;
+const blogsCollections_1 = require("../db/collections/blogsCollections");
+const postsCollections_1 = require("../db/collections/postsCollections");
+exports.testingCommandRepository = {
+    deleteAllDB() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const resDeletedBlogs = yield blogsCollections_1.blogsCollections.deleteMany({});
+            const resDeletedPosts = yield postsCollections_1.postsCollections.deleteMany({});
+            return resDeletedBlogs.deletedCount === 1 && resDeletedPosts.deletedCount === 1;
+        });
     }
-    else {
-        res.sendStatus(404);
-    }
-});
-exports.uriParamsValidation = uriParamsValidation;
+};

@@ -9,16 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uriParamsValidation = void 0;
-const blogs_query_repository_1 = require("../repositories/blogs/blogs-query-repository");
-const uriParamsValidation = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const blogId = req.params.blogId;
-    const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(blogId);
-    if (blog) {
-        next();
+exports.usersCommandRepository = void 0;
+exports.usersCommandRepository = {
+    createUser() {
+        return __awaiter(this, void 0, void 0, function* () {
+        });
     }
-    else {
-        res.sendStatus(404);
-    }
-});
-exports.uriParamsValidation = uriParamsValidation;
+};

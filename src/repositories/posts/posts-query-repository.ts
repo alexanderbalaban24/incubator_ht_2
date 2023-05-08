@@ -1,8 +1,8 @@
-import {PostDB, postsCollections} from "../db/collections/postsCollections";
-import {ViewPostModel} from "../models/post/ViewPostModel";
-import {ViewWithQueryPostModel} from "../models/post/ViewWithQueryPostModel";
+import {PostDB, postsCollections} from "../../db/collections/postsCollections";
+import {ViewPostModel} from "../../models/post/ViewPostModel";
+import {ViewWithQueryPostModel} from "../../models/post/ViewWithQueryPostModel";
 import {FindCursor} from "mongodb";
-import {QueryParamsPostModel} from "../models/post/QueryParamsPostModel";
+import {QueryParamsPostModel} from "../../models/post/QueryParamsPostModel";
 
 export const postsQueryRepository = {
     async findPost(query: QueryParamsPostModel, blogId?: string | undefined): Promise<ViewWithQueryPostModel> {

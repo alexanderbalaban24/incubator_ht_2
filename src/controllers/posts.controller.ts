@@ -8,7 +8,7 @@ import {Response} from "express";
 import {ViewPostModel} from "../models/post/ViewPostModel";
 import {CreatePostModel} from "../models/post/CreatePostModel";
 import {postsServices} from "../domain/posts-services";
-import {postsQueryRepository} from "../repositories/posts-query-repository";
+import {postsQueryRepository} from "../repositories/posts/posts-query-repository";
 import {ViewWithQueryPostModel} from "../models/post/ViewWithQueryPostModel";
 import {QueryParamsPostModel} from "../models/post/QueryParamsPostModel";
 

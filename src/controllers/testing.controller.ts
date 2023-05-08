@@ -1,8 +1,8 @@
 import {Request, Response} from "express";
-import {testingRepository} from "../repositories/testing-repository";
+import {testingCommandRepository} from "../repositories/testing/testing-command-repository";
 
 export const deleteAllData = async (req: Request, res: Response) => {
-    await testingRepository.deleteAllDB();
+    await testingCommandRepository.deleteAllDB();
     res.sendStatus(204);
 
 

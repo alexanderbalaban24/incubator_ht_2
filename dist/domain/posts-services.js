@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsServices = void 0;
-const posts_repository_1 = require("../repositories/posts-repository");
-const blogs_query_repository_1 = require("../repositories/blogs-query-repository");
+const posts_command_repository_1 = require("../repositories/posts/posts-command-repository");
+const blogs_query_repository_1 = require("../repositories/blogs/blogs-query-repository");
 exports.postsServices = {
     createPost(title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -27,7 +27,7 @@ exports.postsServices = {
                 blogName: blog.name,
                 createdAt: new Date().toISOString()
             };
-            return yield posts_repository_1.postsRepository.createPost(newPost);
+            return yield posts_command_repository_1.postsCommandRepository.createPost(newPost);
         });
     },
     updatePost(postId, title, shortDescription, content, blogId) {
@@ -35,12 +35,12 @@ exports.postsServices = {
             const blog = yield blogs_query_repository_1.blogsQueryRepository.findBlogById(blogId);
             if (!blog)
                 return false;
-            return yield posts_repository_1.postsRepository.updatePost(postId, title, shortDescription, content, blogId);
+            return yield posts_command_repository_1.postsCommandRepository.updatePost(postId, title, shortDescription, content, blogId);
         });
     },
     deletePostById(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield posts_repository_1.postsRepository.deletePostById(postId);
+            return yield posts_command_repository_1.postsCommandRepository.deletePostById(postId);
         });
     }
 };

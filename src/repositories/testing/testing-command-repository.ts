@@ -1,7 +1,7 @@
-import {blogsCollections} from "../db/collections/blogsCollections";
-import {postsCollections} from "../db/collections/postsCollections";
+import {blogsCollections} from "../../db/collections/blogsCollections";
+import {postsCollections} from "../../db/collections/postsCollections";
 
-export const testingRepository = {
+export const testingCommandRepository = {
     async deleteAllDB() {
         const resDeletedBlogs = await blogsCollections.deleteMany({});
         const resDeletedPosts = await postsCollections.deleteMany({});

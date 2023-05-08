@@ -9,30 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsServices = void 0;
-const blogs_command_repository_1 = require("../repositories/blogs/blogs-command-repository");
-exports.blogsServices = {
-    createBlog(name, description, websiteUrl) {
+exports.blogsCommandRepository = void 0;
+const blogsCollections_1 = require("../db/collections/blogsCollections");
+exports.blogsCommandRepository = {
+    createBlog(newBlog) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newBlog = {
-                id: new Date().toISOString(),
-                name,
-                description,
-                websiteUrl,
-                createdAt: new Date().toISOString(),
-                isMembership: false
-            };
-            return yield blogs_command_repository_1.blogsCommandRepository.createBlog(newBlog);
+            yield blogsCollections_1.blogsCollections.insertOne(newBlog);
+            return newBlog.id;
         });
     },
     deleteBlogById(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield blogs_command_repository_1.blogsCommandRepository.deleteBlogById(blogId);
+            const result = yield blogsCollections_1.blogsCollections.deleteOne({ id: blogId });
+            return result.deletedCount === 1;
         });
     },
     updateBlog(blogId, name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield blogs_command_repository_1.blogsCommandRepository.updateBlog(blogId, name, description, websiteUrl);
+            const result = yield blogsCollections_1.blogsCollections.updateOne({ id: blogId }, { $set: { name, description, websiteUrl } });
+            return result.matchedCount === 1;
         });
     }
 };

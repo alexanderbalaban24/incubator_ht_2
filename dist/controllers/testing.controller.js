@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAllData = void 0;
-const testing_repository_1 = require("../repositories/testing-repository");
+const testing_command_repository_1 = require("../repositories/testing/testing-command-repository");
 const deleteAllData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield testing_repository_1.testingRepository.deleteAllDB();
+    yield testing_command_repository_1.testingCommandRepository.deleteAllDB();
     res.sendStatus(204);
 });
 exports.deleteAllData = deleteAllData;

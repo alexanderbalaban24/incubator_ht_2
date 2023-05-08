@@ -1,4 +1,4 @@
-import {blogsRepository} from "../repositories/blogs-repository";
+import {blogsCommandRepository} from "../repositories/blogs/blogs-command-repository";
 
 export type Blog = {
     id: string
@@ -19,13 +19,13 @@ export const blogsServices = {
             createdAt: new Date().toISOString(),
             isMembership: false
         }
-        return await blogsRepository.createBlog(newBlog);
+        return await blogsCommandRepository.createBlog(newBlog);
     },
     async deleteBlogById(blogId: string): Promise<boolean> {
-        return await blogsRepository.deleteBlogById(blogId);
+        return await blogsCommandRepository.deleteBlogById(blogId);
     },
     async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<boolean> {
-        return await blogsRepository.updateBlog(blogId, name, description, websiteUrl);
+        return await blogsCommandRepository.updateBlog(blogId, name, description, websiteUrl);
     }
 
 

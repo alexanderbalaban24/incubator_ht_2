@@ -1,7 +1,7 @@
-import {blogsCollections} from "../db/collections/blogsCollections";
-import {Blog} from "../domain/blogs-services";
+import {blogsCollections} from "../../db/collections/blogsCollections";
+import {Blog} from "../../domain/blogs-services";
 
-export const blogsRepository = {
+export const blogsCommandRepository = {
     async createBlog(newBlog: Blog): Promise<string> {
         await blogsCollections.insertOne(newBlog);
 
