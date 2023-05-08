@@ -42,16 +42,16 @@ export const blogsQueryRepository = {
             cursor.filter({name: {$regex: query.searchNameTerm, $options: 'i'}});
         }
 
-        const arr = await cursor.toArray();
+        const totalCount = await cursor.count();
 
         cursor.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
-        const pagesCount = Math.ceil(arr.length / pageSize);
+        const pagesCount = Math.ceil(totalCount / pageSize);
 
         return {
             pagesCount: pagesCount,
             page: pageNumber,
             pageSize: pageSize,
-            totalCount: arr.length,
+            totalCount: totalCount,
             items: []
         }
     }
