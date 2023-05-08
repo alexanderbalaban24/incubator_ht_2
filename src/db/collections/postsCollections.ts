@@ -1,15 +1,14 @@
 import {client} from "../index";
-import {ObjectId} from "mongodb";
+import {ObjectId, OptionalId} from "mongodb";
 
 export type PostDB = {
-    id: string
     title: string
     shortDescription: string
     content: string
     blogId: string
     blogName: string
     createdAt: string
-    _id?: ObjectId
+    _id: ObjectId
 }
 
-export const postsCollections = client.db().collection<PostDB>("products");
+export const postsCollections = client.db().collection<OptionalId<PostDB>>("products");

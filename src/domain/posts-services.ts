@@ -2,7 +2,6 @@ import {postsCommandRepository} from "../repositories/posts/posts-command-reposi
 import {blogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 
 export type Post = {
-    id: string
     title: string
     shortDescription: string
     content: string
@@ -17,7 +16,6 @@ export const postsServices = {
         if (!blog) return null;
 
         const newPost: Post = {
-            id: new Date().toISOString(),
             title,
             shortDescription,
             content,

@@ -1,12 +1,12 @@
 import {BlogDB, blogsCollections} from "../../db/collections/blogsCollections";
 import {ViewBlogModel} from "../../models/blog/ViewBlogModel";
 import {QueryParamsBlogModel} from "../../models/blog/QueryParamsBlogModel";
-import {FindCursor} from "mongodb";
+import {FindCursor, ObjectId} from "mongodb";
 import {ViewWithQueryBlogModel} from "../../models/blog/ViewWithQueryBlogModel";
 
 export const blogsQueryRepository = {
     async findBlogs(query: QueryParamsBlogModel): Promise<ViewWithQueryBlogModel> {
-        const cursor = blogsCollections.find({}, {projection: {_id: 0}});
+        const cursor = blogsCollections.find({});
         const queryResult = await this._findConstructor(query, cursor);
         const blogs = await cursor.toArray();
 
@@ -14,7 +14,7 @@ export const blogsQueryRepository = {
         return queryResult;
     },
     async findBlogById(blogId: string): Promise<ViewBlogModel | null> {
-        const blog = await blogsCollections.findOne({id: blogId}, {projection: {_id: 0}});
+        const blog = await blogsCollections.findOne({_id: new ObjectId(blogId)});
         if (blog) {
             return this._mapBlogDBToViewBlogModel(blog);
         } else {
@@ -23,7 +23,7 @@ export const blogsQueryRepository = {
     },
     _mapBlogDBToViewBlogModel(blog: BlogDB): ViewBlogModel {
         return {
-            id: blog.id,
+            id: blog._id!.toString(),
             name: blog.name,
             description: blog.description,
             websiteUrl: blog.websiteUrl,
@@ -42,16 +42,16 @@ export const blogsQueryRepository = {
             cursor.filter({name: {$regex: query.searchNameTerm, $options: 'i'}});
         }
 
-        const arr = await cursor.toArray();
+        const totalCount = await cursor.count();
 
         cursor.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
-        const pagesCount = Math.ceil(arr.length / pageSize);
+        const pagesCount = Math.ceil(totalCount / pageSize);
 
         return {
             pagesCount: pagesCount,
             page: pageNumber,
             pageSize: pageSize,
-            totalCount: arr.length,
+            totalCount: totalCount,
             items: []
         }
     }
