@@ -52,14 +52,14 @@ exports.blogsQueryRepository = {
             if (query.searchNameTerm) {
                 cursor.filter({ name: { $regex: query.searchNameTerm, $options: 'i' } });
             }
-            const arr = yield cursor.toArray();
+            const totalCount = yield cursor.count();
             cursor.sort({ [sortBy]: sortDirection }).skip(skip).limit(pageSize);
-            const pagesCount = Math.ceil(arr.length / pageSize);
+            const pagesCount = Math.ceil(totalCount / pageSize);
             return {
                 pagesCount: pagesCount,
                 page: pageNumber,
                 pageSize: pageSize,
-                totalCount: arr.length,
+                totalCount: totalCount,
                 items: []
             };
         });

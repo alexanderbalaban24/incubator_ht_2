@@ -9,4 +9,5 @@ export const app = express();
 app.use(express.json());
 app.use('/testing', testingRouter);
 app.use('/blogs', blogsRouter);
+app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
