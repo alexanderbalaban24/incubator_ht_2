@@ -43,11 +43,11 @@ export const usersQueryRepository = {
         const skip = pageSize * (pageNumber - 1);
 
         const filter = [];
-        if (query.searchLoginTerm && query.searchLoginTerm !== "") {
-            filter.push({login: {$regex: query.searchLoginTerm, $options: 'i'}});
+        if (query.searchLoginTerm) {
+            filter.push({login: {$regex: query.searchLoginTerm}});
         }
-        if (query.searchEmailTerm && query.searchEmailTerm !== "") {
-            filter.push({email: {$regex: query.searchEmailTerm, $options: 'i'}});
+        if (query.searchEmailTerm) {
+            filter.push({email: {$regex: query.searchEmailTerm}});
         }
 
         if (filter.length) {
