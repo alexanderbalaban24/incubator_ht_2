@@ -1,13 +1,12 @@
 import {client} from "../index";
-import {ObjectId} from "mongodb";
+import {ObjectId, OptionalId} from "mongodb";
 
 export type UsersDB = {
-    id: string
     login: string
     email: string
     passwordHash: string
     createdAt: string
-    _id?: ObjectId
+    _id: ObjectId
 }
 
-export const usersCollections = client.db().collection<UsersDB>("users");
+export const usersCollections = client.db().collection<OptionalId<UsersDB>>("users");

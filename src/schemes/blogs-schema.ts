@@ -15,7 +15,7 @@ export const blogValidateSchema = checkSchema({
         notEmpty: true,
         isLength: {options: {max: 500}, errorMessage: "Field description should be length maximum 500"},
         escape: true,
-        errorMessage: "Field name should be exist and have type string"
+        errorMessage: "Field description should be exist and have type string"
     },
     websiteUrl: {
         isString: true,
@@ -26,6 +26,6 @@ export const blogValidateSchema = checkSchema({
             options: "^https:\\/\\/([a-zA-Z0-9_-]+\\.)+[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*\\/?$",
             errorMessage: "Field websiteUrl have unresolved format"
         },
-        errorMessage: "Field name should be exist and have type string"
+        errorMessage: "Field websiteUrl should be exist and have type string"
     },
 }, ['body'])
