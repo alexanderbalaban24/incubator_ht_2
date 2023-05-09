@@ -44,10 +44,10 @@ export const usersQueryRepository = {
 
         const filter = [];
         if (query.searchLoginTerm) {
-            filter.push({login: {$regex: query.searchLoginTerm}});
+            filter.push({login: {$regex: query.searchLoginTerm, $options: 'i'}});
         }
         if (query.searchEmailTerm) {
-            filter.push({email: {$regex: query.searchEmailTerm}});
+            filter.push({email: {$regex: query.searchEmailTerm, $options: 'i'}});
         }
 
         if (filter.length) {
