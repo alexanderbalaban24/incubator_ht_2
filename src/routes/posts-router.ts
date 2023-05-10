@@ -12,6 +12,7 @@ import {
 import {postValidateSchema} from "../schemes/posts-schema";
 import {inputValidationMiddleware} from "../middlewares/input-validation";
 import {jwtAuth} from "../middlewares/jwt-auth";
+import {commentsSchema} from "../schemes/comments-schema";
 
 export const postsRouter = Router();
 
@@ -24,4 +25,4 @@ postsRouter.route('/:postId')
     .put(basicAuthMiddleware, postValidateSchema, inputValidationMiddleware, updatePost)
     .delete(basicAuthMiddleware, deletePost);
 
-postsRouter.route('/:postId/comments').get(getAllComments).post(jwtAuth, createComment);
+postsRouter.route('/:postId/comments').get(getAllComments).post(jwtAuth, commentsSchema, inputValidationMiddleware, createComment);

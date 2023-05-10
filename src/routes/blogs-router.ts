@@ -11,7 +11,7 @@ import {inputValidationMiddleware} from "../middlewares/input-validation";
 import {blogValidateSchema} from "../schemes/blogs-schema";
 import {basicAuthMiddleware} from "../middlewares/basic-auth";
 import {postValidateSchema} from "../schemes/posts-schema";
-import {uriParamsValidation} from "../middlewares/uriParams-validation";
+import {blogIdValidation} from "../middlewares/blogId-validation";
 
 
 export const blogsRouter = Router();
@@ -26,5 +26,5 @@ blogsRouter.route('/:blogId')
     .delete(basicAuthMiddleware, deleteBlog);
 
 blogsRouter.route('/:blogId/posts')
-    .get(uriParamsValidation, getPostsByBlogId)
-    .post(basicAuthMiddleware, uriParamsValidation, postValidateSchema, inputValidationMiddleware, createPostByBlogId);
+    .get(blogIdValidation, getPostsByBlogId)
+    .post(basicAuthMiddleware, blogIdValidation, postValidateSchema, inputValidationMiddleware, createPostByBlogId);

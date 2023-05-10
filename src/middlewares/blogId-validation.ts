@@ -3,7 +3,7 @@ import {NextFunction} from "express";
 import {CreatePostModel} from "../models/post/CreatePostModel";
 import {blogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 
-export const uriParamsValidation = async (req: RequestWithParamsAndBody<{
+export const blogIdValidation = async (req: RequestWithParamsAndBody<{
     blogId: string
 }, CreatePostModel>, res: ResponseEmpty, next: NextFunction) => {
     const blogId = req.params.blogId;

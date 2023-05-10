@@ -15,7 +15,18 @@ export const getComment = async (req: RequestWithParams<{ commentId: string }>, 
 }
 
 export const deleteComment = async (req: RequestWithParams<{ commentId: string }>, res: ResponseEmpty) => {
-    const isDeleted = await commentsServices.deleteComment(req.params.commentId, req.userId!);
+    const comment = await commentsQueryRepository.findCommentById(req.params.commentId);
+    if (!comment) {
+        res.sendStatus(404);
+        return;
+    }
+
+    if (comment.commentatorInfo.userId !== req.userId) {
+        res.sendStatus(403);
+        return;
+    }
+
+    const isDeleted = await commentsServices.deleteComment(req.params.commentId);
 
     if (isDeleted) {
         res.sendStatus(204);
@@ -24,8 +35,21 @@ export const deleteComment = async (req: RequestWithParams<{ commentId: string }
     }
 }
 
-export const updateComment = async (req: RequestWithParamsAndBody<{commentId: string}, {content: string}>, res: ResponseEmpty) => {
-    const isUpdated = await commentsServices.updateComment(req.params.commentId, req.body.content, req.userId!);
+export const updateComment = async (req: RequestWithParamsAndBody<{ commentId: string }, {
+    content: string
+}>, res: ResponseEmpty) => {
+    const comment = await commentsQueryRepository.findCommentById(req.params.commentId);
+    if (!comment) {
+        res.sendStatus(404);
+        return;
+    }
+
+    if (comment.commentatorInfo.userId !== req.userId) {
+        res.sendStatus(403);
+        return;
+    }
+
+    const isUpdated = await commentsServices.updateComment(req.params.commentId, req.body.content);
 
     if (isUpdated) {
         res.sendStatus(204);
