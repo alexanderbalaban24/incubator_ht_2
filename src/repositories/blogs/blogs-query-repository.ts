@@ -33,9 +33,9 @@ export const blogsQueryRepository = {
     },
     async _findConstructor(query: QueryParamsBlogModel, cursor: FindCursor): Promise<ViewWithQueryBlogModel> {
         const sortBy = query.sortBy ? query.sortBy : "createdAt";
-        const sortDirection = query.sortDirection ? query.sortDirection : "desc"
-        const pageNumber = query.pageNumber ? +query.pageNumber : 1
-        const pageSize = query.pageSize ? +query.pageSize : 10
+        const sortDirection = query.sortDirection ? query.sortDirection : "desc";
+        const pageNumber = query.pageNumber ? +query.pageNumber : 1;
+        const pageSize = query.pageSize ? +query.pageSize : 10;
 
         const skip = pageSize * (pageNumber - 1);
         if (query.searchNameTerm) {

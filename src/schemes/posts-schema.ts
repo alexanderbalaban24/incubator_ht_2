@@ -31,7 +31,7 @@ export const postValidateSchema = checkSchema({
         isString: true,
         trim: true,
         notEmpty: true,
-        isLength: {options: {max: 100000}, errorMessage: "Field blogId should be length maximum 100"},
+        isLength: {options: {max: 100000}, errorMessage: "Field blogId should be length maximum 100000"},
         escape: true,
         errorMessage: "Field blogId should be exist and have type string",
         custom: {
