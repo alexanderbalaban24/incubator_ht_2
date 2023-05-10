@@ -16,7 +16,7 @@ export const login = async (req: RequestWithBody<LoginModel>, res: Response<{ ac
     }
 
     const accessToken = jwtServices.createJWT(userId);
-    res.status(201).json({accessToken});
+    res.status(200).json({accessToken});
 }
 
 export const getMe = async (req: RequestEmpty, res: Response<ViewMeModel>) => {
