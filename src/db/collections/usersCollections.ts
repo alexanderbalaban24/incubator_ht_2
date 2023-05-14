@@ -6,7 +6,14 @@ export type UsersDB = {
     email: string
     passwordHash: string
     createdAt: string
+    emailConfirmation: EmailConfirmation
     _id: ObjectId
+}
+
+type EmailConfirmation = {
+    confirmationCode: string
+    expirationDate: string
+    isConfirmed: boolean
 }
 
 export const usersCollections = client.db().collection<OptionalId<UsersDB>>("users");

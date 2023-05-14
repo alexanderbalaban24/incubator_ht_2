@@ -6,7 +6,7 @@ export const authValidateSchema = checkSchema({
         trim: true,
         notEmpty: true,
         escape: true,
-        errorMessage: "Field login should be exist and have type string"
+        errorMessage: "Field loginOrEmail should be exist and have type string"
     },
     password: {
         isString: true,

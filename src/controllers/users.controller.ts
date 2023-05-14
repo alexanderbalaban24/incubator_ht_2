@@ -15,7 +15,7 @@ export const getUsers = async (req: RequestWithQueryParams<QueryParamsUserModel>
 }
 
 export const createUser = async (req: RequestWithBody<CreateUserModel>, res: Response<ViewUserModel>) => {
-    const userId = await usersServices.createUser(req.body.login, req.body.email, req.body.password);
+    const userId = await usersServices.createUser(req.body.login, req.body.email, req.body.password, true);
     const user = await usersQueryRepository.findUserById(userId);
     res.status(201).json(user!);
 }

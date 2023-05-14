@@ -7,6 +7,9 @@ export const userValidateSchema = checkSchema({
         notEmpty: true,
         isLength: {options: {min: 3, max: 10}, errorMessage: "Field login should be length minimum 3 and maximum 10"},
         escape: true,
+        matches: {
+            options: "^[a-zA-Z0-9_-]*$"
+        },
         errorMessage: "Field login should be exist and have type string"
     },
     email: {
