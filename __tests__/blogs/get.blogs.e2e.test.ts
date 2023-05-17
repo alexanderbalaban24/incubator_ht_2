@@ -1,6 +1,7 @@
 import {app} from "../../src/app";
 import request from "supertest";
-import {INVALID_VALUE, VALID_BLOG_DATA} from "../../src/shared/utils";
+import {VALID_BLOG_DATA} from "../../src/shared/utils";
+import {client} from "../../src/db";
 
 
 describe("GET /blogs/:blogId", () => {
@@ -11,7 +12,7 @@ describe("GET /blogs/:blogId", () => {
         });
 
         it ("should return status code: 404", async () => {
-            await request(app).get(`/blogs/:blogId`).expect(404);
+            await request(app).get(`/blogs/64613aba832813de2992088f`).expect(404);
         });
     });
 
@@ -26,8 +27,14 @@ describe("GET /blogs/:blogId", () => {
             const res = await request(app).get(`/blogs/${blogId}`).expect(200).then(el => el.body);
             expect(res).toEqual({
                 ...VALID_BLOG_DATA,
+                createdAt: expect.any(String),
+                isMembership: false,
                 id: blogId,
             });
         });
+    });
+
+    afterAll(async () => {
+        await client.close();
     });
 });

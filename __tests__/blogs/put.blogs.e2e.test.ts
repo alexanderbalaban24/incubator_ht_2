@@ -1,6 +1,7 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {INVALID_VALUE, VALID_BLOG_DATA} from "../../src/shared/utils";
+import {client} from "../../src/db";
 
 
 describe("PUT /blogs/:blogId", () => {
@@ -47,16 +48,22 @@ describe("PUT /blogs/:blogId", () => {
         });
 
         it("should return status code: 204", async () => {
-            const blog = await request(app).put(`/blogs/${blogId}`).auth("admin", "qwerty", {type: "basic"}).send({...VALID_BLOG_DATA, name: "updated"}).expect(204);
-        })
+            await request(app).put(`/blogs/${blogId}`).auth("admin", "qwerty", {type: "basic"}).send({...VALID_BLOG_DATA, name: "updated"}).expect(204);
+        });
 
         it("should return status code: 200 and expected data with use get endpoint", async () => {
             const blog = await request(app).get(`/blogs/${blogId}`).expect(200).then(el => el.body);
             expect(blog).toEqual({
                 ...VALID_BLOG_DATA,
+                createdAt: expect.any(String),
+                isMembership: false,
                 name: "updated",
                 id: expect.any(String),
             });
         });
+    });
+
+    afterAll(async () => {
+        await client.close();
     });
 });

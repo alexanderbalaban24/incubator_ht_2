@@ -11,7 +11,7 @@ import {
 } from "../controllers/posts.controller";
 import {postValidateSchema} from "../schemes/posts-schema";
 import {inputValidationMiddleware} from "../middlewares/input-validation";
-import {jwtAuth} from "../middlewares/jwt-auth";
+import {jwtAuthAccess} from "../middlewares/jwt-auth-access";
 import {commentsSchema} from "../schemes/comments-schema";
 import {postIdValidation} from "../middlewares/postId-validation";
 
@@ -26,4 +26,4 @@ postsRouter.route('/:postId')
     .put(basicAuthMiddleware, postValidateSchema, inputValidationMiddleware, updatePost)
     .delete(basicAuthMiddleware, deletePost);
 
-postsRouter.route('/:postId/comments').get(postIdValidation, getAllComments).post(jwtAuth, postIdValidation, commentsSchema, inputValidationMiddleware, createComment);
+postsRouter.route('/:postId/comments').get(postIdValidation, getAllComments).post(jwtAuthAccess, postIdValidation, commentsSchema, inputValidationMiddleware, createComment);

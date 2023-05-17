@@ -66,7 +66,6 @@ export const deletePost = async (req: RequestWithParams<{ postId: string }>, res
 }
 
 export const getAllComments = async (req: RequestWithQueryParamsAndURI<{ postId: string }, QueryParamsCommentModel>, res: Response<ViewWithQueryCommentModel>) => {
-    console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQq")
     const comments = await commentsQueryRepository.findComments(req.params.postId, req.query);
 
     if (comments) {

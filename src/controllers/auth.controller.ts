@@ -2,22 +2,39 @@ import {Response} from "express";
 import {RequestEmpty, RequestWithBody, ResponseEmpty} from "../shared/types";
 import {LoginModel} from "../models/auth/LoginModel";
 import {authServices} from "../domain/auth-services";
-import {jwtServices} from "../application/jwt-services";
 import {ViewMeModel} from "../models/auth/ViewMeModel";
 import {usersQueryRepository} from "../repositories/users/users-query-repository";
 import {ViewLoginModel} from "../models/auth/ViewLoginModel";
 import {RegistrationModel} from "../models/auth/RegistrationModel";
 
 export const login = async (req: RequestWithBody<LoginModel>, res: Response<ViewLoginModel>) => {
-    const userId = await authServices.login(req.body.loginOrEmail, req.body.password);
+    const tokenPair = await authServices.login(req.body.loginOrEmail, req.body.password);
+
+    if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
+        res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
+        res.status(200).json({accessToken: tokenPair.accessToken});
+    } else {
+        res.sendStatus(401);
+    }
+}
+
+export const refreshToken = async (req: RequestEmpty, res: Response<ViewLoginModel>) => {
+    const userId = req.userId;
 
     if (!userId) {
         res.sendStatus(401);
-        return;
     }
 
-    const accessToken = jwtServices.createJWT(userId);
-    res.status(200).json(accessToken);
+    const refreshToken = req.cookies.refreshToken;
+
+    const tokenPair = await authServices.refreshToken(refreshToken, userId!);
+
+    if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
+        res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
+        res.status(200).json({accessToken: tokenPair.accessToken});
+    } else {
+        res.sendStatus(401);
+    }
 }
 
 export const registration = async (req: RequestWithBody<RegistrationModel>, res: ResponseEmpty) => {
@@ -30,13 +47,25 @@ export const registration = async (req: RequestWithBody<RegistrationModel>, res:
     }
 }
 
-export const confirmRegistration = async (req: RequestWithBody<{code: string}>, res: ResponseEmpty) => {
+export const confirmRegistration = async (req: RequestWithBody<{ code: string }>, res: ResponseEmpty) => {
     const isVerified = await authServices.verifyEmail(req.body.code);
 
     if (isVerified) {
         res.sendStatus(204)
     } else {
         res.sendStatus(404);
+    }
+}
+
+export const revokeRefreshToken = async (req: RequestEmpty, res: ResponseEmpty) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    const isRevoked = await authServices.revokeRefreshToken(refreshToken);
+
+    if (isRevoked) {
+        res.sendStatus(204);
+    } else {
+        res.sendStatus(401);
     }
 }
 

@@ -4,5 +4,12 @@ module.exports = {
   testEnvironment: 'node',
   testTimeout: 100000,
   testRegex: '.e2e.test.ts$',
-  rootDir: './__tests__'
+  rootDir: './__tests__',
+  collectCoverage: true,
+  collectCoverageFrom: [
+    "**/*.{ts,tsx,js,jsx}",
+    "!**/*/*.d.ts",
+    "!**/coverage/**",
+    "!**/node_modules/**"
+  ]
 };

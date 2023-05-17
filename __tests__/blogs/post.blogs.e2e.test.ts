@@ -1,6 +1,7 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {INVALID_VALUE, VALID_BLOG_DATA} from "../../src/shared/utils";
+import {client} from "../../src/db";
 
 
 describe("POST /blogs", () => {
@@ -44,18 +45,26 @@ describe("POST /blogs", () => {
             const blog = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(201).then(el => el.body);
             expect(blog).toEqual({
                 ...VALID_BLOG_DATA,
+                createdAt: expect.any(String),
+                isMembership: false,
                 id: expect.any(String),
             });
         })
 
         it("should return status code: 200 and expected data with use get endpoint", async () => {
             const res = await request(app).get("/blogs").expect(200).then(el => el.body);
-            expect(res[0]).toEqual({
+            expect(res.items[0]).toEqual({
                 ...VALID_BLOG_DATA,
+                createdAt: expect.any(String),
+                isMembership: false,
                 id: expect.any(String),
             });
 
-            expect(res.length).toBe(1);
+            expect(res.items.length).toBe(1);
         });
+    });
+
+    afterAll(async () => {
+        await client.close();
     });
 });

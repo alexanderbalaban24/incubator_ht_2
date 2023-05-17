@@ -3,9 +3,11 @@ import {ViewLoginModel} from "../models/auth/ViewLoginModel";
 
 
 export const jwtServices = {
-    createJWT(userId: string): ViewLoginModel {
-        const accessToken = jwt.sign({userId}, process.env.JWT_SECRET!);
-        return {accessToken};
+    createAccessToken(userId: string): string {
+        return jwt.sign({userId}, process.env.JWT_SECRET!, {expiresIn: "10000"});
+    },
+    createRefreshToken(userId: string): string {
+        return jwt.sign({userId}, process.env.JWT_SECRET!, {expiresIn: "20000"});
     },
     checkCredentials(token: string) {
         try {

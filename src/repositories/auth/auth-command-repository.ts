@@ -1,5 +1,7 @@
 import {usersCollections} from "../../db/collections/usersCollections";
 import {ObjectId} from "mongodb";
+import {refreshBlacklistCollections} from "../../db/collections/refreshBlacklistCollections";
+import {LockedTokenType} from "../../domain/auth-services";
 
 export const authCommandRepository = {
     async updateIsConfirmedFieldById(userId: string): Promise<boolean> {
@@ -11,5 +13,10 @@ export const authCommandRepository = {
         const result = await usersCollections.updateOne({email: email}, {$set: {"emailConfirmation.expirationDate": expirationDate, "emailConfirmation.confirmationCode": confirmationCode}});
 
         return result.matchedCount === 1;
+    },
+    async writeRefreshTokenInBlacklist(newLockedToken: LockedTokenType): Promise<boolean> {
+        const result = await refreshBlacklistCollections.insertOne(newLockedToken);
+
+        return !!result.insertedId;
     }
 }

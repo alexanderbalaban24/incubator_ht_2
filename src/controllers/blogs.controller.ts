@@ -35,7 +35,7 @@ export const getBlog = async (req: RequestWithParams<URIParamsBlogModel>, res: R
     const blog = await blogsQueryRepository.findBlogById(req.params.blogId);
 
     if (blog) {
-        res.status(200).json(blog)
+        res.status(200).json(blog);
     } else {
         res.sendStatus(404);
     }

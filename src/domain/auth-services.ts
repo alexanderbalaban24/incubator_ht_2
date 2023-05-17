@@ -5,6 +5,7 @@ import {businessService} from "./business-service";
 import {authCommandRepository} from "../repositories/auth/auth-command-repository";
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
+import {jwtServices} from "../application/jwt-services";
 
 export type ConfirmationDataType = {
     confirmationCode: string
@@ -17,16 +18,28 @@ export type UserInfoType = {
     passwordHash: string
 }
 
+export type LockedTokenType = {
+    refreshToken: string
+}
+
+export type TokenPair = {
+    accessToken: string,
+    refreshToken: string
+}
+
 
 export const authServices = {
-    async login(loginOrEmail: string, password: string): Promise<string | null> {
+    async login(loginOrEmail: string, password: string): Promise<TokenPair | null> {
         const userInfo = await authQueryRepository.searchUserByCredentials(loginOrEmail);
 
         if (userInfo) {
             const isValidCredentials = await compare(password, userInfo.passwordHash);
 
             if (isValidCredentials) {
-                return userInfo.id;
+                const accessToken = jwtServices.createAccessToken(userInfo.id);
+                const refreshToken = jwtServices.createRefreshToken(userInfo.id);
+
+                return {accessToken, refreshToken}
             } else {
                 return null;
             }
@@ -34,6 +47,32 @@ export const authServices = {
             return null;
         }
 
+    },
+    async refreshToken(token: string, userId: string): Promise<TokenPair | null> {
+        const isExist = await authQueryRepository.findRefreshToken(token);
+        if (isExist) return null;
+
+        const newLockedToken: LockedTokenType = {
+            refreshToken: token
+        }
+
+        const isLocked = await authCommandRepository.writeRefreshTokenInBlacklist(newLockedToken);
+        if (!isLocked) return null;
+
+        const accessToken = jwtServices.createAccessToken(userId);
+        const refreshToken = jwtServices.createRefreshToken(userId);
+
+        return {accessToken, refreshToken};
+    },
+    async revokeRefreshToken(refreshToken: string): Promise<boolean> {
+        const isExist = await authQueryRepository.findRefreshToken(refreshToken);
+        if (isExist) return false;
+
+        const newLockedToken: LockedTokenType = {
+            refreshToken
+        }
+
+        return await authCommandRepository.writeRefreshTokenInBlacklist(newLockedToken);
     },
     async registration(login: string, email: string, password: string): Promise<boolean> {
         const userId = await usersServices.createUser(login, email, password, false);
