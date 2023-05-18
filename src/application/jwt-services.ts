@@ -1,18 +1,17 @@
 import jwt from "jsonwebtoken";
-import {ViewLoginModel} from "../models/auth/ViewLoginModel";
 
 
 export const jwtServices = {
     createAccessToken(userId: string): string {
         return jwt.sign({userId}, process.env.JWT_SECRET!, {expiresIn: "10000"});
     },
-    createRefreshToken(userId: string): string {
-        return jwt.sign({userId}, process.env.JWT_SECRET!, {expiresIn: "20000"});
+    createRefreshToken(userId: string, deviceId: string): string {
+        return jwt.sign({userId, deviceId}, process.env.JWT_SECRET!, {expiresIn: "20000"});
     },
     checkCredentials(token: string) {
         try {
             const result: any = jwt.verify(token, process.env.JWT_SECRET!);
-            return result.userId;
+            return {userId: result.userId, exp: result.exp, deviceId: result?.deviceId, iat: result.iat};
         } catch(e){
             return null;
         }

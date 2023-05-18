@@ -9,9 +9,9 @@ export const jwtAuthAccess = (req: Request, res: Response, next: NextFunction) =
 
     const [type, token] = req.headers.authorization.split(" ");
 
-    const userId = jwtServices.checkCredentials(token);
-    if (userId && type === "Bearer") {
-        req.userId = userId;
+    const result = jwtServices.checkCredentials(token);
+    if (result && result.userId && type === "Bearer") {
+        req.userId = result.userId;
         next()
     } else {
         res.sendStatus(401);

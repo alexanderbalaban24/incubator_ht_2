@@ -6,6 +6,7 @@ import {authCommandRepository} from "../repositories/auth/auth-command-repositor
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {jwtServices} from "../application/jwt-services";
+import {securityServices} from "./security-services";
 
 export type ConfirmationDataType = {
     confirmationCode: string
@@ -29,7 +30,7 @@ export type TokenPair = {
 
 
 export const authServices = {
-    async login(loginOrEmail: string, password: string): Promise<TokenPair | null> {
+    async login(loginOrEmail: string, password: string, deviceName: string = "Other device", ip: string): Promise<TokenPair | null> {
         const userInfo = await authQueryRepository.searchUserByCredentials(loginOrEmail);
 
         if (userInfo) {
@@ -37,7 +38,9 @@ export const authServices = {
 
             if (isValidCredentials) {
                 const accessToken = jwtServices.createAccessToken(userInfo.id);
-                const refreshToken = jwtServices.createRefreshToken(userInfo.id);
+
+                const deviceId = await securityServices.createDevice(userInfo.id, deviceName, ip, 20000);
+                const refreshToken = jwtServices.createRefreshToken(userInfo.id, deviceId);
 
                 return {accessToken, refreshToken}
             } else {
@@ -49,7 +52,8 @@ export const authServices = {
 
     },
     async refreshToken(token: string, userId: string): Promise<TokenPair | null> {
-        const isExist = await authQueryRepository.findRefreshToken(token);
+        const refreshInfo = await jwtServices.checkCredentials(token);
+        /*const isExist = await authQueryRepository.findRefreshToken(token);
         if (isExist) return null;
 
         const newLockedToken: LockedTokenType = {
@@ -57,7 +61,7 @@ export const authServices = {
         }
 
         const isLocked = await authCommandRepository.writeRefreshTokenInBlacklist(newLockedToken);
-        if (!isLocked) return null;
+        if (!isLocked) return null;*/
 
         const accessToken = jwtServices.createAccessToken(userId);
         const refreshToken = jwtServices.createRefreshToken(userId);

@@ -6,11 +6,15 @@ import {usersRouter} from "./routes/users-router";
 import {authRouter} from "./routes/auth-router";
 import {commentsRouter} from "./routes/comments-router";
 import cookieParser from "cookie-parser";
+import {securityDevices} from "./routes/security-devices";
 
 export const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+// @ts-ignore
+app.use('trust proxy',true);
+app.use('/security', securityDevices);
 app.use('/testing', testingRouter);
 app.use('/blogs', blogsRouter);
 app.use('/posts', postsRouter);

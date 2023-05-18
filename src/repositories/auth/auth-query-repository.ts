@@ -1,7 +1,7 @@
 import {usersCollections} from "../../db/collections/usersCollections";
 import {ConfirmationDataType, UserInfoType} from "../../domain/auth-services";
 import {ObjectId} from "mongodb";
-import {refreshBlacklistCollections} from "../../db/collections/refreshBlacklistCollections";
+import {deviceSecureCollections} from "../../db/collections/deviceSecureCollections";
 
 export const authQueryRepository = {
     async searchUserByCredentials(loginOrEmail: string): Promise<UserInfoType | null> {
@@ -47,10 +47,5 @@ export const authQueryRepository = {
         } else {
             return null;
         }
-    },
-    async findRefreshToken(token: string): Promise<boolean> {
-        const refreshToken = await refreshBlacklistCollections.findOne({refreshToken: token});
-
-        return !!refreshToken;
     }
 }

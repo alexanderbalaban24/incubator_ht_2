@@ -8,7 +8,7 @@ import {ViewLoginModel} from "../models/auth/ViewLoginModel";
 import {RegistrationModel} from "../models/auth/RegistrationModel";
 
 export const login = async (req: RequestWithBody<LoginModel>, res: Response<ViewLoginModel>) => {
-    const tokenPair = await authServices.login(req.body.loginOrEmail, req.body.password);
+    const tokenPair = await authServices.login(req.body.loginOrEmail, req.body.password, req.headers["user-agent"], req.ip);
 
     if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
         res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
