@@ -9,9 +9,9 @@ export const jwtAuthRefresh = (req: Request, res: Response, next: NextFunction) 
 
     const refreshToken = req.cookies.refreshToken;
 
-    const userId = jwtServices.checkCredentials(refreshToken);
-    if (userId) {
-        req.userId = userId;
+    const result = jwtServices.checkCredentials(refreshToken);
+    if (result && result.userId) {
+        req.userId = result.userId;
         next();
     } else {
         res.sendStatus(401);

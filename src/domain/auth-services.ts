@@ -7,6 +7,8 @@ import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {jwtServices} from "../application/jwt-services";
 import {securityServices} from "./security-services";
+import {usersQueryRepository} from "../repositories/users/users-query-repository";
+import {devicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
 
 export type ConfirmationDataType = {
     confirmationCode: string
@@ -26,6 +28,15 @@ export type LockedTokenType = {
 export type TokenPair = {
     accessToken: string,
     refreshToken: string
+}
+
+export type DeviceDataType = {
+    id: string,
+    userId: string,
+    deviceName: string,
+    ip: string,
+    issuedAt: Date,
+    expirationAt: Date
 }
 
 
@@ -53,30 +64,27 @@ export const authServices = {
     },
     async refreshToken(token: string, userId: string): Promise<TokenPair | null> {
         const refreshInfo = await jwtServices.checkCredentials(token);
-        /*const isExist = await authQueryRepository.findRefreshToken(token);
-        if (isExist) return null;
+        if (!refreshInfo || !refreshInfo.deviceId) return null;
 
-        const newLockedToken: LockedTokenType = {
-            refreshToken: token
+        const deviceInfo = await devicesQueryRepository.findDeviceById(refreshInfo.deviceId);
+        if(!deviceInfo) return null;
+
+        if(deviceInfo.userId === refreshInfo.userId && refreshInfo.iat === deviceInfo.issuedAt) {
+            await securityServices.updateSessionTime(deviceInfo.id);
+
+            const accessToken = jwtServices.createAccessToken(userId);
+            const refreshToken = jwtServices.createRefreshToken(userId, deviceInfo.id);
+
+            return {accessToken, refreshToken};
+        } else {
+            return null;
         }
-
-        const isLocked = await authCommandRepository.writeRefreshTokenInBlacklist(newLockedToken);
-        if (!isLocked) return null;*/
-
-        const accessToken = jwtServices.createAccessToken(userId);
-        const refreshToken = jwtServices.createRefreshToken(userId);
-
-        return {accessToken, refreshToken};
     },
     async revokeRefreshToken(refreshToken: string): Promise<boolean> {
-        const isExist = await authQueryRepository.findRefreshToken(refreshToken);
-        if (isExist) return false;
+        const refreshInfo = await jwtServices.checkCredentials(refreshToken);
+        if(!refreshInfo) return false;
 
-        const newLockedToken: LockedTokenType = {
-            refreshToken
-        }
-
-        return await authCommandRepository.writeRefreshTokenInBlacklist(newLockedToken);
+        return await securityServices.revokeRefreshToken(refreshInfo.userId);
     },
     async registration(login: string, email: string, password: string): Promise<boolean> {
         const userId = await usersServices.createUser(login, email, password, false);

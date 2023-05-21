@@ -10,7 +10,7 @@ export type DeviceType = {
 }
 
 export const securityServices = {
-    async createDevice(userId: string, deviceName: string, ip: string, expiration: number) {
+    async createDevice(userId: string, deviceName: string, ip: string, expiration: number): Promise<string> {
         const newDevice: DeviceType = {
             userId,
             deviceName,
@@ -22,5 +22,12 @@ export const securityServices = {
         return await devicesCommandRepository.createDevice(newDevice);
 
 
+    },
+    async updateSessionTime(deviceId: string) {
+        const newIssuedAt = new Date();
+        return await devicesCommandRepository.updateIssuedAt(deviceId, newIssuedAt);
+    },
+    async revokeRefreshToken(userId: string) {
+        return await devicesCommandRepository.deleteAllUserSessions(userId);
     }
 }
