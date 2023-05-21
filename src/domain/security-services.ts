@@ -1,5 +1,6 @@
 import { addMilliseconds } from 'date-fns'
 import {devicesCommandRepository} from "../repositories/securityDevices/devices-command-repository";
+import {jwtServices} from "../application/jwt-services";
 
 export type DeviceType = {
     userId: string,
@@ -19,8 +20,8 @@ export const securityServices = {
             expirationAt: addMilliseconds(new Date(), expiration)
         }
 
-        return await devicesCommandRepository.createDevice(newDevice);
-
+        const deviceId =  await devicesCommandRepository.createDevice(newDevice);
+        return jwtServices.createRefreshToken(userId, deviceId);
 
     },
     async updateSessionTime(deviceId: string) {

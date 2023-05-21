@@ -7,7 +7,6 @@ import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {jwtServices} from "../application/jwt-services";
 import {securityServices} from "./security-services";
-import {usersQueryRepository} from "../repositories/users/users-query-repository";
 import {devicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
 
 export type ConfirmationDataType = {
@@ -50,8 +49,7 @@ export const authServices = {
             if (isValidCredentials) {
                 const accessToken = jwtServices.createAccessToken(userInfo.id);
 
-                const deviceId = await securityServices.createDevice(userInfo.id, deviceName, ip, 20000);
-                const refreshToken = jwtServices.createRefreshToken(userInfo.id, deviceId);
+                const refreshToken = await securityServices.createDevice(userInfo.id, deviceName, ip, 20000);
 
                 return {accessToken, refreshToken}
             } else {
@@ -63,13 +61,13 @@ export const authServices = {
 
     },
     async refreshToken(token: string, userId: string): Promise<TokenPair | null> {
-        const refreshInfo = await jwtServices.checkCredentials(token);
+        const refreshInfo = await jwtServices.decodeToken(token);
         if (!refreshInfo || !refreshInfo.deviceId) return null;
 
         const deviceInfo = await devicesQueryRepository.findDeviceById(refreshInfo.deviceId);
         if(!deviceInfo) return null;
 
-        if(deviceInfo.userId === refreshInfo.userId && refreshInfo.iat === deviceInfo.issuedAt) {
+        if(deviceInfo.userId === refreshInfo.userId && refreshInfo.iat === Math.trunc(+deviceInfo.issuedAt / 1000)) {
             await securityServices.updateSessionTime(deviceInfo.id);
 
             const accessToken = jwtServices.createAccessToken(userId);
@@ -81,7 +79,7 @@ export const authServices = {
         }
     },
     async revokeRefreshToken(refreshToken: string): Promise<boolean> {
-        const refreshInfo = await jwtServices.checkCredentials(refreshToken);
+        const refreshInfo = await jwtServices.decodeToken(refreshToken);
         if(!refreshInfo) return false;
 
         return await securityServices.revokeRefreshToken(refreshInfo.userId);
