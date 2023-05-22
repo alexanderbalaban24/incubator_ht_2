@@ -11,7 +11,7 @@ export const login = async (req: RequestWithBody<LoginModel>, res: Response<View
     const tokenPair = await authServices.login(req.body.loginOrEmail, req.body.password, req.headers["user-agent"], req.ip);
 
     if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
-        res.cookie("refreshToken", tokenPair.refreshToken, /*{httpOnly: true, secure: true}*/);
+        res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
         res.status(200).json({accessToken: tokenPair.accessToken});
     } else {
         res.sendStatus(401);
@@ -28,7 +28,7 @@ export const refreshToken = async (req: RequestEmpty, res: Response<ViewLoginMod
 
     const tokenPair = await authServices.refreshToken(refreshToken, userId!);
     if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
-        res.cookie("refreshToken", tokenPair.refreshToken, /*{httpOnly: true, secure: true}*/);
+        res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
         res.status(200).json({accessToken: tokenPair.accessToken});
     } else {
         res.sendStatus(401);
