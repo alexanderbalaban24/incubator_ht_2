@@ -14,13 +14,14 @@ import {confirmationSchema} from "../schemes/confirmation-schema";
 import {registrationValidateSchema} from "../schemes/registration-schema";
 import {resendSchema} from "../schemes/resend-schema";
 import {jwtAuthRefresh} from "../middlewares/jwt-auth-refresh";
+import {rateLimitMiddleware} from "../middlewares/rate-limit";
 
 export const authRouter = Router();
 
-authRouter.route('/login').post(authValidateSchema, inputValidationMiddleware, login);
+authRouter.route('/login').post(rateLimitMiddleware, authValidateSchema, inputValidationMiddleware, login);
 authRouter.route('/refresh-token').post(jwtAuthRefresh, refreshToken);
-authRouter.route('/registration').post(registrationValidateSchema, inputValidationMiddleware, registration);
-authRouter.route('/registration-confirmation').post(confirmationSchema, inputValidationMiddleware, confirmRegistration);
-authRouter.route('/registration-email-resending').post(resendSchema, inputValidationMiddleware, resendConfirmationCode);
+authRouter.route('/registration').post(rateLimitMiddleware, registrationValidateSchema, inputValidationMiddleware, registration);
+authRouter.route('/registration-confirmation').post(rateLimitMiddleware, confirmationSchema, inputValidationMiddleware, confirmRegistration);
+authRouter.route('/registration-email-resending').post(rateLimitMiddleware, resendSchema, inputValidationMiddleware, resendConfirmationCode);
 authRouter.route('/logout').post(jwtAuthRefresh, revokeRefreshToken);
 authRouter.route('/me').get(jwtAuthAccess, getMe);

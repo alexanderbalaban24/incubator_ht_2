@@ -18,5 +18,10 @@ export const devicesCommandRepository = {
         const result = await deviceSecureCollections.deleteMany({userId});
 
         return result.deletedCount > 0;
+    },
+    async deleteUserSession(deviceId: string): Promise<boolean> {
+        const result = await deviceSecureCollections.deleteOne({_id: new ObjectId(deviceId)});
+
+        return result.deletedCount === 1;
     }
 }
