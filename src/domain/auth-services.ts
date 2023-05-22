@@ -78,7 +78,7 @@ export const authServices = {
             return null;
         }
     },
-    async revokeRefreshToken(refreshToken: string): Promise<boolean> {
+    async logout(refreshToken: string): Promise<boolean> {
         const refreshInfo = await jwtServices.decodeToken(refreshToken);
         if(!refreshInfo || !refreshInfo.deviceId) return false;
 

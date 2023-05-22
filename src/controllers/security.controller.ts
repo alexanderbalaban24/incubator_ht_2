@@ -24,6 +24,16 @@ export const deleteAllDevices = async (req: Request, res: ResponseEmpty) => {
 }
 
 export const deleteOneDevice = async (req: RequestWithParams<{ deviceId: string }>, res: ResponseEmpty) => {
+    const deviceInfo = await devicesQueryRepository.findDeviceById(req.params.deviceId);
+    if(!deviceInfo) {
+        res.sendStatus(404);
+        return;
+    }
+
+    if(deviceInfo.userId !== req.userId) {
+        res.sendStatus(403);
+    }
+
     const isDeleted = await devicesCommandRepository.deleteUserSession(req.params.deviceId)
 
         if (isDeleted) {

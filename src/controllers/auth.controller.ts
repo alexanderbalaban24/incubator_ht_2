@@ -55,10 +55,10 @@ export const confirmRegistration = async (req: RequestWithBody<{ code: string }>
     }
 }
 
-export const revokeRefreshToken = async (req: RequestEmpty, res: ResponseEmpty) => {
+export const logout = async (req: RequestEmpty, res: ResponseEmpty) => {
     const refreshToken = req.cookies.refreshToken;
 
-    const isRevoked = await authServices.revokeRefreshToken(refreshToken);
+    const isRevoked = await authServices.logout(refreshToken);
 
     if (isRevoked) {
         res.sendStatus(204);

@@ -5,7 +5,7 @@ import {
     login,
     refreshToken,
     registration,
-    resendConfirmationCode, revokeRefreshToken
+    resendConfirmationCode, logout
 } from "../controllers/auth.controller";
 import {authValidateSchema} from "../schemes/auth-schema";
 import {inputValidationMiddleware} from "../middlewares/input-validation";
@@ -23,5 +23,5 @@ authRouter.route('/refresh-token').post(jwtAuthRefresh, refreshToken);
 authRouter.route('/registration').post(rateLimitMiddleware, registrationValidateSchema, inputValidationMiddleware, registration);
 authRouter.route('/registration-confirmation').post(rateLimitMiddleware, confirmationSchema, inputValidationMiddleware, confirmRegistration);
 authRouter.route('/registration-email-resending').post(rateLimitMiddleware, resendSchema, inputValidationMiddleware, resendConfirmationCode);
-authRouter.route('/logout').post(jwtAuthRefresh, revokeRefreshToken);
+authRouter.route('/logout').post(jwtAuthRefresh, logout);
 authRouter.route('/me').get(jwtAuthAccess, getMe);

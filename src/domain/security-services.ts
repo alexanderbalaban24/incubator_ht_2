@@ -24,11 +24,11 @@ export const securityServices = {
         return jwtServices.createRefreshToken(userId, deviceId);
 
     },
-    async updateSessionTime(deviceId: string) {
+    async updateSessionTime(deviceId: string): Promise<boolean> {
         const newIssuedAt = new Date();
         return await devicesCommandRepository.updateIssuedAt(deviceId, newIssuedAt);
     },
-    async revokeRefreshToken(userId: string) {
+    async revokeRefreshToken(userId: string): Promise<boolean> {
         return await devicesCommandRepository.deleteAllUserSessions(userId);
     }
 }
