@@ -80,9 +80,17 @@ export const authServices = {
     },
     async revokeRefreshToken(refreshToken: string): Promise<boolean> {
         const refreshInfo = await jwtServices.decodeToken(refreshToken);
-        if(!refreshInfo) return false;
+        if(!refreshInfo || !refreshInfo.deviceId) return false;
 
-        return await securityServices.revokeRefreshToken(refreshInfo.userId);
+        const deviceInfo = await devicesQueryRepository.findDeviceById(refreshInfo.deviceId);
+        if(!deviceInfo) return false;
+
+        if(deviceInfo.userId === refreshInfo.userId && refreshInfo.iat === Math.trunc(+deviceInfo.issuedAt / 1000)) {
+            return await securityServices.revokeRefreshToken(refreshInfo.userId);
+        } else {
+            return false;
+        }
+
     },
     async registration(login: string, email: string, password: string): Promise<boolean> {
         const userId = await usersServices.createUser(login, email, password, false);
