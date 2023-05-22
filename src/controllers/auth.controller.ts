@@ -22,6 +22,7 @@ export const refreshToken = async (req: RequestEmpty, res: Response<ViewLoginMod
     const userId = req.userId;
     if (!userId) {
         res.sendStatus(401);
+        return;
     }
 
     const refreshToken = req.cookies.refreshToken;
