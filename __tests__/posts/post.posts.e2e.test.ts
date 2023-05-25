@@ -2,6 +2,7 @@ import request from "supertest";
 import {app} from "../../src/app";
 import {INVALID_VALUE, VALID_BLOG_DATA, VALID_POST_DATA} from "../../src/shared/utils";
 import {ViewBlogModel} from "../../src/models/blog/ViewBlogModel";
+import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 
 describe("POST /posts", () => {
@@ -11,11 +12,11 @@ describe("POST /posts", () => {
         let blogId: string;
         beforeAll(async () => {
             await request(app).delete("/testing/all-data");
-            blogId = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(201).then(el => el.body.id);
+            blogId = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(HTTPResponseStatusCodes.CREATED).then(el => el.body.id);
         });
 
         it("should return status code: 401", async () => {
-            await request(app).post("/posts").send(VALID_POST_DATA).expect(401);
+            await request(app).post("/posts").send(VALID_POST_DATA).expect(HTTPResponseStatusCodes.UNAUTHORIZED);
         });
     });
 
@@ -23,7 +24,7 @@ describe("POST /posts", () => {
         let blog: ViewBlogModel;
         beforeAll(async () => {
             await request(app).delete("/testing/all-data");
-            blog = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(201).then(el => el.body);
+            blog = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(HTTPResponseStatusCodes.CREATED).then(el => el.body);
         });
 
         it("should return status code: 400", async () => {
@@ -33,7 +34,7 @@ describe("POST /posts", () => {
                     ...VALID_BLOG_DATA,
                     blogId: blog.id,
                     [field]: INVALID_VALUE
-                }).expect(400);
+                }).expect(HTTPResponseStatusCodes.BAD_REQUEST);
 
                 checks.push(check);
             });
@@ -46,7 +47,7 @@ describe("POST /posts", () => {
         let blog: ViewBlogModel;
         beforeAll(async () => {
             await request(app).delete("/testing/all-data");
-            blog = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(201).then(el => el.body);
+            blog = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(HTTPResponseStatusCodes.CREATED).then(el => el.body);
         });
 
         it("should return status code: 201 and expected data", async () => {
@@ -61,7 +62,7 @@ describe("POST /posts", () => {
         });
 
         it("should return status code: 200 and expected data", async () => {
-            const res = await request(app).get("/posts").expect(200).then(el => el.body);
+            const res = await request(app).get("/posts").expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res.items[0]).toEqual({
                 id: expect.any(String),
                 ...VALID_POST_DATA,

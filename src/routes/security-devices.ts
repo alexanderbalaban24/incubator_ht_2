@@ -1,5 +1,4 @@
 import {Router} from "express";
-import {jwtAuthAccess} from "../middlewares/jwt-auth-access";
 import {jwtAuthRefresh} from "../middlewares/jwt-auth-refresh";
 import {deleteAllDevices, deleteOneDevice, getAllDevices} from "../controllers/security.controller";
 

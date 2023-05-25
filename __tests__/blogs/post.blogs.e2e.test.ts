@@ -1,7 +1,8 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {INVALID_VALUE, VALID_BLOG_DATA} from "../../src/shared/utils";
-import {client} from "../../src/db";
+import {client} from "../../src/db/run-db";
+import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 
 describe("POST /blogs", () => {
@@ -12,7 +13,7 @@ describe("POST /blogs", () => {
         });
 
         it("should return status code: 401", async () => {
-            await request(app).post("/blogs").expect(401);
+            await request(app).post("/blogs").expect(HTTPResponseStatusCodes.UNAUTHORIZED);
         });
     });
 
@@ -27,7 +28,7 @@ describe("POST /blogs", () => {
                 const check = request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send({
                     ...VALID_BLOG_DATA,
                     [field]: INVALID_VALUE
-                }).expect(400);
+                }).expect(HTTPResponseStatusCodes.BAD_REQUEST);
 
                 checks.push(check);
             });
@@ -42,7 +43,7 @@ describe("POST /blogs", () => {
         });
 
         it("should return status code: 201  and expected data", async () => {
-            const blog = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(201).then(el => el.body);
+            const blog = await request(app).post("/blogs").auth("admin", "qwerty", {type: "basic"}).send(VALID_BLOG_DATA).expect(HTTPResponseStatusCodes.CREATED).then(el => el.body);
             expect(blog).toEqual({
                 ...VALID_BLOG_DATA,
                 createdAt: expect.any(String),
@@ -52,7 +53,7 @@ describe("POST /blogs", () => {
         })
 
         it("should return status code: 200 and expected data with use get endpoint", async () => {
-            const res = await request(app).get("/blogs").expect(200).then(el => el.body);
+            const res = await request(app).get("/blogs").expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res.items[0]).toEqual({
                 ...VALID_BLOG_DATA,
                 createdAt: expect.any(String),

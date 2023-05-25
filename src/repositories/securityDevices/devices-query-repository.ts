@@ -1,6 +1,6 @@
-import {deviceSecureCollections} from "../../db/collections/deviceSecureCollections";
 import {ObjectId} from "mongodb";
 import {DeviceDataType} from "../../domain/auth-services";
+import {DeviceModel} from "../../db";
 
 
 export type SecurityDeviceActiveSessions = {
@@ -12,7 +12,7 @@ export type SecurityDeviceActiveSessions = {
 
 export const devicesQueryRepository = {
     async findDeviceByUserId(userId: string): Promise<SecurityDeviceActiveSessions[] | null> {
-        const sessions = await deviceSecureCollections.find({userId}).toArray();
+        const sessions = await DeviceModel.find({userId}).exec();
 
         return sessions.map(session => ({
             ip: session.ip,
@@ -22,7 +22,7 @@ export const devicesQueryRepository = {
         }));
     },
     async findDeviceById(deviceId: string): Promise<DeviceDataType | null> {
-        const device = await deviceSecureCollections.findOne({_id: new ObjectId(deviceId)});
+        const device = await DeviceModel.findOne({_id: new ObjectId(deviceId)});
 
         if (device) {
             return {

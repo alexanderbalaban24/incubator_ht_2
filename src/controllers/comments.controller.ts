@@ -4,34 +4,35 @@ import {RequestWithParams, RequestWithParamsAndBody, ResponseEmpty} from "../sha
 import {commentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {commentsCommandRepository} from "../repositories/comments/comments-command-repository";
 import {commentsServices} from "../domain/comments-services";
+import {HTTPResponseStatusCodes} from "../shared/enums";
 
 export const getComment = async (req: RequestWithParams<{ commentId: string }>, res: Response<ViewCommentModel>) => {
     const comment = await commentsQueryRepository.findCommentById(req.params.commentId);
     if (comment) {
-        res.status(200).json(comment);
+        res.status(HTTPResponseStatusCodes.OK).json(comment);
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 }
 
 export const deleteComment = async (req: RequestWithParams<{ commentId: string }>, res: ResponseEmpty) => {
     const comment = await commentsQueryRepository.findCommentById(req.params.commentId);
     if (!comment) {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
         return;
     }
 
     if (comment.commentatorInfo.userId !== req.userId) {
-        res.sendStatus(403);
+        res.sendStatus(HTTPResponseStatusCodes.FORBIDDEN);
         return;
     }
 
     const isDeleted = await commentsServices.deleteComment(req.params.commentId);
 
     if (isDeleted) {
-        res.sendStatus(204);
+        res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 }
 
@@ -40,20 +41,20 @@ export const updateComment = async (req: RequestWithParamsAndBody<{ commentId: s
 }>, res: ResponseEmpty) => {
     const comment = await commentsQueryRepository.findCommentById(req.params.commentId);
     if (!comment) {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
         return;
     }
 
     if (comment.commentatorInfo.userId !== req.userId) {
-        res.sendStatus(403);
+        res.sendStatus(HTTPResponseStatusCodes.FORBIDDEN);
         return;
     }
 
     const isUpdated = await commentsServices.updateComment(req.params.commentId, req.body.content);
 
     if (isUpdated) {
-        res.sendStatus(204);
+        res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 }

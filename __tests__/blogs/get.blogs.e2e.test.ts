@@ -1,7 +1,8 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {VALID_BLOG_DATA} from "../../src/shared/utils";
-import {client} from "../../src/db";
+import {client} from "../../src/db/run-db";
+import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 
 describe("GET /blogs/:blogId", () => {
@@ -12,7 +13,7 @@ describe("GET /blogs/:blogId", () => {
         });
 
         it ("should return status code: 404", async () => {
-            await request(app).get(`/blogs/64613aba832813de2992088f`).expect(404);
+            await request(app).get(`/blogs/64613aba832813de2992088f`).expect(HTTPResponseStatusCodes.NOT_FOUND);
         });
     });
 
@@ -24,7 +25,7 @@ describe("GET /blogs/:blogId", () => {
         });
 
         it("should return status code: 200 and expected data", async () => {
-            const res = await request(app).get(`/blogs/${blogId}`).expect(200).then(el => el.body);
+            const res = await request(app).get(`/blogs/${blogId}`).expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res).toEqual({
                 ...VALID_BLOG_DATA,
                 createdAt: expect.any(String),

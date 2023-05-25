@@ -1,20 +1,20 @@
 import {Comment} from "../../domain/comments-services";
-import {commentsCollections} from "../../db/collections/commentsCollections";
 import {ObjectId} from "mongodb";
+import {CommentsModel} from "../../db";
 
 export const commentsCommandRepository = {
     async createComment(newComment: Comment): Promise<string> {
-    const result = await commentsCollections.insertOne(newComment);
+    const result = await new CommentsModel(newComment).save();
 
-    return result.insertedId.toString();
+    return result._id.toString();
     },
     async deleteComment(commentId: string): Promise<boolean> {
-        const result = await commentsCollections.deleteOne({_id: new ObjectId(commentId)});
+        const result = await CommentsModel.deleteOne({_id: new ObjectId(commentId)});
 
         return result.deletedCount === 1;
     },
     async updateComment(commentId: string, content: string): Promise<boolean> {
-        const result = await commentsCollections.updateOne({_id: new ObjectId(commentId)}, {$set: {content: content}});
+        const result = await CommentsModel.updateOne({_id: new ObjectId(commentId)}, {$set: {content: content}});
 
         return result.matchedCount === 1;
     }

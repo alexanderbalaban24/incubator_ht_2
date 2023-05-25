@@ -1,7 +1,8 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {INVALID_VALUE, VALID_BLOG_DATA} from "../../src/shared/utils";
-import {client} from "../../src/db";
+import {client} from "../../src/db/run-db";
+import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 
 describe("PUT /blogs/:blogId", () => {
@@ -14,7 +15,7 @@ describe("PUT /blogs/:blogId", () => {
         });
 
         it("should return status code: 401", async () => {
-            await request(app).put(`/blogs/${blogId}`).expect(401);
+            await request(app).put(`/blogs/${blogId}`).expect(HTTPResponseStatusCodes.UNAUTHORIZED);
         });
     });
 
@@ -31,7 +32,7 @@ describe("PUT /blogs/:blogId", () => {
                 const check = request(app).put(`/blogs/${blogId}`).auth("admin", "qwerty", {type: "basic"}).send({
                     ...VALID_BLOG_DATA,
                     [field]: INVALID_VALUE
-                }).expect(400);
+                }).expect(HTTPResponseStatusCodes.BAD_REQUEST);
 
                 checks.push(check);
             });
@@ -48,11 +49,11 @@ describe("PUT /blogs/:blogId", () => {
         });
 
         it("should return status code: 204", async () => {
-            await request(app).put(`/blogs/${blogId}`).auth("admin", "qwerty", {type: "basic"}).send({...VALID_BLOG_DATA, name: "updated"}).expect(204);
+            await request(app).put(`/blogs/${blogId}`).auth("admin", "qwerty", {type: "basic"}).send({...VALID_BLOG_DATA, name: "updated"}).expect(HTTPResponseStatusCodes.NO_CONTENT);
         });
 
         it("should return status code: 200 and expected data with use get endpoint", async () => {
-            const blog = await request(app).get(`/blogs/${blogId}`).expect(200).then(el => el.body);
+            const blog = await request(app).get(`/blogs/${blogId}`).expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(blog).toEqual({
                 ...VALID_BLOG_DATA,
                 createdAt: expect.any(String),

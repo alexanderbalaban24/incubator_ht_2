@@ -29,6 +29,12 @@ export const securityServices = {
         return await devicesCommandRepository.updateIssuedAt(deviceId, newIssuedAt);
     },
     async revokeRefreshToken(userId: string): Promise<boolean> {
-        return await devicesCommandRepository.deleteAllUserSessions(userId);
+        return await devicesCommandRepository.deleteUserSession(userId);
+    },
+    async deleteAllUserSessions(userId: string, refreshToken: string): Promise<boolean> {
+        const refreshInfo = jwtServices.decodeToken(refreshToken);
+        if (!refreshInfo) return false;
+
+        return await devicesCommandRepository.deleteAllUserSessions(userId, refreshInfo.deviceId);
     }
 }

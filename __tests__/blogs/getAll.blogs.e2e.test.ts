@@ -1,7 +1,8 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {VALID_BLOG_DATA} from "../../src/shared/utils";
-import {client} from "../../src/db";
+import {client} from "../../src/db/run-db";
+import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 
 describe("GET /blogs", () => {
@@ -12,7 +13,7 @@ describe("GET /blogs", () => {
         });
 
         it ("should return status code: 200 and empty array", async () => {
-            await request(app).get("/blogs").expect(200, {
+            await request(app).get("/blogs").expect(HTTPResponseStatusCodes.OK, {
                 pagesCount: 0,
                 page: 1,
                 pageSize: 10,
@@ -30,7 +31,7 @@ describe("GET /blogs", () => {
         });
 
         it("should return status code: 200 and expected data", async () => {
-            const res = await request(app).get("/blogs").expect(200).then(el => el.body);
+            const res = await request(app).get("/blogs").expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res).toEqual({
                 pagesCount: 1,
                 page: 1,
@@ -58,7 +59,7 @@ describe("GET /blogs", () => {
         });
 
         it("should return status code: 200 and expected data", async () => {
-            const res = await request(app).get("/blogs?pageNumber=2&pageSize=1").expect(200).then(el => el.body);
+            const res = await request(app).get("/blogs?pageNumber=2&pageSize=1").expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res).toEqual({
                 pagesCount: 2,
                 page: 2,
@@ -69,7 +70,7 @@ describe("GET /blogs", () => {
         });
 
         it("should return status code: 200 and sorted data with direction desc", async () => {
-            const res = await request(app).get("/blogs?sortBy=name").expect(200).then(el => el.body);
+            const res = await request(app).get("/blogs?sortBy=name").expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res.items[0]).toEqual({
             ...VALID_BLOG_DATA,
                 name: "bbbbbbbbbbbbbbb",
@@ -80,7 +81,7 @@ describe("GET /blogs", () => {
         });
 
         it("should return status code: 200 and sorted data with direction asc", async () => {
-            const res = await request(app).get("/blogs?sortBy=name&sortDirection=asc").expect(200).then(el => el.body);
+            const res = await request(app).get("/blogs?sortBy=name&sortDirection=asc").expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res.items[0]).toEqual({
             ...VALID_BLOG_DATA,
                 name: "aaaaaaaaaaaaaaa",
@@ -91,7 +92,7 @@ describe("GET /blogs", () => {
         });
 
         it("should return status code: 200 and find blogs", async () => {
-            const res = await request(app).get("/blogs?searchNameTerm=aaaaaa").expect(200).then(el => el.body);
+            const res = await request(app).get("/blogs?searchNameTerm=aaaaaa").expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res).toEqual({
                 pagesCount: 1,
                 page: 1,

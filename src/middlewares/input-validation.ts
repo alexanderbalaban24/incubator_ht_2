@@ -1,6 +1,7 @@
 import {validationResult} from "express-validator";
 import {ErrorType, RequestEmpty, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
+import {HTTPResponseStatusCodes} from "../shared/enums";
 
 export const inputValidationMiddleware = (req: RequestEmpty, res: ResponseEmpty, next: NextFunction) => {
     const errors = validationResult(req);
@@ -16,6 +17,6 @@ export const inputValidationMiddleware = (req: RequestEmpty, res: ResponseEmpty,
             }
 
         }) as ErrorType[]
-        res.status(400).json({errorsMessages: resultError});
+        res.status(HTTPResponseStatusCodes.BAD_REQUEST).json({errorsMessages: resultError});
     }
 }

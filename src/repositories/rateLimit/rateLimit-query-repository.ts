@@ -1,9 +1,9 @@
-import {rateLimitCollections} from "../../db/collections/rateLimitCollections";
-import {AttemptType} from "../../application/rateLimit-services";
+import {RateLimitModel} from "../../db";
+
 
 export const rateLimitQueryRepository = {
     async getCountAttemptsByIPAndUrl(IP: string, URL: string, limitInterval: Date): Promise<number> {
-        const attempts = await rateLimitCollections.find({IP, URL, date: {$gte: limitInterval}}).toArray();
+        const attempts = await RateLimitModel.find({IP, URL, date: {$gte: limitInterval}}).exec();
 
         return attempts.length;
     }

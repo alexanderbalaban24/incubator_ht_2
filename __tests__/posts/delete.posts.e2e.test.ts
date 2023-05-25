@@ -2,7 +2,8 @@ import request from "supertest";
 import {app} from "../../src/app";
 import {VALID_BLOG_DATA, VALID_POST_DATA} from "../../src/shared/utils";
 import {ViewBlogModel} from "../../src/models/blog/ViewBlogModel";
-import {client} from "../../src/db";
+import {client} from "../../src/db/run-db";
+import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 
 describe("DELETE /posts", () => {
@@ -17,7 +18,7 @@ describe("DELETE /posts", () => {
         });
 
         it("should return status code: 200 and expected data", async () => {
-            const res = await request(app).get(`/posts/${postId}`).expect(200).then(el => el.body);
+            const res = await request(app).get(`/posts/${postId}`).expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res).toEqual({
                 id: expect.any(String),
                 ...VALID_POST_DATA,
@@ -28,11 +29,11 @@ describe("DELETE /posts", () => {
         });
 
         it("should return status code: 204", async () => {
-            await request(app).delete(`/posts/${postId}`).auth("admin", "qwerty", {type: "basic"}).expect(204);
+            await request(app).delete(`/posts/${postId}`).auth("admin", "qwerty", {type: "basic"}).expect(HTTPResponseStatusCodes.NO_CONTENT);
         });
 
         it("should return status code: 200", async () => {
-            await request(app).get("/posts").expect(200, {
+            await request(app).get("/posts").expect(HTTPResponseStatusCodes.OK, {
                 pagesCount: 0,
                 page: 1,
                 pageSize: 10,

@@ -1,28 +1,29 @@
-import {commentsCollections, CommentsDB} from "../../db/collections/commentsCollections";
 import {ViewCommentModel} from "../../models/comment/ViewCommentModel";
-import {FindCursor, ObjectId} from "mongodb";
+import {FindCursor, ObjectId, WithId} from "mongodb";
 import {ViewWithQueryCommentModel} from "../../models/comment/ViewWithQueryCommentModel";
 import {QueryParamsCommentModel} from "../../models/comment/QueryParamsCommentModel";
+import {CommentsDB, CommentsModel} from "../../db";
+import {Query} from "mongoose";
 
 export const commentsQueryRepository = {
     async findComments(postId: string, query: QueryParamsCommentModel): Promise<ViewWithQueryCommentModel> {
-        const cursor = commentsCollections.find({postId});
-        const queryResult = await this._findConstructor(query, cursor);
+        const queryCommentsData = CommentsModel.find({postId});
+        const queryResult = await this._findConstructor(query, queryCommentsData);
 
-        const comments = await cursor.toArray();
+        const comments = await queryCommentsData.exec();
 
         queryResult.items = comments.map(comment => this._mapCommentDBByViewCommentModel(comment));
         return queryResult;
     },
     async findCommentById(commentId: string) {
-        const comment = await commentsCollections.findOne({_id: new ObjectId(commentId)});
+        const comment = await CommentsModel.findOne({_id: new ObjectId(commentId)});
         if (comment) {
             return this._mapCommentDBByViewCommentModel(comment);
         } else {
             return null;
         }
     },
-    _mapCommentDBByViewCommentModel(comment: CommentsDB): ViewCommentModel {
+    _mapCommentDBByViewCommentModel(comment: WithId<CommentsDB>): ViewCommentModel {
         return {
             id: comment._id.toString(),
             content: comment.content,
@@ -33,17 +34,17 @@ export const commentsQueryRepository = {
             createdAt: comment.createdAt
         }
     },
-    async _findConstructor(query: QueryParamsCommentModel, cursor: FindCursor): Promise<ViewWithQueryCommentModel> {
-        const sortBy = query.sortBy ? query.sortBy : "createdAt";
-        const sortDirection = query.sortDirection ? query.sortDirection : "desc";
-        const pageNumber = query.pageNumber ? +query.pageNumber : 1;
-        const pageSize = query.pageSize ? +query.pageSize : 10;
+    async _findConstructor(queryCommentsData: QueryParamsCommentModel, query: Query<any, any>): Promise<ViewWithQueryCommentModel> {
+        const sortBy = queryCommentsData.sortBy ? queryCommentsData.sortBy : "createdAt";
+        const sortDirection = queryCommentsData.sortDirection ? queryCommentsData.sortDirection : "desc";
+        const pageNumber = queryCommentsData.pageNumber ? +queryCommentsData.pageNumber : 1;
+        const pageSize = queryCommentsData.pageSize ? +queryCommentsData.pageSize : 10;
 
         const skip = pageSize * (pageNumber - 1);
 
-        const totalCount = await cursor.count();
+        const totalCount = await query.clone().count();
 
-        cursor.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
+        query.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
         const pagesCount = Math.ceil(totalCount / pageSize);
 
         return {

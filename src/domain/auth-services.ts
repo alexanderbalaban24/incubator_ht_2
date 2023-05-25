@@ -86,7 +86,7 @@ export const authServices = {
         if(!deviceInfo) return false;
 
         if(deviceInfo.userId === refreshInfo.userId && refreshInfo.iat === Math.trunc(+deviceInfo.issuedAt / 1000)) {
-            return await securityServices.revokeRefreshToken(refreshInfo.userId);
+            return await securityServices.revokeRefreshToken(refreshInfo.deviceId);
         } else {
             return false;
         }

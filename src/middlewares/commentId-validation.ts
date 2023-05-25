@@ -1,6 +1,7 @@
 import {RequestWithParams, ResponseEmpty} from "../shared/types";
 import {commentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {NextFunction} from "express";
+import {HTTPResponseStatusCodes} from "../shared/enums";
 
 export const commentIdValidation = async (req: RequestWithParams<{
     commentId: string
@@ -10,6 +11,6 @@ export const commentIdValidation = async (req: RequestWithParams<{
     if (comment) {
         next();
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 }

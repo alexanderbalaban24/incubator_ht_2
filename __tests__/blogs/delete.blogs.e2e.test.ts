@@ -1,7 +1,8 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {VALID_BLOG_DATA} from "../../src/shared/utils";
-import {client} from "../../src/db";
+import {client} from "../../src/db/run-db";
+import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 
 describe("DELETE /blogs", () => {
@@ -14,7 +15,7 @@ describe("DELETE /blogs", () => {
         });
 
         it("should return status code: 200 and expected data before deleted", async () => {
-            const res = await request(app).get(`/blogs/${blogId}`).expect(200).then(el => el.body);
+            const res = await request(app).get(`/blogs/${blogId}`).expect(HTTPResponseStatusCodes.OK).then(el => el.body);
             expect(res).toEqual({
                 ...VALID_BLOG_DATA,
                 createdAt: expect.any(String),
@@ -24,11 +25,11 @@ describe("DELETE /blogs", () => {
         });
 
         it("should return status code: 204", async () => {
-            await request(app).delete(`/blogs/${blogId}`).auth("admin", "qwerty", {type: "basic"}).expect(204);
+            await request(app).delete(`/blogs/${blogId}`).auth("admin", "qwerty", {type: "basic"}).expect(HTTPResponseStatusCodes.NO_CONTENT);
         });
 
         it("should return status code: 200 and empty array", async () => {
-            await request(app).get("/blogs").expect(200, {
+            await request(app).get("/blogs").expect(HTTPResponseStatusCodes.OK, {
                 pagesCount: 0,
                 page: 1,
                 pageSize: 10,

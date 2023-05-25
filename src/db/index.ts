@@ -1,21 +1,11 @@
-import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
-dotenv.config()
-
-const url = process.env.MONGO_URL;
-
-if (!url) {
-    throw new Error('MongoDB url not found');
-}
-
-export const client = new MongoClient(url);
-
-export const runDB = async () => {
-    try {
-        await client.connect();
-        console.log('Connected successfully to server');
-    } catch (e) {
-        console.log('Don\'t connected successfully to server');
-        await client.close();
-    }
-}
+export { runDB } from "./run-db";
+export { BlogsModel } from "./blogs/blogs.model";
+export { BlogDB } from "./blogs/types";
+export { CommentsModel } from "./comments/comments.model";
+export { CommentsDB } from "./comments/types";
+export { DeviceModel } from "./devices/device.model";
+export { PostsModel } from "./posts/posts.model";
+export { PostDB } from "./posts/types";
+export { RateLimitModel } from "./rateLimit/rateLimit.model";
+export { UsersModel } from "./users/users.model";
+export { UsersDB } from "./users/types";

@@ -26,4 +26,6 @@ postsRouter.route('/:postId')
     .put(basicAuthMiddleware, postValidateSchema, inputValidationMiddleware, updatePost)
     .delete(basicAuthMiddleware, deletePost);
 
-postsRouter.route('/:postId/comments').get(postIdValidation, getAllComments).post(jwtAuthAccess, postIdValidation, commentsSchema, inputValidationMiddleware, createComment);
+postsRouter.route('/:postId/comments')
+    .get(postIdValidation, getAllComments)
+    .post(jwtAuthAccess, postIdValidation, commentsSchema, inputValidationMiddleware, createComment);

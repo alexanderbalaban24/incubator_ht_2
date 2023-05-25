@@ -1,9 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 import {jwtServices} from "../application/jwt-services";
+import {HTTPResponseStatusCodes} from "../shared/enums";
 
 export const jwtAuthRefresh = (req: Request, res: Response, next: NextFunction) => {
     if(!req.cookies.refreshToken) {
-        res.sendStatus(401);
+        res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
         return;
     }
 
@@ -14,6 +15,6 @@ export const jwtAuthRefresh = (req: Request, res: Response, next: NextFunction) 
         req.userId = userId;
         next();
     } else {
-        res.sendStatus(401);
+        res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
     }
 }

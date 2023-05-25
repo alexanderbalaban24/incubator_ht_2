@@ -1,16 +1,16 @@
 import {UserType} from "../../domain/users-services";
-import {usersCollections} from "../../db/collections/usersCollections";
 import {ObjectId} from "mongodb";
+import {UsersModel} from "../../db";
 
 
 export const usersCommandRepository = {
     async createUser (user: UserType): Promise<string> {
-    const result = await usersCollections.insertOne(user);
+    const result = await new UsersModel(user).save();
 
-    return result.insertedId.toString();
+    return result._id.toString();
     },
     async deleteUserById(userId: string): Promise<boolean> {
-        const result = await usersCollections.deleteOne({_id: new ObjectId(userId)});
+        const result = await UsersModel.deleteOne({_id: new ObjectId(userId)});
 
         return result.deletedCount === 1;
     }

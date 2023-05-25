@@ -1,4 +1,5 @@
 import jwt, {JwtPayload} from "jsonwebtoken";
+import {settings} from "../shared/settings";
 
 export type JWTSCredentialsType = {
     userId: string
@@ -8,15 +9,16 @@ export type JWTSCredentialsType = {
 }
 
 export const jwtServices = {
+    secret: settings.jwt_secret!,
     createAccessToken(userId: string): string {
-        return jwt.sign({userId}, process.env.JWT_SECRET!, {expiresIn: "10000"});
+        return jwt.sign({userId}, this.secret, {expiresIn: "10000"});
     },
     createRefreshToken(userId: string, deviceId: string): string {
-        return jwt.sign({userId, deviceId}, process.env.JWT_SECRET!, {expiresIn: "20000"});
+        return jwt.sign({userId, deviceId}, this.secret, {expiresIn: "20000"});
     },
     checkCredentials(token: string): string | null {
         try {
-            const result = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+            const result = jwt.verify(token, this.secret!) as JwtPayload;
             return result.userId;
         } catch (e) {
             return null;

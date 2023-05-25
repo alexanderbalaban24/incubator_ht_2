@@ -1,9 +1,10 @@
 import nodemailer from "nodemailer";
+import {settings} from "../shared/settings";
 
 export const emailAdapter = {
     async sendEmail(email: string, subject: string, message: string): Promise<boolean> {
-        const gmail = process.env.GMAIL;
-        const pass = process.env.GMAIL_PASS
+        const gmail = settings.admin_gmail;
+        const pass = settings.admin_gmail_app_key;
 
         const transport = await nodemailer.createTransport({
             port: 465,

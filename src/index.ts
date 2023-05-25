@@ -1,9 +1,8 @@
-import {config} from "dotenv";
 import {app} from "./app";
+import {settings} from "./shared/settings";
 import {runDB} from "./db";
-config();
 
-const PORT = process.env.PORT;
+const PORT = settings.port;
 
 const startApp = async () => {
     try {

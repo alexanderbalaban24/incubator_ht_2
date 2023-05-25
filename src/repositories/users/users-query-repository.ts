@@ -1,23 +1,25 @@
-import {usersCollections, UsersDB} from "../../db/collections/usersCollections";
+
 import {FindCursor, ObjectId, WithId} from "mongodb";
 import {ViewUserModel} from "../../models/user/ViewUserModel";
 import {QueryParamsUserModel} from "../../models/user/QueryParamsUserModel";
 import {ViewWithQueryUserModel} from "../../models/user/ViewWithQueryUserModel";
+import {UsersDB, UsersModel} from "../../db";
+import {Query} from "mongoose";
 
 
 export const usersQueryRepository = {
     async findUsers(query: QueryParamsUserModel): Promise<ViewWithQueryUserModel> {
-        const cursor = usersCollections.find({}, {projection: {passwordHash: 0}});
+        const queryUsersData = UsersModel.find({}, {projection: {passwordHash: 0}});
 
-        const queryResult = await this._findConstructor(query, cursor);
+        const queryResult = await this._findConstructor(query, queryUsersData);
 
-        const users = await cursor.toArray();
+        const users = await queryUsersData.exec();
         queryResult.items = users.map(user => this._mapUserDBToViewUserModel(user));
 
         return queryResult;
     },
     async findUserById(userId: string): Promise<ViewUserModel | null> {
-        const user = await usersCollections.findOne({_id: new ObjectId(userId)}, {projection: {passwordHash: 0}});
+        const user = await UsersModel.findOne({_id: new ObjectId(userId)}, {projection: {passwordHash: 0}});
 
         if (user) {
             return this._mapUserDBToViewUserModel(user);
@@ -26,7 +28,7 @@ export const usersQueryRepository = {
         }
 
     },
-    _mapUserDBToViewUserModel(user: UsersDB): ViewUserModel {
+    _mapUserDBToViewUserModel(user: WithId<UsersDB>): ViewUserModel {
         return {
             id: user._id.toString(),
             login: user.login,
@@ -34,7 +36,7 @@ export const usersQueryRepository = {
             createdAt: user.createdAt
         }
     },
-    async _findConstructor(query: QueryParamsUserModel, cursor: FindCursor): Promise<ViewWithQueryUserModel> {
+    async _findConstructor(query: QueryParamsUserModel, cursor: Query<any, any>): Promise<ViewWithQueryUserModel> {
         const sortBy = query.sortBy ? query.sortBy : "createdAt";
         const sortDirection = query.sortDirection ? query.sortDirection : "desc"
         const pageNumber = query.pageNumber ? +query.pageNumber : 1
@@ -44,21 +46,21 @@ export const usersQueryRepository = {
 
         const filter = [];
         if (query.searchLoginTerm) {
-            filter.push({login: {$regex: query.searchLoginTerm, $options: 'i'}});
+            filter.push(query.searchLoginTerm);
         }
         if (query.searchEmailTerm) {
-            filter.push({email: {$regex: query.searchEmailTerm, $options: 'i'}});
+            filter.push(query.searchEmailTerm);
         }
 
         if (filter.length) {
             if (filter.length === 1) {
-                cursor.filter(filter[0]);
+                cursor.regex("login", new RegExp(filter[0]));
             } else {
-                cursor.filter({$or: filter});
+                cursor.regex("login", new RegExp(filter[0])).regex("email", new RegExp(filter[1]));
             }
         }
 
-        const totalCount = await cursor.count();
+        const totalCount = await cursor.clone().count();
 
         cursor.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
         const pagesCount = Math.ceil(totalCount / pageSize);

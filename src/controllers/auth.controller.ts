@@ -6,22 +6,23 @@ import {ViewMeModel} from "../models/auth/ViewMeModel";
 import {usersQueryRepository} from "../repositories/users/users-query-repository";
 import {ViewLoginModel} from "../models/auth/ViewLoginModel";
 import {RegistrationModel} from "../models/auth/RegistrationModel";
+import {HTTPResponseStatusCodes} from "../shared/enums";
 
 export const login = async (req: RequestWithBody<LoginModel>, res: Response<ViewLoginModel>) => {
     const tokenPair = await authServices.login(req.body.loginOrEmail, req.body.password, req.headers["user-agent"], req.ip);
 
     if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
         res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
-        res.status(200).json({accessToken: tokenPair.accessToken});
+        res.status(HTTPResponseStatusCodes.OK).json({accessToken: tokenPair.accessToken});
     } else {
-        res.sendStatus(401);
+        res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
     }
 }
 
 export const refreshToken = async (req: RequestEmpty, res: Response<ViewLoginModel>) => {
     const userId = req.userId;
     if (!userId) {
-        res.sendStatus(401);
+        res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
         return;
     }
 
@@ -30,9 +31,9 @@ export const refreshToken = async (req: RequestEmpty, res: Response<ViewLoginMod
     const tokenPair = await authServices.refreshToken(refreshToken, userId!);
     if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
         res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
-        res.status(200).json({accessToken: tokenPair.accessToken});
+        res.status(HTTPResponseStatusCodes.OK).json({accessToken: tokenPair.accessToken});
     } else {
-        res.sendStatus(401);
+        res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
     }
 }
 
@@ -40,9 +41,9 @@ export const registration = async (req: RequestWithBody<RegistrationModel>, res:
     const success = await authServices.registration(req.body.login, req.body.email, req.body.password);
 
     if (success) {
-        res.sendStatus(204);
+        res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 }
 
@@ -50,9 +51,9 @@ export const confirmRegistration = async (req: RequestWithBody<{ code: string }>
     const isVerified = await authServices.verifyEmail(req.body.code);
 
     if (isVerified) {
-        res.sendStatus(204)
+        res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT)
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 }
 
@@ -62,9 +63,9 @@ export const logout = async (req: RequestEmpty, res: ResponseEmpty) => {
     const isRevoked = await authServices.logout(refreshToken);
 
     if (isRevoked) {
-        res.sendStatus(204);
+        res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
     } else {
-        res.sendStatus(401);
+        res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
     }
 }
 
@@ -73,9 +74,9 @@ export const getMe = async (req: RequestEmpty, res: Response<ViewMeModel>) => {
     const user = await usersQueryRepository.findUserById(userId!);
 
     if (user) {
-        res.status(200).json({email: user.email, login: user.login, userId: user.id});
+        res.status(HTTPResponseStatusCodes.OK).json({email: user.email, login: user.login, userId: user.id});
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 
 }
@@ -84,8 +85,8 @@ export const resendConfirmationCode = async (req: RequestWithBody<{ email: strin
     const success = await authServices.resendConfirmationCode(req.body.email);
 
     if (success) {
-        res.sendStatus(204);
+        res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
     } else {
-        res.sendStatus(404);
+        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
     }
 }
