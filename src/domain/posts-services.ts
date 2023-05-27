@@ -7,7 +7,6 @@ export type Post = {
     content: string
     blogId: string
     blogName: string
-    createdAt: string
 }
 
 export const postsServices = {
@@ -20,8 +19,7 @@ export const postsServices = {
             shortDescription,
             content,
             blogId,
-            blogName: blog.name,
-            createdAt: new Date().toISOString()
+            blogName: blog.name
         }
 
         return await postsCommandRepository.createPost(newPost);
@@ -31,7 +29,7 @@ export const postsServices = {
         const blog = await blogsQueryRepository.findBlogById(blogId);
         if (!blog) return false;
 
-        return await postsCommandRepository.updatePost(postId, title, shortDescription, content, blogId);
+        return await postsCommandRepository.updatePost(postId, title, shortDescription, content, blogId, blog.name);
     },
     async deletePostById(postId: string): Promise<boolean> {
         return await postsCommandRepository.deletePostById(postId);

@@ -1,30 +1,37 @@
 import {Post} from "../../domain/posts-services";
-import {ObjectId} from "mongodb";
-import {BlogsModel, PostsModel} from "../../db";
+import {BlogsModelClass, PostsModelClass} from "../../db";
 
 export const postsCommandRepository = {
     async createPost(newPost: Post): Promise<string> {
-        const result = await new PostsModel(newPost).save();
+        const result = await new PostsModelClass(newPost).save();
         return result._id.toString();
     },
-    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
-        const blog = await BlogsModel.findOne({_id: new ObjectId(blogId)});
-        if (!blog) return false;
+    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string, blogName: string): Promise<boolean> {
+        const postInstances = await PostsModelClass.findById(postId);
+        if (!postInstances) return false;
 
-        const result = await PostsModel.updateOne({_id: new ObjectId(postId)}, {
-            $set: {
-                title,
-                shortDescription,
-                content,
-                blogId
-            }
-        });
+        postInstances.title = title;
+        postInstances.shortDescription = shortDescription;
+        postInstances.content = content;
+        postInstances.blogId = blogId;
+        postInstances.blogName = blogName;
 
-        return result.matchedCount === 1;
+        try {
+            await postInstances.save();
+            return true;
+        } catch (e) {
+            return false;
+        }
     },
     async deletePostById(postId: string): Promise<boolean> {
-        const result = await PostsModel.deleteOne({_id: new ObjectId(postId)});
+        const postInstances = await PostsModelClass.findById(postId);
+        if (!postInstances) return false;
 
-        return result.deletedCount === 1;
+        try {
+            const result = await postInstances.deleteOne();
+            return result.$isDeleted();
+        } catch (e) {
+            return false;
+        }
     }
 }

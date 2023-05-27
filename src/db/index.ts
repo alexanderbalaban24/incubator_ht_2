@@ -1,11 +1,11 @@
 export { runDB } from "./run-db";
-export { BlogsModel } from "./blogs/blogs.model";
+export { BlogsModelClass } from "./blogs/blogsModelClass";
 export { BlogDB } from "./blogs/types";
-export { CommentsModel } from "./comments/comments.model";
+export { CommentsModelClass } from "./comments/comments.model";
 export { CommentsDB } from "./comments/types";
-export { DeviceModel } from "./devices/device.model";
-export { PostsModel } from "./posts/posts.model";
+export { DeviceModelClass } from "./devices/deviceModelClass";
+export { PostsModelClass } from "./posts/postsModelClass";
 export { PostDB } from "./posts/types";
-export { RateLimitModel } from "./rateLimit/rateLimit.model";
-export { UsersModel } from "./users/users.model";
+export { RateLimitModelClass } from "./rateLimit/rateLimit.model";
+export { UsersModelClass } from "./users/users.model";
 export { UsersDB } from "./users/types";

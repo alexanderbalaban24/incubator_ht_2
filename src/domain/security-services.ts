@@ -12,6 +12,7 @@ export type DeviceType = {
 
 export const securityServices = {
     async createDevice(userId: string, deviceName: string, ip: string, expiration: number): Promise<string> {
+        console.log("Native date", new Date())
         const newDevice: DeviceType = {
             userId,
             deviceName,

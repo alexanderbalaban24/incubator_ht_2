@@ -7,6 +7,5 @@ export const PostsSchema = new mongoose.Schema<WithId<PostDB>>({
     shortDescription: {type: String, required: true},
     content: {type: String, required: true},
     blogId: {type: String, required: true},
-    blogName: {type: String, required: true},
-    createdAt: {type: String, required: true}
-})
+    blogName: {type: String, required: true}
+}, {timestamps: true});

@@ -1,22 +1,22 @@
 import {ViewPostModel} from "../../models/post/ViewPostModel";
 import {ViewWithQueryPostModel} from "../../models/post/ViewWithQueryPostModel";
-import {FindCursor, ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {QueryParamsPostModel} from "../../models/post/QueryParamsPostModel";
-import {PostDB, PostsModel} from "../../db";
+import {PostDB, PostsModelClass} from "../../db";
 import {Query} from "mongoose";
 
 export const postsQueryRepository = {
     async findPost(query: QueryParamsPostModel, blogId?: string | undefined): Promise<ViewWithQueryPostModel> {
-        const queryPostsData = PostsModel.find({});
-        const queryResult = await this._findConstructor(query, queryPostsData, blogId);
-        const posts = await queryPostsData.exec();
+        const postInstances = PostsModelClass.find({});
+        const queryResult = await this._queryBuilder(query, postInstances, blogId);
+        const posts = await postInstances;
 
         queryResult.items = posts.map(post => this._mapPostDBToViewPostModel(post));
 
         return queryResult;
     },
     async findPostById(postId: string): Promise<ViewPostModel | null> {
-        const post = await PostsModel.findOne({_id: new ObjectId(postId)});
+        const post = await PostsModelClass.findById(postId).lean();
 
         if (post) {
             return this._mapPostDBToViewPostModel(post);
@@ -35,7 +35,7 @@ export const postsQueryRepository = {
             createdAt: post.createdAt
         }
     },
-    async _findConstructor(queryPosts: QueryParamsPostModel, query: Query<any, any>, blogId: string | undefined): Promise<ViewWithQueryPostModel> {
+    async _queryBuilder(queryPosts: QueryParamsPostModel, query: Query<any, any>, blogId: string | undefined): Promise<ViewWithQueryPostModel> {
         const sortBy = queryPosts.sortBy ? queryPosts.sortBy : "createdAt";
         const sortDirection = queryPosts.sortDirection ? queryPosts.sortDirection : "desc"
         const pageNumber = queryPosts.pageNumber ? +queryPosts.pageNumber : 1

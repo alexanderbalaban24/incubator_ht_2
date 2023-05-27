@@ -1,22 +1,23 @@
 import {ViewCommentModel} from "../../models/comment/ViewCommentModel";
-import {FindCursor, ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {ViewWithQueryCommentModel} from "../../models/comment/ViewWithQueryCommentModel";
 import {QueryParamsCommentModel} from "../../models/comment/QueryParamsCommentModel";
-import {CommentsDB, CommentsModel} from "../../db";
+import {CommentsDB, CommentsModelClass} from "../../db";
 import {Query} from "mongoose";
 
 export const commentsQueryRepository = {
     async findComments(postId: string, query: QueryParamsCommentModel): Promise<ViewWithQueryCommentModel> {
-        const queryCommentsData = CommentsModel.find({postId});
-        const queryResult = await this._findConstructor(query, queryCommentsData);
+        const commentsInstances = CommentsModelClass.find({postId});
+        const queryResult = await this._queryBuilder(query, commentsInstances);
 
-        const comments = await queryCommentsData.exec();
+        const comments = await commentsInstances;
 
         queryResult.items = comments.map(comment => this._mapCommentDBByViewCommentModel(comment));
         return queryResult;
     },
     async findCommentById(commentId: string) {
-        const comment = await CommentsModel.findOne({_id: new ObjectId(commentId)});
+        const comment = await CommentsModelClass.findById(commentId).lean();
+
         if (comment) {
             return this._mapCommentDBByViewCommentModel(comment);
         } else {
@@ -34,7 +35,7 @@ export const commentsQueryRepository = {
             createdAt: comment.createdAt
         }
     },
-    async _findConstructor(queryCommentsData: QueryParamsCommentModel, query: Query<any, any>): Promise<ViewWithQueryCommentModel> {
+    async _queryBuilder(queryCommentsData: QueryParamsCommentModel, query: Query<any, any>): Promise<ViewWithQueryCommentModel> {
         const sortBy = queryCommentsData.sortBy ? queryCommentsData.sortBy : "createdAt";
         const sortDirection = queryCommentsData.sortDirection ? queryCommentsData.sortDirection : "desc";
         const pageNumber = queryCommentsData.pageNumber ? +queryCommentsData.pageNumber : 1;

@@ -1,21 +1,21 @@
 import {ViewBlogModel} from "../../models/blog/ViewBlogModel";
 import {QueryParamsBlogModel} from "../../models/blog/QueryParamsBlogModel";
-import {ObjectId, WithId} from "mongodb";
+import {WithId} from "mongodb";
 import {ViewWithQueryBlogModel} from "../../models/blog/ViewWithQueryBlogModel";
 import {Query} from "mongoose";
-import {BlogDB, BlogsModel} from "../../db";
+import {BlogDB, BlogsModelClass} from "../../db";
 
 export const blogsQueryRepository = {
     async findBlogs(query: QueryParamsBlogModel): Promise<ViewWithQueryBlogModel> {
-        const queryBlogData = BlogsModel.find({});
-        const queryResult = await this._findConstructor(query, queryBlogData);
-        const blogs = await queryBlogData.exec();
+        const blogInstances = BlogsModelClass.find({});
+        const queryResult = await this._queryBuilder(query, blogInstances);
+        const blogs = await blogInstances;
 
         queryResult.items = blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
         return queryResult;
     },
     async findBlogById(blogId: string): Promise<ViewBlogModel | null> {
-        const blog = await BlogsModel.findOne({_id: new ObjectId(blogId)});
+        const blog = await BlogsModelClass.findById(blogId).lean();
         if (blog) {
             return this._mapBlogDBToViewBlogModel(blog);
         } else {
@@ -24,7 +24,7 @@ export const blogsQueryRepository = {
     },
     _mapBlogDBToViewBlogModel(blog: WithId<BlogDB>): ViewBlogModel {
         return {
-            id: blog._id!.toString(),
+            id: blog._id.toString(),
             name: blog.name,
             description: blog.description,
             websiteUrl: blog.websiteUrl,
@@ -32,7 +32,7 @@ export const blogsQueryRepository = {
             isMembership: blog.isMembership
         }
     },
-    async _findConstructor(queryBlogData: QueryParamsBlogModel, query: Query<any, any>): Promise<ViewWithQueryBlogModel> {
+    async _queryBuilder(queryBlogData: QueryParamsBlogModel, query: Query<any, any>): Promise<ViewWithQueryBlogModel> {
         const sortBy = queryBlogData.sortBy ? queryBlogData.sortBy : "createdAt";
         const sortDirection = queryBlogData.sortDirection ? queryBlogData.sortDirection : "desc";
         const pageNumber = queryBlogData.pageNumber ? +queryBlogData.pageNumber : 1;

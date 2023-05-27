@@ -8,7 +8,6 @@ export type UserType = {
     login: string
     email: string
     passwordHash: string,
-    createdAt: string,
     emailConfirmation: {
         confirmationCode: string
         expirationDate: string
@@ -25,7 +24,6 @@ export const usersServices = {
             login,
             email,
             passwordHash,
-            createdAt: new Date().toISOString(),
             emailConfirmation: {
                 confirmationCode: uuidv4(),
                 expirationDate: add(new Date(), {hours: 3}).toISOString(),

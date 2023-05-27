@@ -8,4 +8,4 @@ export const DeviceSchema = new mongoose.Schema<WithId<DeviceAuthSessionsTypeDB>
     deviceName: {type: String, required: true},
     issuedAt: {type: Date, required: true},
     expirationAt: {type: Date, required: true}
-})
+});

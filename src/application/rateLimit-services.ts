@@ -6,15 +6,13 @@ import {rateLimitQueryRepository} from "../repositories/rateLimit/rateLimit-quer
 export type AttemptType = {
     IP: string
     URL: string
-    date: Date
 }
 
 export const rateLimitServices = {
     async addAttempt(IP: string, URL: string): Promise<string> {
         const newAttempt: AttemptType = {
             IP,
-            URL,
-            date: new Date()
+            URL
         }
 
         return await rateLimitCommandRepository.addAttempt(newAttempt);

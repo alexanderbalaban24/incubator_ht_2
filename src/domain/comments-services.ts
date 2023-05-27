@@ -1,7 +1,6 @@
 import {postsQueryRepository} from "../repositories/posts/posts-query-repository";
 import {usersQueryRepository} from "../repositories/users/users-query-repository";
 import {commentsCommandRepository} from "../repositories/comments/comments-command-repository";
-import {commentsQueryRepository} from "../repositories/comments/comments-query-repository";
 
 export type Comment = {
     postId: string
@@ -9,8 +8,7 @@ export type Comment = {
     commentatorInfo: {
         userId: string
         userLogin: string
-    },
-    createdAt: string
+    }
 }
 
 export const commentsServices = {
@@ -27,8 +25,7 @@ export const commentsServices = {
             commentatorInfo: {
                 userId: userId,
                 userLogin: user.login
-            },
-            createdAt: new Date().toISOString()
+            }
         }
 
         return await commentsCommandRepository.createComment(newComment);

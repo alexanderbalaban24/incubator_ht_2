@@ -1,16 +1,16 @@
-import {BlogsModel, CommentsModel, DeviceModel, PostsModel, RateLimitModel, UsersModel} from "../../db";
+import {BlogsModelClass, CommentsModelClass, DeviceModelClass, PostsModelClass, RateLimitModelClass, UsersModelClass} from "../../db";
 
 
 export const testingCommandRepository = {
     async deleteAllDB(): Promise<boolean> {
         try {
             const deletedResult = await Promise.all([
-                BlogsModel.deleteMany({}),
-                PostsModel.deleteMany({}),
-                UsersModel.deleteMany({}),
-                CommentsModel.deleteMany({}),
-                DeviceModel.deleteMany({}),
-                RateLimitModel.deleteMany({})
+                BlogsModelClass.deleteMany({}),
+                PostsModelClass.deleteMany({}),
+                UsersModelClass.deleteMany({}),
+                CommentsModelClass.deleteMany({}),
+                DeviceModelClass.deleteMany({}),
+                RateLimitModelClass.deleteMany({})
             ]);
             return deletedResult.every(item => item.deletedCount === 1);
         } catch (e) {

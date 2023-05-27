@@ -10,7 +10,9 @@ const mongoURL = settings.mongo_url;
 
 export const runDB = async () => {
     try {
-        await mongoose.connect(mongoURL);
+        await mongoose.connect(mongoURL, {
+            dbName: "blog-platform"
+        });
         console.log('Connected successfully to server');
     } catch (e) {
         console.log('Don\'t connected successfully to server');

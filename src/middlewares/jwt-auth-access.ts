@@ -4,7 +4,6 @@ import {HTTPResponseStatusCodes} from "../shared/enums";
 
 export const jwtAuthAccess = (req: Request, res: Response, next: NextFunction) => {
 
-    console.log(req.headers)
     if (!req.headers?.authorization) {
         res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
         return;

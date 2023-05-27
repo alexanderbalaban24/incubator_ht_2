@@ -1,21 +1,31 @@
 import {Comment} from "../../domain/comments-services";
-import {ObjectId} from "mongodb";
-import {CommentsModel} from "../../db";
+import {CommentsModelClass} from "../../db";
 
 export const commentsCommandRepository = {
     async createComment(newComment: Comment): Promise<string> {
-    const result = await new CommentsModel(newComment).save();
+    const result = await new CommentsModelClass(newComment).save();
 
     return result._id.toString();
     },
     async deleteComment(commentId: string): Promise<boolean> {
-        const result = await CommentsModel.deleteOne({_id: new ObjectId(commentId)});
+        const commentInstances = await CommentsModelClass.findById(commentId);
+        if (!commentInstances) return false;
 
-        return result.deletedCount === 1;
+        const result = await commentInstances.deleteOne();
+
+        return result.$isDeleted();
     },
     async updateComment(commentId: string, content: string): Promise<boolean> {
-        const result = await CommentsModel.updateOne({_id: new ObjectId(commentId)}, {$set: {content: content}});
+        const commentInstances = await CommentsModelClass.findById(commentId);
+        if(!commentInstances) return false;
 
-        return result.matchedCount === 1;
+        commentInstances.content = content;
+
+        try {
+            await commentInstances.save();
+            return true;
+        } catch(e) {
+            return false;
+        }
     }
 }

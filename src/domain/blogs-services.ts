@@ -4,8 +4,6 @@ export type Blog = {
     name: string
     description: string
     websiteUrl: string
-    createdAt: string
-    isMembership: boolean
 }
 
 export const blogsServices = {
@@ -13,9 +11,7 @@ export const blogsServices = {
         const newBlog: Blog = {
             name,
             description,
-            websiteUrl,
-            createdAt: new Date().toISOString(),
-            isMembership: false
+            websiteUrl
         }
         return await blogsCommandRepository.createBlog(newBlog);
     },

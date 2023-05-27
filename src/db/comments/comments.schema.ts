@@ -8,6 +8,5 @@ export const CommentsSchema = new mongoose.Schema<WithId<CommentsDB>>({
     commentatorInfo: {
         userId: {type: String, required: true},
         userLogin: {type: String, required: true}
-    },
-    createdAt: String
-})
+    }
+}, {timestamps: true});

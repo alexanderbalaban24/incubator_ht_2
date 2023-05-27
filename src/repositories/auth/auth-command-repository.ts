@@ -1,15 +1,32 @@
 import {ObjectId} from "mongodb";
-import {UsersModel} from "../../db";
+import {UsersModelClass} from "../../db";
 
 export const authCommandRepository = {
     async updateIsConfirmedFieldById(userId: string): Promise<boolean> {
-        const result = await UsersModel.updateOne({_id: new ObjectId(userId)}, {$set: {"emailConfirmation.isConfirmed": true}});
+        const userInstances = await UsersModelClass.findById(userId);
+        if (!userInstances) return false;
 
-        return result.matchedCount === 1;
+        userInstances.emailConfirmation.isConfirmed = true;
+
+        try {
+            await userInstances.save();
+            return true;
+        } catch (e) {
+            return false;
+        }
     },
     async updateConfirmationDataByEmail(email: string, confirmationCode: string, expirationDate: string) {
-        const result = await UsersModel.updateOne({email: email}, {$set: {"emailConfirmation.expirationDate": expirationDate, "emailConfirmation.confirmationCode": confirmationCode}});
+        const userInstances = await UsersModelClass.findOne({email});
+        if (!userInstances) return false;
 
-        return result.matchedCount === 1;
+        userInstances.emailConfirmation.expirationDate = expirationDate;
+        userInstances.emailConfirmation.confirmationCode = confirmationCode;
+
+        try {
+            await userInstances.save();
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 }

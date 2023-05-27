@@ -26,7 +26,6 @@ export const emailAdapter = {
                     console.error(err);
                     reject(false);
                 } else {
-                    console.log(info);
                     resolve(true);
                 }
             })

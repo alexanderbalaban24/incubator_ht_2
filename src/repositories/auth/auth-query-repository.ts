@@ -1,10 +1,10 @@
 import {ConfirmationDataType, UserInfoType} from "../../domain/auth-services";
 import {ObjectId} from "mongodb";
-import {UsersModel} from "../../db";
+import {UsersModelClass} from "../../db";
 
 export const authQueryRepository = {
     async searchUserByCredentials(loginOrEmail: string): Promise<UserInfoType | null> {
-        const user = await UsersModel.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]});
+        const user = await UsersModelClass.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]});
 
         if (user) {
             return {passwordHash: user.passwordHash, id: user._id.toString()};
@@ -13,7 +13,7 @@ export const authQueryRepository = {
         }
     },
     async findUserWithConfirmationDataById(userId: string): Promise<ConfirmationDataType | null> {
-        const user = await UsersModel.findOne({_id: new ObjectId(userId)})
+        const user = await UsersModelClass.findOne({_id: new ObjectId(userId)})
 
         if (user) {
             return {
@@ -26,7 +26,7 @@ export const authQueryRepository = {
         }
     },
     async findUserWithConfirmationDataByEmail(email: string): Promise<ConfirmationDataType | null> {
-        const user = await UsersModel.findOne({email: email})
+        const user = await UsersModelClass.findOne({email: email})
 
         if (user) {
             return {
@@ -39,7 +39,7 @@ export const authQueryRepository = {
         }
     },
     async findUserByConfirmationCode(code: string): Promise<string | null> {
-        const user = await UsersModel.findOne({"emailConfirmation.confirmationCode": code});
+        const user = await UsersModelClass.findOne({"emailConfirmation.confirmationCode": code});
 
         if (user) {
             return user._id.toString();

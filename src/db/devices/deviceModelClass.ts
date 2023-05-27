@@ -9,4 +9,4 @@ import mongoose from "mongoose";
 import {DeviceAuthSessionsTypeDB} from "./types";
 import {DeviceSchema} from "./device.schema";
 
-export const DeviceModel = mongoose.model<DeviceAuthSessionsTypeDB>("device", DeviceSchema);
+export const DeviceModelClass = mongoose.model<DeviceAuthSessionsTypeDB>("device", DeviceSchema);
