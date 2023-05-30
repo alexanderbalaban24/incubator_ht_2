@@ -1,7 +1,7 @@
 import {BlogsModelClass, CommentsModelClass, DeviceModelClass, PostsModelClass, RateLimitModelClass, UsersModelClass} from "../../db";
 
 
-export const testingCommandRepository = {
+export class TestingCommandRepository {
     async deleteAllDB(): Promise<boolean> {
         try {
             const deletedResult = await Promise.all([

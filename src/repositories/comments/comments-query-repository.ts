@@ -5,7 +5,7 @@ import {QueryParamsCommentModel} from "../../models/comment/QueryParamsCommentMo
 import {CommentsDB, CommentsModelClass} from "../../db";
 import {Query} from "mongoose";
 
-export const commentsQueryRepository = {
+export class CommentsQueryRepository {
     async findComments(postId: string, query: QueryParamsCommentModel): Promise<ViewWithQueryCommentModel> {
         const commentsInstances = CommentsModelClass.find({postId});
         const queryResult = await this._queryBuilder(query, commentsInstances);
@@ -14,7 +14,7 @@ export const commentsQueryRepository = {
 
         queryResult.items = comments.map(comment => this._mapCommentDBByViewCommentModel(comment));
         return queryResult;
-    },
+    }
     async findCommentById(commentId: string) {
         const comment = await CommentsModelClass.findById(commentId).lean();
 
@@ -23,7 +23,7 @@ export const commentsQueryRepository = {
         } else {
             return null;
         }
-    },
+    }
     _mapCommentDBByViewCommentModel(comment: WithId<CommentsDB>): ViewCommentModel {
         return {
             id: comment._id.toString(),
@@ -34,7 +34,7 @@ export const commentsQueryRepository = {
             },
             createdAt: comment.createdAt
         }
-    },
+    }
     async _queryBuilder(queryCommentsData: QueryParamsCommentModel, query: Query<any, any>): Promise<ViewWithQueryCommentModel> {
         const sortBy = queryCommentsData.sortBy ? queryCommentsData.sortBy : "createdAt";
         const sortDirection = queryCommentsData.sortDirection ? queryCommentsData.sortDirection : "desc";

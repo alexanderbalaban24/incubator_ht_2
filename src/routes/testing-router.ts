@@ -1,6 +1,6 @@
 import {Router} from "express";
-import {deleteAllData} from "../controllers/testing.controller";
+import {testingController} from "../composition-root";
 
 export const testingRouter = Router();
 
-testingRouter.route('/all-data').delete(deleteAllData);
+testingRouter.route('/all-data').delete(testingController.deleteAllData.bind(testingController));

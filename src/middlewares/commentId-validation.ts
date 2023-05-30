@@ -1,7 +1,7 @@
 import {RequestWithParams, ResponseEmpty} from "../shared/types";
-import {commentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {NextFunction} from "express";
 import {HTTPResponseStatusCodes} from "../shared/enums";
+import {commentsQueryRepository} from "../composition-root";
 
 export const commentIdValidation = async (req: RequestWithParams<{
     commentId: string

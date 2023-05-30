@@ -1,31 +1,23 @@
 import {Router} from "express";
 import {basicAuthMiddleware} from "../middlewares/basic-auth";
-import {
-    createComment,
-    createPost,
-    deletePost,
-    getAllComments,
-    getAllPosts,
-    getPost,
-    updatePost
-} from "../controllers/posts.controller";
 import {postValidateSchema} from "../schemes/posts-schema";
 import {inputValidationMiddleware} from "../middlewares/input-validation";
 import {jwtAuthAccess} from "../middlewares/jwt-auth-access";
 import {commentsSchema} from "../schemes/comments-schema";
 import {postIdValidation} from "../middlewares/postId-validation";
+import {postsController} from "../composition-root";
 
 export const postsRouter = Router();
 
 postsRouter.route('/')
-    .get(getAllPosts)
-    .post(basicAuthMiddleware, postValidateSchema, inputValidationMiddleware, createPost);
+    .get(postsController.getAllPosts.bind(postsController))
+    .post(basicAuthMiddleware, postValidateSchema, inputValidationMiddleware, postsController.createPost.bind(postsController));
 
 postsRouter.route('/:postId')
-    .get(getPost)
-    .put(basicAuthMiddleware, postValidateSchema, inputValidationMiddleware, updatePost)
-    .delete(basicAuthMiddleware, deletePost);
+    .get(postsController.getPost.bind(postsController))
+    .put(basicAuthMiddleware, postValidateSchema, inputValidationMiddleware, postsController.updatePost.bind(postsController))
+    .delete(basicAuthMiddleware, postsController.deletePost.bind(postsController));
 
 postsRouter.route('/:postId/comments')
-    .get(postIdValidation, getAllComments)
-    .post(jwtAuthAccess, postIdValidation, commentsSchema, inputValidationMiddleware, createComment);
+    .get(postIdValidation, postsController.getAllComments.bind(postsController))
+    .post(jwtAuthAccess, postIdValidation, commentsSchema, inputValidationMiddleware, postsController.createComment.bind(postsController));

@@ -2,18 +2,18 @@ import {ConfirmationDataType, UserInfoType} from "../../domain/auth-services";
 import {ObjectId} from "mongodb";
 import {UsersModelClass} from "../../db";
 
-export const authQueryRepository = {
+export class AuthQueryRepository {
     async searchUserByCredentials(loginOrEmail: string): Promise<UserInfoType | null> {
-        const user = await UsersModelClass.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]});
+        const user = await UsersModelClass.findOne().or([{login: loginOrEmail}, {email: loginOrEmail}]).lean();
 
         if (user) {
             return {passwordHash: user.passwordHash, id: user._id.toString()};
         } else {
             return null;
         }
-    },
-    async findUserWithConfirmationDataById(userId: string): Promise<ConfirmationDataType | null> {
-        const user = await UsersModelClass.findOne({_id: new ObjectId(userId)})
+    }
+    async findUserWithEmailConfirmationDataById(userId: string): Promise<ConfirmationDataType | null> {
+        const user = await UsersModelClass.findById(userId).lean();
 
         if (user) {
             return {
@@ -24,9 +24,21 @@ export const authQueryRepository = {
         } else {
             return null;
         }
-    },
+    }
+    async findUserWithPasswordRecoverConfirmationDataById(userId: string): Promise<ConfirmationDataType | null> {
+        const user = await UsersModelClass.findById({_id: new ObjectId(userId)}).lean();
+        if (user) {
+            return {
+                confirmationCode: user.passwordRecover.confirmationCode,
+                expirationDate: user.passwordRecover.expirationDate,
+                isConfirmed: user.passwordRecover.isConfirmed
+            }
+        } else {
+            return null;
+        }
+    }
     async findUserWithConfirmationDataByEmail(email: string): Promise<ConfirmationDataType | null> {
-        const user = await UsersModelClass.findOne({email: email})
+        const user = await UsersModelClass.findOne({email})
 
         if (user) {
             return {
@@ -37,9 +49,10 @@ export const authQueryRepository = {
         } else {
             return null;
         }
-    },
+    }
     async findUserByConfirmationCode(code: string): Promise<string | null> {
-        const user = await UsersModelClass.findOne({"emailConfirmation.confirmationCode": code});
+        const user = await UsersModelClass.findOne()
+            .or([{"emailConfirmation.confirmationCode": code}, {"passwordRecover.confirmationCode": code}]);
 
         if (user) {
             return user._id.toString();

@@ -1,27 +1,30 @@
-import {authQueryRepository} from "../repositories/auth/auth-query-repository";
-import {compare} from "bcrypt";
-import {usersServices} from "./users-services";
+import {compare, genSalt, hash} from "bcrypt";
 import {businessService} from "./business-service";
-import {authCommandRepository} from "../repositories/auth/auth-command-repository";
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {jwtServices} from "../application/jwt-services";
-import {securityServices} from "./security-services";
-import {devicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
+import {EmailEvents} from "../shared/enums";
+import {usersServices} from "../composition-root";
+import {AuthQueryRepository} from "../repositories/auth/auth-query-repository";
+import {AuthCommandRepository} from "../repositories/auth/auth-command-repository";
+import {SecurityServices} from "./security-services";
+import {DevicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
 
 export type ConfirmationDataType = {
     confirmationCode: string
-    expirationDate: string
+    expirationDate: Date
+    isConfirmed: boolean
+}
+
+export type RecoveryPasswordDataType = {
+    confirmationCode: string
+    expirationDate: Date
     isConfirmed: boolean
 }
 
 export type UserInfoType = {
     id: string,
     passwordHash: string
-}
-
-export type LockedTokenType = {
-    refreshToken: string
 }
 
 export type TokenPair = {
@@ -39,9 +42,17 @@ export type DeviceDataType = {
 }
 
 
-export const authServices = {
+export class AuthServices {
+
+    constructor(
+        protected authQueryRepository: AuthQueryRepository,
+        protected authCommandRepository: AuthCommandRepository,
+        protected securityServices: SecurityServices,
+        protected devicesQueryRepository: DevicesQueryRepository
+    ){}
+
     async login(loginOrEmail: string, password: string, deviceName: string = "Other device", ip: string): Promise<TokenPair | null> {
-        const userInfo = await authQueryRepository.searchUserByCredentials(loginOrEmail);
+        const userInfo = await this.authQueryRepository.searchUserByCredentials(loginOrEmail);
 
         if (userInfo) {
             const isValidCredentials = await compare(password, userInfo.passwordHash);
@@ -49,7 +60,7 @@ export const authServices = {
             if (isValidCredentials) {
                 const accessToken = jwtServices.createAccessToken(userInfo.id);
 
-                const refreshToken = await securityServices.createDevice(userInfo.id, deviceName, ip, 20000);
+                const refreshToken = await this.securityServices.createDevice(userInfo.id, deviceName, ip, 20000);
 
                 return {accessToken, refreshToken}
             } else {
@@ -59,16 +70,16 @@ export const authServices = {
             return null;
         }
 
-    },
+    }
     async refreshToken(token: string, userId: string): Promise<TokenPair | null> {
         const refreshInfo = await jwtServices.decodeToken(token);
         if (!refreshInfo || !refreshInfo.deviceId) return null;
 
-        const deviceInfo = await devicesQueryRepository.findDeviceById(refreshInfo.deviceId);
+        const deviceInfo = await this.devicesQueryRepository.findDeviceById(refreshInfo.deviceId);
         if(!deviceInfo) return null;
 
         if(deviceInfo.userId === refreshInfo.userId && refreshInfo.iat === Math.trunc(+deviceInfo.issuedAt / 1000)) {
-            await securityServices.updateSessionTime(deviceInfo.id);
+            await this.securityServices.updateSessionTime(deviceInfo.id);
 
             const accessToken = jwtServices.createAccessToken(userId);
             const refreshToken = jwtServices.createRefreshToken(userId, deviceInfo.id);
@@ -77,29 +88,29 @@ export const authServices = {
         } else {
             return null;
         }
-    },
+    }
     async logout(refreshToken: string): Promise<boolean> {
         const refreshInfo = await jwtServices.decodeToken(refreshToken);
         if(!refreshInfo || !refreshInfo.deviceId) return false;
 
-        const deviceInfo = await devicesQueryRepository.findDeviceById(refreshInfo.deviceId);
+        const deviceInfo = await this.devicesQueryRepository.findDeviceById(refreshInfo.deviceId);
         if(!deviceInfo) return false;
 
         if(deviceInfo.userId === refreshInfo.userId && refreshInfo.iat === Math.trunc(+deviceInfo.issuedAt / 1000)) {
-            return await securityServices.revokeRefreshToken(refreshInfo.deviceId);
+            return await this.securityServices.revokeRefreshToken(refreshInfo.deviceId);
         } else {
             return false;
         }
 
-    },
+    }
     async registration(login: string, email: string, password: string): Promise<boolean> {
         const userId = await usersServices.createUser(login, email, password, false);
         if (!userId) return false;
 
-        const confirmationData = await authQueryRepository.findUserWithConfirmationDataById(userId);
+        const confirmationData = await this.authQueryRepository.findUserWithEmailConfirmationDataById(userId);
         if (!confirmationData) return false;
 
-        const success = await businessService.doOperation(email, confirmationData.confirmationCode);
+        const success = await businessService.doOperation(EmailEvents.Registration, email, confirmationData.confirmationCode);
 
         if (success) {
             return true;
@@ -107,23 +118,52 @@ export const authServices = {
             await usersServices.deleteUserById(userId);
             return false;
         }
-    },
-    async verifyEmail(code: string): Promise<boolean> {
-        const userId = await authQueryRepository.findUserByConfirmationCode(code);
+    }
+    async recoverPass(email: string): Promise<boolean> {
+        const userInfo = await this.authQueryRepository.searchUserByCredentials(email);
+        if (!userInfo) return false;
+
+        const recoverPasswordData: RecoveryPasswordDataType = {
+            confirmationCode: uuidv4(),
+            expirationDate: add(new Date(), {hours: 3}),
+            isConfirmed: false
+        }
+
+        const recoverCode = await this.authCommandRepository.updateRecoveryData(userInfo.id, recoverPasswordData);
+        if (!recoverCode) return false;
+
+
+        return await businessService.doOperation(EmailEvents.Recover_password, email, recoverCode);
+
+    }
+    async confirmRecoverPass(newPassword: string, code: string): Promise<boolean> {
+        const userId = await this.authQueryRepository.findUserByConfirmationCode(code);
+
+        const passwordSalt = await genSalt(10);
+        const passwordHash = await hash(newPassword, passwordSalt);
 
         if (userId) {
-            return await authCommandRepository.updateIsConfirmedFieldById(userId);
+            return await this.authCommandRepository.updateIsConfirmedPasswordConfirmationAndPasswordHashById(userId, passwordHash);
         } else {
             return false;
         }
-    },
+    }
+    async verifyEmail(code: string): Promise<boolean> {
+        const userId = await this.authQueryRepository.findUserByConfirmationCode(code);
+
+        if (userId) {
+            return await this.authCommandRepository.updateIsConfirmedEmailConfirmationFieldById(userId);
+        } else {
+            return false;
+        }
+    }
     async resendConfirmationCode(email: string): Promise<boolean> {
         const confirmationCode = uuidv4();
-        const expirationDate = add(new Date(), {hours: 3}).toISOString();
+        const expirationDate = add(new Date(), {hours: 3});
 
-        const isUpdate = await authCommandRepository.updateConfirmationDataByEmail(email, confirmationCode, expirationDate);
+        const isUpdate = await this.authCommandRepository.updateConfirmationDataByEmail(email, confirmationCode, expirationDate);
         if (!isUpdate) return false;
 
-        return await businessService.doOperation(email, confirmationCode);
+        return await businessService.doOperation(EmailEvents.Registration, email, confirmationCode);
     }
 }

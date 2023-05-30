@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import {authQueryRepository} from "../repositories/auth/auth-query-repository";
+import {authQueryRepository} from "../composition-root";
 
 
 export const resendSchema = checkSchema({

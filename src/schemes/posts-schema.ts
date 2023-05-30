@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import {blogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
+import {blogsQueryRepository} from "../composition-root";
 
 
 export const postValidateSchema = checkSchema({

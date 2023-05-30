@@ -1,6 +1,6 @@
-import {postsQueryRepository} from "../repositories/posts/posts-query-repository";
-import {usersQueryRepository} from "../repositories/users/users-query-repository";
-import {commentsCommandRepository} from "../repositories/comments/comments-command-repository";
+import {CommentsCommandRepository} from "../repositories/comments/comments-command-repository";
+import {PostsQueryRepository} from "../repositories/posts/posts-query-repository";
+import {usersQueryRepository} from "../composition-root";
 
 export type Comment = {
     postId: string
@@ -11,9 +11,12 @@ export type Comment = {
     }
 }
 
-export const commentsServices = {
+export class CommentsServices {
+
+    constructor(protected commentsCommandRepository: CommentsCommandRepository, protected postsQueryRepository: PostsQueryRepository){}
+
     async createComment(postId: string, content: string, userId: string): Promise<string | null> {
-        const post = await postsQueryRepository.findPostById(postId);
+        const post = await this.postsQueryRepository.findPostById(postId);
         if (!post) return null;
 
         const user = await usersQueryRepository.findUserById(userId);
@@ -28,14 +31,14 @@ export const commentsServices = {
             }
         }
 
-        return await commentsCommandRepository.createComment(newComment);
-    },
+        return await this.commentsCommandRepository.createComment(newComment);
+    }
     async deleteComment(commentId: string): Promise<boolean> {
-            return await commentsCommandRepository.deleteComment(commentId);
+            return await this.commentsCommandRepository.deleteComment(commentId);
 
-    },
+    }
     async updateComment(commentId: string, content: string): Promise<boolean> {
-            return await commentsCommandRepository.updateComment(commentId, content);
+            return await this.commentsCommandRepository.updateComment(commentId, content);
 
     }
 }

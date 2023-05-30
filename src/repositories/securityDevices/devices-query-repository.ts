@@ -9,7 +9,7 @@ export type SecurityDeviceActiveSessions = {
     deviceId: string
 }
 
-export const devicesQueryRepository = {
+export class DevicesQueryRepository {
     async findDeviceByUserId(userId: string): Promise<SecurityDeviceActiveSessions[] | null> {
         const sessions = await DeviceModelClass.find({userId}).lean();
 
@@ -19,7 +19,7 @@ export const devicesQueryRepository = {
             lastActiveDate: session.issuedAt.toISOString(),
             deviceId: session._id.toString()
         }));
-    },
+    }
     async findDeviceById(deviceId: string): Promise<DeviceDataType | null> {
         const device = await DeviceModelClass.findById(deviceId).lean();
 

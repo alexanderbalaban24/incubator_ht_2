@@ -4,10 +4,17 @@ export type UsersDB = {
     passwordHash: string
     createdAt: string
     emailConfirmation: EmailConfirmation
+    passwordRecover: PasswordRecover
 }
 
 type EmailConfirmation = {
     confirmationCode: string
-    expirationDate: string
+    expirationDate: Date
+    isConfirmed: boolean
+}
+
+type PasswordRecover = {
+    confirmationCode: string
+    expirationDate: Date
     isConfirmed: boolean
 }

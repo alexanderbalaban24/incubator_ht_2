@@ -5,7 +5,7 @@ import {ViewWithQueryBlogModel} from "../../models/blog/ViewWithQueryBlogModel";
 import {Query} from "mongoose";
 import {BlogDB, BlogsModelClass} from "../../db";
 
-export const blogsQueryRepository = {
+export class BlogsQueryRepository {
     async findBlogs(query: QueryParamsBlogModel): Promise<ViewWithQueryBlogModel> {
         const blogInstances = BlogsModelClass.find({});
         const queryResult = await this._queryBuilder(query, blogInstances);
@@ -13,7 +13,7 @@ export const blogsQueryRepository = {
 
         queryResult.items = blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
         return queryResult;
-    },
+    }
     async findBlogById(blogId: string): Promise<ViewBlogModel | null> {
         const blog = await BlogsModelClass.findById(blogId).lean();
         if (blog) {
@@ -21,7 +21,7 @@ export const blogsQueryRepository = {
         } else {
             return null;
         }
-    },
+    }
     _mapBlogDBToViewBlogModel(blog: WithId<BlogDB>): ViewBlogModel {
         return {
             id: blog._id.toString(),
@@ -31,7 +31,7 @@ export const blogsQueryRepository = {
             createdAt: blog.createdAt,
             isMembership: blog.isMembership
         }
-    },
+    }
     async _queryBuilder(queryBlogData: QueryParamsBlogModel, query: Query<any, any>): Promise<ViewWithQueryBlogModel> {
         const sortBy = queryBlogData.sortBy ? queryBlogData.sortBy : "createdAt";
         const sortDirection = queryBlogData.sortDirection ? queryBlogData.sortDirection : "desc";

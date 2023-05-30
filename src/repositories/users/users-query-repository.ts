@@ -6,7 +6,7 @@ import {UsersDB, UsersModelClass} from "../../db";
 import {Query} from "mongoose";
 
 
-export const usersQueryRepository = {
+export class UsersQueryRepository {
     async findUsers(query: QueryParamsUserModel): Promise<ViewWithQueryUserModel> {
         const userInstances = UsersModelClass.find({}, {projection: {passwordHash: 0}});
 
@@ -16,7 +16,7 @@ export const usersQueryRepository = {
         queryResult.items = users.map(user => this._mapUserDBToViewUserModel(user));
 
         return queryResult;
-    },
+    }
     async findUserById(userId: string): Promise<ViewUserModel | null> {
         const user = await UsersModelClass.findById(userId, {projection: {passwordHash: 0}});
 
@@ -26,7 +26,7 @@ export const usersQueryRepository = {
             return null;
         }
 
-    },
+    }
     _mapUserDBToViewUserModel(user: WithId<UsersDB>): ViewUserModel {
         return {
             id: user._id.toString(),
@@ -34,7 +34,7 @@ export const usersQueryRepository = {
             email: user.email,
             createdAt: user.createdAt
         }
-    },
+    }
     async _queryBuilder(queryUserData: QueryParamsUserModel, query: Query<any, any>): Promise<ViewWithQueryUserModel> {
         const sortBy = queryUserData.sortBy ? queryUserData.sortBy : "createdAt";
         const sortDirection = queryUserData.sortDirection ? queryUserData.sortDirection : "desc"

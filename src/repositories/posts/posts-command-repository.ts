@@ -1,11 +1,11 @@
 import {Post} from "../../domain/posts-services";
 import {BlogsModelClass, PostsModelClass} from "../../db";
 
-export const postsCommandRepository = {
+export class PostsCommandRepository {
     async createPost(newPost: Post): Promise<string> {
         const result = await new PostsModelClass(newPost).save();
         return result._id.toString();
-    },
+    }
     async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string, blogName: string): Promise<boolean> {
         const postInstances = await PostsModelClass.findById(postId);
         if (!postInstances) return false;
@@ -22,7 +22,7 @@ export const postsCommandRepository = {
         } catch (e) {
             return false;
         }
-    },
+    }
     async deletePostById(postId: string): Promise<boolean> {
         const postInstances = await PostsModelClass.findById(postId);
         if (!postInstances) return false;

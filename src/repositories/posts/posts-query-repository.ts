@@ -5,7 +5,7 @@ import {QueryParamsPostModel} from "../../models/post/QueryParamsPostModel";
 import {PostDB, PostsModelClass} from "../../db";
 import {Query} from "mongoose";
 
-export const postsQueryRepository = {
+export class PostsQueryRepository {
     async findPost(query: QueryParamsPostModel, blogId?: string | undefined): Promise<ViewWithQueryPostModel> {
         const postInstances = PostsModelClass.find({});
         const queryResult = await this._queryBuilder(query, postInstances, blogId);
@@ -14,7 +14,7 @@ export const postsQueryRepository = {
         queryResult.items = posts.map(post => this._mapPostDBToViewPostModel(post));
 
         return queryResult;
-    },
+    }
     async findPostById(postId: string): Promise<ViewPostModel | null> {
         const post = await PostsModelClass.findById(postId).lean();
 
@@ -23,7 +23,7 @@ export const postsQueryRepository = {
         } else {
             return null;
         }
-    },
+    }
     _mapPostDBToViewPostModel(post: WithId<PostDB>): ViewPostModel {
         return {
             id: post._id.toString(),
@@ -34,7 +34,7 @@ export const postsQueryRepository = {
             blogName: post.blogName,
             createdAt: post.createdAt
         }
-    },
+    }
     async _queryBuilder(queryPosts: QueryParamsPostModel, query: Query<any, any>, blogId: string | undefined): Promise<ViewWithQueryPostModel> {
         const sortBy = queryPosts.sortBy ? queryPosts.sortBy : "createdAt";
         const sortDirection = queryPosts.sortDirection ? queryPosts.sortDirection : "desc"

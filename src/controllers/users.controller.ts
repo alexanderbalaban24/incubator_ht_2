@@ -1,32 +1,36 @@
 import {RequestWithBody, RequestWithParams, RequestWithQueryParams, ResponseEmpty} from "../shared/types";
 import {ViewUserModel} from "../models/user/ViewUserModel";
 import {CreateUserModel} from "../models/user/CreateUserModel";
-import {usersServices} from "../domain/users-services";
-import {usersQueryRepository} from "../repositories/users/users-query-repository";
 import {Response} from "express";
 import {QueryParamsUserModel} from "../models/user/QueryParamsUserModel";
 import {ViewWithQueryUserModel} from "../models/user/ViewWithQueryUserModel";
 import {HTTPResponseStatusCodes} from "../shared/enums";
+import {UsersQueryRepository} from "../repositories/users/users-query-repository";
+import {UsersServices} from "../domain/users-services";
 
 
-export const getUsers = async (req: RequestWithQueryParams<QueryParamsUserModel>, res: Response<ViewWithQueryUserModel>) => {
-    const users = await usersQueryRepository.findUsers(req.query);
+export class UsersController {
 
-    res.status(HTTPResponseStatusCodes.OK).json(users);
-}
+    constructor(protected usersServices: UsersServices, protected usersQueryRepository: UsersQueryRepository){}
+    async getUsers(req: RequestWithQueryParams<QueryParamsUserModel>, res: Response<ViewWithQueryUserModel>) {
+        const users = await this.usersQueryRepository.findUsers(req.query);
 
-export const createUser = async (req: RequestWithBody<CreateUserModel>, res: Response<ViewUserModel>) => {
-    const userId = await usersServices.createUser(req.body.login, req.body.email, req.body.password, true);
-    const user = await usersQueryRepository.findUserById(userId);
-    res.status(HTTPResponseStatusCodes.CREATED).json(user!);
-}
+        res.status(HTTPResponseStatusCodes.OK).json(users);
+    }
 
-export const deleteUser = async (req: RequestWithParams<{ userId: string }>, res: ResponseEmpty) => {
-    const isDeleted = await usersServices.deleteUserById(req.params.userId);
+    async createUser(req: RequestWithBody<CreateUserModel>, res: Response<ViewUserModel>) {
+        const userId = await this.usersServices.createUser(req.body.login, req.body.email, req.body.password, true);
+        const user = await this.usersQueryRepository.findUserById(userId);
+        res.status(HTTPResponseStatusCodes.CREATED).json(user!);
+    }
 
-    if (isDeleted) {
-        res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
-    } else {
-        res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+    async deleteUser(req: RequestWithParams<{ userId: string }>, res: ResponseEmpty) {
+        const isDeleted = await this.usersServices.deleteUserById(req.params.userId);
+
+        if (isDeleted) {
+            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        } else {
+            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+        }
     }
 }

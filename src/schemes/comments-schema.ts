@@ -1,6 +1,4 @@
 import {checkSchema} from "express-validator";
-import {blogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
-import {commentsQueryRepository} from "../repositories/comments/comments-query-repository";
 
 
 export const commentsSchema = checkSchema({

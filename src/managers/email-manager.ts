@@ -11,5 +11,15 @@ export const emailManager = {
         const subject = "Registration Confirmation";
 
         return await emailAdapter.sendEmail(email, subject, message);
+    },
+    async sendEmailRecoverPasswordMessage(email: string, recoverCode: string): Promise<boolean> {
+        const message = "<h1>Password recovery</h1>\n" +
+            "       <p>To finish password recovery please follow the link below:\n" +
+            `          <a href='https://somesite.com/password-recovery?recoveryCode=${recoverCode}'>recovery password</a>\n` +
+            "      </p>";
+
+        const subject = "Password recover";
+
+        return await emailAdapter.sendEmail(email, subject, message);
     }
 }

@@ -1,8 +1,8 @@
 import {RequestWithParamsAndBody, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
 import {CreatePostModel} from "../models/post/CreatePostModel";
-import {blogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 import {HTTPResponseStatusCodes} from "../shared/enums";
+import {blogsQueryRepository} from "../composition-root";
 
 export const blogIdValidation = async (req: RequestWithParamsAndBody<{
     blogId: string

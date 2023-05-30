@@ -10,3 +10,8 @@ export enum HTTPResponseStatusCodes {
     NOT_FOUND = 404,
     TOO_MANY_REQUESTS = 429
 }
+
+export enum EmailEvents {
+    Registration,
+    Recover_password
+}

@@ -11,10 +11,10 @@ export type JWTSCredentialsType = {
 export const jwtServices = {
     secret: settings.jwt_secret!,
     createAccessToken(userId: string): string {
-        return jwt.sign({userId}, this.secret, {expiresIn: "10000"});
+        return jwt.sign({userId}, this.secret, {expiresIn: "600000"});
     },
     createRefreshToken(userId: string, deviceId: string): string {
-        return jwt.sign({userId, deviceId}, this.secret, {expiresIn: "20000"});
+        return jwt.sign({userId, deviceId}, this.secret, {expiresIn: "300000"});
     },
     checkCredentials(token: string): string | null {
         try {
