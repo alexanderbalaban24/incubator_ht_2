@@ -1,8 +1,8 @@
 import {AttemptType} from "../../application/rateLimit-services";
-import {RateLimitModelClass} from "../../db";
+import {RateLimitModelClass} from "../../models/rateLimit/RateLimitModelClass";
 
 
-export const rateLimitCommandRepository = {
+export class RateLimitCommandRepository {
     async addAttempt(newAttempt: AttemptType): Promise<string> {
         const result = await new RateLimitModelClass(newAttempt).save();
 

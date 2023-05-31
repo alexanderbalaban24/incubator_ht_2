@@ -1,12 +1,12 @@
 import {app} from "./app";
 import {settings} from "./shared/settings";
-import {runDB} from "./db";
+import {startDB} from "./db";
 
 const PORT = settings.port;
 
 const startApp = async () => {
     try {
-        await runDB();
+        await startDB();
         app.listen(PORT, () => {
             console.log(`Server running on port : ${PORT}`);
         });

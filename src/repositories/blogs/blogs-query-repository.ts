@@ -3,7 +3,8 @@ import {QueryParamsBlogModel} from "../../models/blog/QueryParamsBlogModel";
 import {WithId} from "mongodb";
 import {ViewWithQueryBlogModel} from "../../models/blog/ViewWithQueryBlogModel";
 import {Query} from "mongoose";
-import {BlogDB, BlogsModelClass} from "../../db";
+import {BlogDB, BlogsModelClass} from "../../models/blog/BlogsModelClass";
+
 
 export class BlogsQueryRepository {
     async findBlogs(query: QueryParamsBlogModel): Promise<ViewWithQueryBlogModel> {

@@ -63,12 +63,16 @@ export class BlogsController {
     }
 
     async updateBlog(req: RequestWithParamsAndBody<URIParamsBlogModel, UpdateBlogModel>, res: ResponseEmpty) {
-        const isUpdated = await this.blogsServices.updateBlog(req.params.blogId, req.body.name, req.body.description, req.body.websiteUrl);
+        try {
+            const isUpdated = await this.blogsServices.updateBlog(req.params.blogId, req.body.name, req.body.description, req.body.websiteUrl);
 
-        if (isUpdated) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT)
-        } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND)
+            if (isUpdated) {
+                res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+            } else {
+                res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            }
+        } catch (e) {
+            res.sendStatus(500);
         }
     }
 

@@ -1,15 +1,7 @@
 import {CommentsCommandRepository} from "../repositories/comments/comments-command-repository";
 import {PostsQueryRepository} from "../repositories/posts/posts-query-repository";
 import {usersQueryRepository} from "../composition-root";
-
-export type Comment = {
-    postId: string
-    content: string
-    commentatorInfo: {
-        userId: string
-        userLogin: string
-    }
-}
+import {CommentDTO} from "./dtos";
 
 export class CommentsServices {
 
@@ -22,14 +14,7 @@ export class CommentsServices {
         const user = await usersQueryRepository.findUserById(userId);
         if (!user) return null;
 
-        const newComment: Comment = {
-            postId: post.id,
-            content,
-            commentatorInfo: {
-                userId: userId,
-                userLogin: user.login
-            }
-        }
+        const newComment = new CommentDTO(post.id, content, userId, user.login);
 
         return await this.commentsCommandRepository.createComment(newComment);
     }

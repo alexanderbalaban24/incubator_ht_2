@@ -1,7 +1,7 @@
 import {app} from "../../src/app";
 import request from "supertest";
 import {VALID_BLOG_DATA} from "../../src/shared/utils";
-import {client} from "../../src/db/run-db";
+import {client} from "../../src/db";
 import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 

@@ -1,9 +1,9 @@
-import {UserType} from "../../domain/users-services";
-import {UsersModelClass} from "../../db";
+import {UsersModelClass} from "../../models/user/UsersModelClass";
+import {UserDTO} from "../../domain/dtos";
 
 
 export class UsersCommandRepository {
-    async createUser (user: UserType): Promise<string> {
+    async createUser (user: UserDTO): Promise<string> {
     const result = await new UsersModelClass(user).save();
 
     return result._id.toString();

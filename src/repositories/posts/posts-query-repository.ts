@@ -2,8 +2,8 @@ import {ViewPostModel} from "../../models/post/ViewPostModel";
 import {ViewWithQueryPostModel} from "../../models/post/ViewWithQueryPostModel";
 import {WithId} from "mongodb";
 import {QueryParamsPostModel} from "../../models/post/QueryParamsPostModel";
-import {PostDB, PostsModelClass} from "../../db";
 import {Query} from "mongoose";
+import {PostDB, PostsModelClass} from "../../models/post/PostsModelClass";
 
 export class PostsQueryRepository {
     async findPost(query: QueryParamsPostModel, blogId?: string | undefined): Promise<ViewWithQueryPostModel> {

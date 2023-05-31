@@ -1,11 +1,21 @@
-export { runDB } from "./run-db";
-export { BlogsModelClass } from "./blogs/blogsModelClass";
-export { BlogDB } from "./blogs/types";
-export { CommentsModelClass } from "./comments/comments.model";
-export { CommentsDB } from "./comments/types";
-export { DeviceModelClass } from "./devices/deviceModelClass";
-export { PostsModelClass } from "./posts/postsModelClass";
-export { PostDB } from "./posts/types";
-export { RateLimitModelClass } from "./rateLimit/rateLimit.model";
-export { UsersModelClass } from "./users/users.model";
-export { UsersDB } from "./users/types";
+import mongoose from "mongoose";
+import {settings} from "../shared/settings";
+
+if (!settings.mongo_url) {
+    throw new Error('MongoDB url not found');
+}
+
+const mongoURL = settings.mongo_url;
+
+
+export const startDB = async () => {
+    try {
+        await mongoose.connect(mongoURL, {
+            dbName: "blog-platform"
+        });
+        console.log('Connected successfully to server');
+    } catch (e) {
+        console.log('Don\'t connected successfully to server');
+        await mongoose.disconnect();
+    }
+}

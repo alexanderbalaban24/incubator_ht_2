@@ -1,5 +1,4 @@
 import {emailManager} from "../managers/email-manager";
-import {ConfirmationDataType} from "./auth-services";
 import {EmailEvents} from "../shared/enums";
 
 export const businessService = {

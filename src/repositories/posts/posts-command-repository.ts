@@ -1,8 +1,8 @@
-import {Post} from "../../domain/posts-services";
-import {BlogsModelClass, PostsModelClass} from "../../db";
+import {PostsModelClass} from "../../models/post/PostsModelClass";
+import {PostDTO} from "../../domain/dtos";
 
 export class PostsCommandRepository {
-    async createPost(newPost: Post): Promise<string> {
+    async createPost(newPost: PostDTO): Promise<string> {
         const result = await new PostsModelClass(newPost).save();
         return result._id.toString();
     }

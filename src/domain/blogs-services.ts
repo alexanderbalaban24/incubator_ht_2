@@ -1,20 +1,11 @@
 import {BlogsCommandRepository} from "../repositories/blogs/blogs-command-repository";
-
-export type Blog = {
-    name: string
-    description: string
-    websiteUrl: string
-}
+import {BlogDTO} from "./dtos";
 
 export class BlogsServices {
 
     constructor(protected blogsCommandRepository: BlogsCommandRepository){}
     async createBlog(name: string, description: string, websiteUrl: string): Promise<string> {
-        const newBlog: Blog = {
-            name,
-            description,
-            websiteUrl
-        }
+        const newBlog = new BlogDTO(name, description, websiteUrl);
         return await this.blogsCommandRepository.createBlog(newBlog);
     }
     async deleteBlogById(blogId: string): Promise<boolean> {
@@ -26,3 +17,19 @@ export class BlogsServices {
 
 
 }
+
+/*
+async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<boolean> {
+    const blogInstances = await this.blogsCommandRepository.getBlogById(blogId)
+    if (!blogInstances) throw new Error('')
+
+
+blogInstances.name = name;
+blogInstances.description = description;
+blogInstances.websiteUrl = websiteUrl;
+
+await this.blogsCommandRepository.save(blogInstances);
+
+return true;
+
+}*/

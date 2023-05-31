@@ -1,27 +1,28 @@
-import {rateLimitCommandRepository} from "../repositories/rateLimit/rateLimit-command-repository";
-import add from "date-fns/add";
 import {sub} from "date-fns";
-import {rateLimitQueryRepository} from "../repositories/rateLimit/rateLimit-query-repository";
+import {RateLimitCommandRepository} from "../repositories/rateLimit/rateLimit-command-repository";
+import {RateLimitQueryRepository} from "../repositories/rateLimit/rateLimit-query-repository";
 
 export type AttemptType = {
     IP: string
     URL: string
 }
 
-export const rateLimitServices = {
+export class RateLimitServices {
+
+    constructor(protected rateLimitCommandRepository: RateLimitCommandRepository, protected rateLimitQueryRepository: RateLimitQueryRepository) {}
     async addAttempt(IP: string, URL: string): Promise<string> {
         const newAttempt: AttemptType = {
             IP,
             URL
         }
 
-        return await rateLimitCommandRepository.addAttempt(newAttempt);
-    },
+        return await this.rateLimitCommandRepository.addAttempt(newAttempt);
+    }
     async getCountAttempts(IP: string, URL: string): Promise<number> {
     const limitInterval = sub(new Date(), {
         seconds: 10
     });
 
-    return await rateLimitQueryRepository.getCountAttemptsByIPAndUrl(IP, URL, limitInterval);
+    return await this.rateLimitQueryRepository.getCountAttemptsByIPAndUrl(IP, URL, limitInterval);
     }
 }

@@ -1,7 +1,7 @@
 import {RequestEmpty, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
-import {rateLimitServices} from "../application/rateLimit-services";
 import {HTTPResponseStatusCodes} from "../shared/enums";
+import {rateLimitServices} from "../composition-root";
 
 export const rateLimitMiddleware = async (req: RequestEmpty, res: ResponseEmpty, next: NextFunction) => {
     await rateLimitServices.addAttempt(req.ip, req.originalUrl);

@@ -9,37 +9,7 @@ import {AuthQueryRepository} from "../repositories/auth/auth-query-repository";
 import {AuthCommandRepository} from "../repositories/auth/auth-command-repository";
 import {SecurityServices} from "./security-services";
 import {DevicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
-
-export type ConfirmationDataType = {
-    confirmationCode: string
-    expirationDate: Date
-    isConfirmed: boolean
-}
-
-export type RecoveryPasswordDataType = {
-    confirmationCode: string
-    expirationDate: Date
-    isConfirmed: boolean
-}
-
-export type UserInfoType = {
-    id: string,
-    passwordHash: string
-}
-
-export type TokenPair = {
-    accessToken: string,
-    refreshToken: string
-}
-
-export type DeviceDataType = {
-    id: string,
-    userId: string,
-    deviceName: string,
-    ip: string,
-    issuedAt: Date,
-    expirationAt: Date
-}
+import {RecoveryPasswordDTO, TokenPairDTO} from "./dtos";
 
 
 export class AuthServices {
@@ -51,7 +21,7 @@ export class AuthServices {
         protected devicesQueryRepository: DevicesQueryRepository
     ){}
 
-    async login(loginOrEmail: string, password: string, deviceName: string = "Other device", ip: string): Promise<TokenPair | null> {
+    async login(loginOrEmail: string, password: string, deviceName: string = "Other device", ip: string): Promise<TokenPairDTO | null> {
         const userInfo = await this.authQueryRepository.searchUserByCredentials(loginOrEmail);
 
         if (userInfo) {
@@ -71,7 +41,7 @@ export class AuthServices {
         }
 
     }
-    async refreshToken(token: string, userId: string): Promise<TokenPair | null> {
+    async refreshToken(token: string, userId: string): Promise<TokenPairDTO | null> {
         const refreshInfo = await jwtServices.decodeToken(token);
         if (!refreshInfo || !refreshInfo.deviceId) return null;
 
@@ -84,7 +54,7 @@ export class AuthServices {
             const accessToken = jwtServices.createAccessToken(userId);
             const refreshToken = jwtServices.createRefreshToken(userId, deviceInfo.id);
 
-            return {accessToken, refreshToken};
+            return new TokenPairDTO(accessToken, refreshToken);
         } else {
             return null;
         }
@@ -123,11 +93,7 @@ export class AuthServices {
         const userInfo = await this.authQueryRepository.searchUserByCredentials(email);
         if (!userInfo) return false;
 
-        const recoverPasswordData: RecoveryPasswordDataType = {
-            confirmationCode: uuidv4(),
-            expirationDate: add(new Date(), {hours: 3}),
-            isConfirmed: false
-        }
+        const recoverPasswordData = new RecoveryPasswordDTO();
 
         const recoverCode = await this.authCommandRepository.updateRecoveryData(userInfo.id, recoverPasswordData);
         if (!recoverCode) return false;

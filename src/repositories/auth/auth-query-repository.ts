@@ -1,6 +1,5 @@
-import {ConfirmationDataType, UserInfoType} from "../../domain/auth-services";
-import {ObjectId} from "mongodb";
-import {UsersModelClass} from "../../db";
+import {ConfirmationDataType, UserInfoType} from "../../domain/types";
+import {UsersModelClass} from "../../models/user/UsersModelClass";
 
 export class AuthQueryRepository {
     async searchUserByCredentials(loginOrEmail: string): Promise<UserInfoType | null> {
@@ -26,7 +25,7 @@ export class AuthQueryRepository {
         }
     }
     async findUserWithPasswordRecoverConfirmationDataById(userId: string): Promise<ConfirmationDataType | null> {
-        const user = await UsersModelClass.findById({_id: new ObjectId(userId)}).lean();
+        const user = await UsersModelClass.findById(userId).lean();
         if (user) {
             return {
                 confirmationCode: user.passwordRecover.confirmationCode,

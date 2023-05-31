@@ -1,4 +1,9 @@
-import {BlogsModelClass, CommentsModelClass, DeviceModelClass, PostsModelClass, RateLimitModelClass, UsersModelClass} from "../../db";
+import {BlogsModelClass} from "../../models/blog/BlogsModelClass";
+import {PostsModelClass} from "../../models/post/PostsModelClass";
+import {UsersModelClass} from "../../models/user/UsersModelClass";
+import {CommentsModelClass} from "../../models/comment/CommentsModelClass";
+import {DeviceModelClass} from "../../models/device/DeviceModelClass";
+import {RateLimitModelClass} from "../../models/rateLimit/RateLimitModelClass";
 
 
 export class TestingCommandRepository {

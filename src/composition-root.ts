@@ -24,6 +24,9 @@ import {SecurityServices} from "./domain/security-services";
 import {SecurityController} from "./controllers/security.controller";
 import {TestingCommandRepository} from "./repositories/testing/testing-command-repository";
 import {TestingController} from "./controllers/testing.controller";
+import {RateLimitQueryRepository} from "./repositories/rateLimit/rateLimit-query-repository";
+import {RateLimitCommandRepository} from "./repositories/rateLimit/rateLimit-command-repository";
+import {RateLimitServices} from "./application/rateLimit-services";
 
 
 export const postsQueryRepository = new PostsQueryRepository();
@@ -32,6 +35,7 @@ export const commentsQueryRepository = new CommentsQueryRepository();
 export const usersQueryRepository = new UsersQueryRepository();
 export const authQueryRepository = new AuthQueryRepository();
 export const devicesQueryRepository = new DevicesQueryRepository();
+export const rateLimitQueryRepository = new RateLimitQueryRepository();
 
 const postsCommandRepository = new PostsCommandRepository();
 const blogsCommandRepository = new BlogsCommandRepository();
@@ -40,6 +44,7 @@ const usersCommandRepository = new UsersCommandRepository();
 const authCommandRepository = new AuthCommandRepository();
 const devicesCommandRepository = new DevicesCommandRepository();
 const testingCommandRepository = new TestingCommandRepository();
+const rateLimitCommandRepository = new RateLimitCommandRepository();
 
 export const postsServices = new PostsServices(postsCommandRepository);
 const blogsServices = new BlogsServices(blogsCommandRepository);
@@ -47,6 +52,7 @@ const commentsServices = new CommentsServices(commentsCommandRepository, postsQu
 export const usersServices = new UsersServices(usersCommandRepository);
 const securityServices = new SecurityServices(devicesCommandRepository);
 export const authServices = new AuthServices(authQueryRepository, authCommandRepository, securityServices, devicesQueryRepository);
+export const rateLimitServices = new RateLimitServices(rateLimitCommandRepository, rateLimitQueryRepository);
 
 export const postsController = new PostsController(postsServices, postsQueryRepository, commentsServices, commentsQueryRepository);
 export const blogsController = new BlogsController(blogsServices, blogsQueryRepository, postsServices, postsQueryRepository);

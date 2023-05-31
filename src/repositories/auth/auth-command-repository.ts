@@ -1,6 +1,5 @@
-import {ObjectId} from "mongodb";
-import {UsersModelClass} from "../../db";
-import {RecoveryPasswordDataType} from "../../domain/auth-services";
+import {UsersModelClass} from "../../models/user/UsersModelClass";
+import {RecoveryPasswordDTO} from "../../domain/dtos";
 
 export class AuthCommandRepository {
     async updateIsConfirmedEmailConfirmationFieldById(userId: string): Promise<boolean> {
@@ -30,7 +29,7 @@ export class AuthCommandRepository {
             return false;
         }
     }
-    async updateRecoveryData(userId: string, newRecoveryData: RecoveryPasswordDataType): Promise<string | null> {
+    async updateRecoveryData(userId: string, newRecoveryData: RecoveryPasswordDTO): Promise<string | null> {
         const userInstances = await UsersModelClass.findById(userId);
         if(!userInstances) return null;
 

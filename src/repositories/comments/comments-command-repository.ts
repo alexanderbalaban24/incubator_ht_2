@@ -1,8 +1,8 @@
-import {Comment} from "../../domain/comments-services";
-import {CommentsModelClass} from "../../db";
+import {CommentsModelClass} from "../../models/comment/CommentsModelClass";
+import {CommentDTO} from "../../domain/dtos";
 
 export class CommentsCommandRepository {
-    async createComment(newComment: Comment): Promise<string> {
+    async createComment(newComment: CommentDTO): Promise<string> {
     const result = await new CommentsModelClass(newComment).save();
 
     return result._id.toString();

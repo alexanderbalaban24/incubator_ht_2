@@ -2,8 +2,8 @@ import {ViewCommentModel} from "../../models/comment/ViewCommentModel";
 import {WithId} from "mongodb";
 import {ViewWithQueryCommentModel} from "../../models/comment/ViewWithQueryCommentModel";
 import {QueryParamsCommentModel} from "../../models/comment/QueryParamsCommentModel";
-import {CommentsDB, CommentsModelClass} from "../../db";
 import {Query} from "mongoose";
+import {CommentsDB, CommentsModelClass} from "../../models/comment/CommentsModelClass";
 
 export class CommentsQueryRepository {
     async findComments(postId: string, query: QueryParamsCommentModel): Promise<ViewWithQueryCommentModel> {

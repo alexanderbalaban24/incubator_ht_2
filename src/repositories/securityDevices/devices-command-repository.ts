@@ -1,10 +1,10 @@
-import {DeviceType} from "../../domain/security-services";
 import {ObjectId} from "mongodb";
-import {DeviceModelClass} from "../../db";
+import {DeviceModelClass} from "../../models/device/DeviceModelClass";
+import {DeviceDTO} from "../../domain/dtos";
 
 
 export class DevicesCommandRepository {
-    async createDevice(newDevice: DeviceType): Promise<string> {
+    async createDevice(newDevice: DeviceDTO): Promise<string> {
         const result = await new DeviceModelClass(newDevice).save();
         return result._id.toString();
     }

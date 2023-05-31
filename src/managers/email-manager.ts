@@ -1,5 +1,6 @@
 import {emailAdapter} from "../adapters/email-adapter";
-import {ConfirmationDataType} from "../domain/auth-services";
+
+import {ConfirmationDataType} from "../domain/types";
 
 export const emailManager = {
     async sendEmailRegistrationMessage(email: string, confirmationCode: string): Promise<boolean> {

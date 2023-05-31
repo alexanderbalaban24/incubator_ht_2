@@ -1,13 +1,7 @@
-import {DeviceDataType} from "../../domain/auth-services";
-import {DeviceModelClass} from "../../db";
+import {SecurityDeviceActiveSessions} from "./types";
+import {DeviceModelClass} from "../../models/device/DeviceModelClass";
+import {DeviceDTO} from "../../domain/dtos";
 
-
-export type SecurityDeviceActiveSessions = {
-    ip: string
-    title: string
-    lastActiveDate: string
-    deviceId: string
-}
 
 export class DevicesQueryRepository {
     async findDeviceByUserId(userId: string): Promise<SecurityDeviceActiveSessions[] | null> {
@@ -20,7 +14,7 @@ export class DevicesQueryRepository {
             deviceId: session._id.toString()
         }));
     }
-    async findDeviceById(deviceId: string): Promise<DeviceDataType | null> {
+    async findDeviceById(deviceId: string): Promise<DeviceDTO & { id: string } | null> {
         const device = await DeviceModelClass.findById(deviceId).lean();
 
         if (device) {

@@ -2,8 +2,8 @@ import {WithId} from "mongodb";
 import {ViewUserModel} from "../../models/user/ViewUserModel";
 import {QueryParamsUserModel} from "../../models/user/QueryParamsUserModel";
 import {ViewWithQueryUserModel} from "../../models/user/ViewWithQueryUserModel";
-import {UsersDB, UsersModelClass} from "../../db";
 import {Query} from "mongoose";
+import {UsersDB, UsersModelClass} from "../../models/user/UsersModelClass";
 
 
 export class UsersQueryRepository {
