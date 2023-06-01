@@ -4,24 +4,27 @@ import {WithId} from "mongodb";
 import {QueryParamsPostModel} from "../../models/post/QueryParamsPostModel";
 import {Query} from "mongoose";
 import {PostDB, PostsModelClass} from "../../models/post/PostsModelClass";
+import {ResultDTO} from "../../shared/dto";
+import {InternalCode} from "../../shared/enums";
 
 export class PostsQueryRepository {
-    async findPost(query: QueryParamsPostModel, blogId?: string | undefined): Promise<ViewWithQueryPostModel> {
+    async findPost(query: QueryParamsPostModel, blogId?: string | undefined): Promise<ResultDTO<ViewWithQueryPostModel>> {
         const postInstances = PostsModelClass.find({});
         const queryResult = await this._queryBuilder(query, postInstances, blogId);
         const posts = await postInstances;
 
         queryResult.items = posts.map(post => this._mapPostDBToViewPostModel(post));
 
-        return queryResult;
+        return new ResultDTO(InternalCode.Success, queryResult);
     }
-    async findPostById(postId: string): Promise<ViewPostModel | null> {
+    async findPostById(postId: string): Promise<ResultDTO<ViewPostModel>> {
         const post = await PostsModelClass.findById(postId).lean();
 
         if (post) {
-            return this._mapPostDBToViewPostModel(post);
+            const mappedData = this._mapPostDBToViewPostModel(post);
+            return new ResultDTO(InternalCode.Success, mappedData);
         } else {
-            return null;
+            return new ResultDTO(InternalCode.Not_Found);
         }
     }
     _mapPostDBToViewPostModel(post: WithId<PostDB>): ViewPostModel {

@@ -4,24 +4,28 @@ import {ViewWithQueryCommentModel} from "../../models/comment/ViewWithQueryComme
 import {QueryParamsCommentModel} from "../../models/comment/QueryParamsCommentModel";
 import {Query} from "mongoose";
 import {CommentsDB, CommentsModelClass} from "../../models/comment/CommentsModelClass";
+import {ResultDTO} from "../../shared/dto";
+import {InternalCode} from "../../shared/enums";
 
 export class CommentsQueryRepository {
-    async findComments(postId: string, query: QueryParamsCommentModel): Promise<ViewWithQueryCommentModel> {
+    async findComments(postId: string, query: QueryParamsCommentModel): Promise<ResultDTO<ViewWithQueryCommentModel>> {
         const commentsInstances = CommentsModelClass.find({postId});
         const queryResult = await this._queryBuilder(query, commentsInstances);
 
         const comments = await commentsInstances;
 
         queryResult.items = comments.map(comment => this._mapCommentDBByViewCommentModel(comment));
-        return queryResult;
+
+        return new ResultDTO(InternalCode.Success, queryResult);
     }
-    async findCommentById(commentId: string) {
+    async findCommentById(commentId: string): Promise<ResultDTO<ViewCommentModel>> {
         const comment = await CommentsModelClass.findById(commentId).lean();
 
         if (comment) {
-            return this._mapCommentDBByViewCommentModel(comment);
+            const mappedData = this._mapCommentDBByViewCommentModel(comment);
+            return new ResultDTO(InternalCode.Success, mappedData);
         } else {
-            return null;
+            return new ResultDTO(InternalCode.Not_Found);
         }
     }
     _mapCommentDBByViewCommentModel(comment: WithId<CommentsDB>): ViewCommentModel {

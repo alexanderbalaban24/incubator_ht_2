@@ -1,37 +1,37 @@
 import {BlogsModelClass} from "../../models/blog/BlogsModelClass";
 import {BlogDTO} from "../../domain/dtos";
+import {ResultDTO} from "../../shared/dto";
+import {InternalCode} from "../../shared/enums";
 
 export class BlogsCommandRepository {
-    async createBlog(newBlog: BlogDTO): Promise<string> {
+    async createBlog(newBlog: BlogDTO): Promise<ResultDTO<{ id: string }>> {
         const result = await new BlogsModelClass(newBlog).save();
 
-        return result._id.toString();
+        return new ResultDTO(InternalCode.Success, {id: result._id.toString()});
     }
-    async deleteBlogById(blogId: string): Promise<boolean> {
-        const blogInstances = await BlogsModelClass.findById(blogId);
-        if (!blogInstances) return false;
 
-        try {
-            const result = await blogInstances.deleteOne();
-            return result.$isDeleted();
-        } catch(e) {
-            return false;
-        }
-    }
-    async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<boolean> {
+    async deleteBlogById(blogId: string): Promise<ResultDTO<{ isDeleted: boolean }>> {
         const blogInstances = await BlogsModelClass.findById(blogId);
-        if (!blogInstances) return false;
+        if (!blogInstances) return new ResultDTO(InternalCode.Not_Found);
+
+        const result = await blogInstances.deleteOne();
+        const isDeleted = result.$isDeleted();
+        if (!isDeleted) return new ResultDTO(InternalCode.Server_Error);
+
+        return new ResultDTO(InternalCode.Success, {isDeleted});
+    }
+
+    async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<ResultDTO<{isUpdate: boolean}>> {
+        const blogInstances = await BlogsModelClass.findById(blogId);
+        if (!blogInstances) return new ResultDTO(InternalCode.Not_Found);
 
         blogInstances.name = name;
         blogInstances.description = description;
         blogInstances.websiteUrl = websiteUrl;
 
-        try {
-            await blogInstances.save();
-            return true;
-        } catch(e) {
-            return false;
-        }
+        await blogInstances.save();
+
+        return new ResultDTO(InternalCode.Success, {isUpdate: true});
     }
 }
 

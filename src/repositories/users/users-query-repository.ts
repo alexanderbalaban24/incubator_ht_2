@@ -4,6 +4,8 @@ import {QueryParamsUserModel} from "../../models/user/QueryParamsUserModel";
 import {ViewWithQueryUserModel} from "../../models/user/ViewWithQueryUserModel";
 import {Query} from "mongoose";
 import {UsersDB, UsersModelClass} from "../../models/user/UsersModelClass";
+import {ResultDTO} from "../../shared/dto";
+import {InternalCode} from "../../shared/enums";
 
 
 export class UsersQueryRepository {
@@ -17,13 +19,14 @@ export class UsersQueryRepository {
 
         return queryResult;
     }
-    async findUserById(userId: string): Promise<ViewUserModel | null> {
+    async findUserById(userId: string): Promise<ResultDTO<ViewUserModel>> {
         const user = await UsersModelClass.findById(userId, {projection: {passwordHash: 0}});
 
         if (user) {
-            return this._mapUserDBToViewUserModel(user);
+            const mappedData = this._mapUserDBToViewUserModel(user);
+            return new ResultDTO(InternalCode.Success, mappedData);
         } else {
-            return null;
+            return new ResultDTO(InternalCode.Not_Found);
         }
 
     }

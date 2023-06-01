@@ -20,7 +20,7 @@ import {HTTPResponseStatusCodes} from "../shared/enums";
 import {BlogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 import {PostsServices} from "../domain/posts-services";
 import {PostsQueryRepository} from "../repositories/posts/posts-query-repository";
-
+import {mapStatusCode} from "../shared/utils";
 
 export class BlogsController {
 
@@ -29,71 +29,87 @@ export class BlogsController {
         protected blogsQueryRepository: BlogsQueryRepository,
         protected postsServices: PostsServices,
         protected postsQueryRepository: PostsQueryRepository
-    ) {}
-
-    async getAllBlogs(req: RequestWithQueryParams<QueryParamsBlogModel>, res: Response<ViewWithQueryBlogModel>) {
-        const blogs = await this.blogsQueryRepository.findBlogs(req.query);
-        res.status(HTTPResponseStatusCodes.OK).json(blogs);
+    ) {
     }
 
-    async createBlog(req: RequestWithBody<CreateBlogModel>, res: Response<ViewBlogModel>) {
-        const blogId = await this.blogsServices.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
-        const blog = await this.blogsQueryRepository.findBlogById(blogId);
-        res.status(HTTPResponseStatusCodes.CREATED).json(blog!);
+    async getAllBlogs(req: RequestWithQueryParams<QueryParamsBlogModel>, res: Response<ViewWithQueryBlogModel | null>) {
+        const blogsResult = await this.blogsQueryRepository.findBlogs(req.query);
+
+        if (blogsResult.success) {
+            res.status(mapStatusCode(blogsResult.code)).json(blogsResult.payload);
+        } else {
+            res.sendStatus(mapStatusCode(blogsResult.code));
+        }
+    }
+
+    async createBlog(req: RequestWithBody<CreateBlogModel>, res: Response<ViewBlogModel | null>) {
+        const createdResult = await this.blogsServices.createBlog(req.body.name, req.body.description, req.body.websiteUrl);
+
+        if (createdResult.success) {
+
+            const blogResult = await this.blogsQueryRepository.findBlogById(createdResult.payload!.id);
+
+            if (blogResult.success) {
+                res.status(HTTPResponseStatusCodes.CREATED).send(blogResult.payload);
+            } else {
+                res.sendStatus(mapStatusCode(createdResult.code));
+            }
+        } else {
+            res.sendStatus(mapStatusCode(createdResult.code));
+        }
     }
 
     async getBlog(req: RequestWithParams<URIParamsBlogModel>, res: Response<ViewBlogModel>) {
-        const blog = await this.blogsQueryRepository.findBlogById(req.params.blogId);
+        const blogResult = await this.blogsQueryRepository.findBlogById(req.params.blogId);
 
-        if (blog) {
-            res.status(HTTPResponseStatusCodes.OK).json(blog);
+        if (blogResult.success) {
+            res.status(mapStatusCode(blogResult.code)).json(blogResult.payload!);
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(blogResult.code));
         }
     }
 
     async deleteBlog(req: Request<URIParamsBlogModel>, res: ResponseEmpty) {
-        const isDeleted = await this.blogsServices.deleteBlogById(req.params.blogId);
+        const deletedResult = await this.blogsServices.deleteBlogById(req.params.blogId);
 
-        if (isDeleted) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
-        } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
-        }
+        res.sendStatus(mapStatusCode(deletedResult.code));
     }
 
     async updateBlog(req: RequestWithParamsAndBody<URIParamsBlogModel, UpdateBlogModel>, res: ResponseEmpty) {
-        try {
-            const isUpdated = await this.blogsServices.updateBlog(req.params.blogId, req.body.name, req.body.description, req.body.websiteUrl);
+        const updateResult = await this.blogsServices.updateBlog(req.params.blogId, req.body.name, req.body.description, req.body.websiteUrl);
 
-            if (isUpdated) {
-                res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
-            } else {
-                res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
-            }
-        } catch (e) {
-            res.sendStatus(500);
-        }
+        res.sendStatus(mapStatusCode(updateResult.code));
     }
 
     async createPostByBlogId(req: RequestWithParamsAndBody<{
         blogId: string
-    }, CreatePostModel>, res: Response<ViewPostModel>) {
+    }, CreatePostModel>, res: Response<ViewPostModel | null>) {
         const blogId = req.params.blogId;
-        const postId = await this.postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, blogId);
-        if (postId) {
-            const post = await this.postsQueryRepository.findPostById(postId);
-            res.status(HTTPResponseStatusCodes.CREATED).json(post!);
+
+        const createResult = await this.postsServices.createPost(req.body.title, req.body.shortDescription, req.body.content, blogId);
+        if (createResult.success) {
+            const postResult = await this.postsQueryRepository.findPostById(createResult.payload!.id);
+
+            if(postResult.success) {
+                res.status(mapStatusCode(postResult.code)).json(postResult.payload);
+            } else {
+                res.sendStatus(mapStatusCode(postResult.code));
+            }
+
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(createResult.code));
         }
     }
 
     async getPostsByBlogId(req: RequestWithQueryParamsAndURI<{
         blogId: string
-    }, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel>) {
-        const posts = await this.postsQueryRepository.findPost(req.query, req.params.blogId);
+    }, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel | null>) {
+        const postsResult = await this.postsQueryRepository.findPost(req.query, req.params.blogId);
 
-        res.status(HTTPResponseStatusCodes.OK).json(posts);
+        if(postsResult.success) {
+            res.status(mapStatusCode(postsResult.code)).json(postsResult.payload);
+        } else {
+            res.sendStatus(mapStatusCode(postsResult.code));
+        }
     }
 }

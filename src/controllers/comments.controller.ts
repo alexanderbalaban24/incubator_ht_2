@@ -4,60 +4,51 @@ import {RequestWithParams, RequestWithParamsAndBody, ResponseEmpty} from "../sha
 import {HTTPResponseStatusCodes} from "../shared/enums";
 import {CommentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {CommentsServices} from "../domain/comments-services";
+import {mapStatusCode} from "../shared/utils";
 
 export class CommentsController {
 
-    constructor(protected commentsServices: CommentsServices, protected commentsQueryRepository: CommentsQueryRepository){}
-    async getComment(req: RequestWithParams<{ commentId: string }>, res: Response<ViewCommentModel>) {
-        const comment = await this.commentsQueryRepository.findCommentById(req.params.commentId);
-        if (comment) {
-            res.status(HTTPResponseStatusCodes.OK).json(comment);
+    constructor(protected commentsServices: CommentsServices, protected commentsQueryRepository: CommentsQueryRepository) {
+    }
+
+    async getComment(req: RequestWithParams<{ commentId: string }>, res: Response<ViewCommentModel | null>) {
+        const commentResult = await this.commentsQueryRepository.findCommentById(req.params.commentId);
+        if (commentResult.success) {
+            res.status(mapStatusCode(commentResult.code)).json(commentResult.payload);
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(commentResult.code));
         }
     }
 
     async deleteComment(req: RequestWithParams<{ commentId: string }>, res: ResponseEmpty) {
-        const comment = await this.commentsQueryRepository.findCommentById(req.params.commentId);
-        if (!comment) {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
-            return;
-        }
+        const commentResult = await this.commentsQueryRepository.findCommentById(req.params.commentId);
+        if (!commentResult.success) return res.sendStatus(mapStatusCode(commentResult.code));
 
-        if (comment.commentatorInfo.userId !== req.userId) {
-            res.sendStatus(HTTPResponseStatusCodes.FORBIDDEN);
-            return;
-        }
+        if (commentResult.payload!.commentatorInfo.userId !== req.userId) return res.sendStatus(HTTPResponseStatusCodes.FORBIDDEN);
 
-        const isDeleted = await this.commentsServices.deleteComment(req.params.commentId);
+        const deleteResult = await this.commentsServices.deleteComment(req.params.commentId);
 
-        if (isDeleted) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        if (deleteResult.success) {
+            res.sendStatus(mapStatusCode(deleteResult.code));
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(deleteResult.code));
         }
     }
 
     async updateComment(req: RequestWithParamsAndBody<{ commentId: string }, {
         content: string
     }>, res: ResponseEmpty) {
-        const comment = await this.commentsQueryRepository.findCommentById(req.params.commentId);
-        if (!comment) {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
-            return;
-        }
+        const commentResult = await this.commentsQueryRepository.findCommentById(req.params.commentId);
+        if (!commentResult.success) return res.sendStatus(mapStatusCode(commentResult.code));
 
-        if (comment.commentatorInfo.userId !== req.userId) {
-            res.sendStatus(HTTPResponseStatusCodes.FORBIDDEN);
-            return;
-        }
+        if (commentResult.payload!.commentatorInfo.userId !== req.userId) return res.sendStatus(HTTPResponseStatusCodes.FORBIDDEN);
 
-        const isUpdated = await this.commentsServices.updateComment(req.params.commentId, req.body.content);
+        const updateResult = await this.commentsServices.updateComment(req.params.commentId, req.body.content);
 
-        if (isUpdated) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        if (updateResult.success) {
+            res.sendStatus(mapStatusCode(updateResult.code));
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(updateResult.code));
         }
     }
 }

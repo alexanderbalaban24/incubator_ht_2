@@ -4,23 +4,26 @@ import {WithId} from "mongodb";
 import {ViewWithQueryBlogModel} from "../../models/blog/ViewWithQueryBlogModel";
 import {Query} from "mongoose";
 import {BlogDB, BlogsModelClass} from "../../models/blog/BlogsModelClass";
+import {ResultDTO} from "../../shared/dto";
+import {InternalCode} from "../../shared/enums";
 
 
 export class BlogsQueryRepository {
-    async findBlogs(query: QueryParamsBlogModel): Promise<ViewWithQueryBlogModel> {
+    async findBlogs(query: QueryParamsBlogModel): Promise<ResultDTO<ViewWithQueryBlogModel>> {
         const blogInstances = BlogsModelClass.find({});
         const queryResult = await this._queryBuilder(query, blogInstances);
         const blogs = await blogInstances;
 
         queryResult.items = blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
-        return queryResult;
+        return new ResultDTO(InternalCode.Success, queryResult);
     }
-    async findBlogById(blogId: string): Promise<ViewBlogModel | null> {
+    async findBlogById(blogId: string): Promise<ResultDTO<ViewBlogModel>> {
         const blog = await BlogsModelClass.findById(blogId).lean();
         if (blog) {
-            return this._mapBlogDBToViewBlogModel(blog);
+            const mappedData = this._mapBlogDBToViewBlogModel(blog);
+            return new ResultDTO(InternalCode.Success, mappedData);
         } else {
-            return null;
+            return new ResultDTO(InternalCode.Not_Found);
         }
     }
     _mapBlogDBToViewBlogModel(blog: WithId<BlogDB>): ViewBlogModel {

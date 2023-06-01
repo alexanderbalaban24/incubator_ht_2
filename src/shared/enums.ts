@@ -8,7 +8,16 @@ export enum HTTPResponseStatusCodes {
     UNAUTHORIZED = 401,
     FORBIDDEN = 403,
     NOT_FOUND = 404,
-    TOO_MANY_REQUESTS = 429
+    TOO_MANY_REQUESTS = 429,
+    INTERNAL_SERVER_ERROR = 500
+}
+
+export enum InternalCode {
+    Success = "OK",
+    Bad_Request = "BAD_REQUEST",
+    Not_Found = "NOT_FOUND",
+    Server_Error = "INTERNAL_SERVER_ERROR",
+    No_Content = "NO_CONTENT"
 }
 
 export enum EmailEvents {

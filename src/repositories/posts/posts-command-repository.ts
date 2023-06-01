@@ -1,14 +1,17 @@
 import {PostsModelClass} from "../../models/post/PostsModelClass";
 import {PostDTO} from "../../domain/dtos";
+import {ResultDTO} from "../../shared/dto";
+import {InternalCode} from "../../shared/enums";
 
 export class PostsCommandRepository {
-    async createPost(newPost: PostDTO): Promise<string> {
+    async createPost(newPost: PostDTO): Promise<ResultDTO<{ id: string }>> {
         const result = await new PostsModelClass(newPost).save();
-        return result._id.toString();
+        return new ResultDTO(InternalCode.Success, {id: result._id.toString()});
     }
-    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string, blogName: string): Promise<boolean> {
+
+    async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string, blogName: string): Promise<ResultDTO<{ isUpdate: boolean }>> {
         const postInstances = await PostsModelClass.findById(postId);
-        if (!postInstances) return false;
+        if (!postInstances) return new ResultDTO(InternalCode.Not_Found);
 
         postInstances.title = title;
         postInstances.shortDescription = shortDescription;
@@ -16,22 +19,21 @@ export class PostsCommandRepository {
         postInstances.blogId = blogId;
         postInstances.blogName = blogName;
 
-        try {
-            await postInstances.save();
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-    async deletePostById(postId: string): Promise<boolean> {
-        const postInstances = await PostsModelClass.findById(postId);
-        if (!postInstances) return false;
+        await postInstances.save();
 
-        try {
+        return new ResultDTO(InternalCode.Success, {isUpdate: true});
+    }
+
+    async deletePostById(postId: string): Promise<ResultDTO<{ isDeleted: boolean }>> {
+        const postInstances = await PostsModelClass.findById(postId);
+        if (!postInstances) return new ResultDTO(InternalCode.Not_Found);
+
+
             const result = await postInstances.deleteOne();
-            return result.$isDeleted();
-        } catch (e) {
-            return false;
-        }
+            const isDeleted = result.$isDeleted();
+
+            if (!isDeleted) return new ResultDTO(InternalCode.Server_Error);
+
+            return new ResultDTO(InternalCode.Success, {isDeleted});
     }
 }

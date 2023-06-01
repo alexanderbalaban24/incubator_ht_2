@@ -48,7 +48,7 @@ const rateLimitCommandRepository = new RateLimitCommandRepository();
 
 export const postsServices = new PostsServices(postsCommandRepository);
 const blogsServices = new BlogsServices(blogsCommandRepository);
-const commentsServices = new CommentsServices(commentsCommandRepository, postsQueryRepository);
+const commentsServices = new CommentsServices(commentsCommandRepository, postsQueryRepository, usersQueryRepository);
 export const usersServices = new UsersServices(usersCommandRepository);
 const securityServices = new SecurityServices(devicesCommandRepository);
 export const authServices = new AuthServices(authQueryRepository, authCommandRepository, securityServices, devicesQueryRepository);
