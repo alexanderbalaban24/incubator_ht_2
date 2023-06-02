@@ -24,7 +24,7 @@ export class PostsServices {
             const postResult = await this.postsCommandRepository.createPost(newPost);
 
             if(postResult.success) {
-               return new ResultDTO(InternalCode.No_Content, postResult.payload);
+               return new ResultDTO(InternalCode.Created, postResult.payload);
             } else {
                 return new ResultDTO(postResult.code);
             }

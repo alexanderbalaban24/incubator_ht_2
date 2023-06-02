@@ -13,9 +13,9 @@ export const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use((req, res, next) => {
-    console.log("Method : ", req.method);
+    /*console.log("Method : ", req.method);
     console.log("URL : ", req.originalUrl);
-    console.log("Body : ", req.body, "\n");
+    console.log("Body : ", req.body, "\n");*/
     next();
 })
 

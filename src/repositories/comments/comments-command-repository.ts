@@ -29,6 +29,6 @@ export class CommentsCommandRepository {
         commentInstances.content = content;
 
         await commentInstances.save();
-        return new ResultDTO(InternalCode.Success, {isUpdate: true})
+        return new ResultDTO(InternalCode.Success, {isUpdate: true});
     }
 }

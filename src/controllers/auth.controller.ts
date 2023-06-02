@@ -7,23 +7,25 @@ import {RegistrationModel} from "../models/auth/RegistrationModel";
 import {HTTPResponseStatusCodes} from "../shared/enums";
 import {usersQueryRepository} from "../composition-root";
 import {AuthServices} from "../domain/auth-services";
+import {mapStatusCode} from "../shared/utils";
 
 export class AuthController {
 
-    constructor(protected authServices: AuthServices){}
+    constructor(protected authServices: AuthServices) {
+    }
 
-    async login(req: RequestWithBody<LoginModel>, res: Response<ViewLoginModel>)   {
-        const tokenPair = await this.authServices.login(req.body.loginOrEmail, req.body.password, req.headers["user-agent"], req.ip);
+    async login(req: RequestWithBody<LoginModel>, res: Response<ViewLoginModel>) {
+        const tokenPairResult = await this.authServices.login(req.body.loginOrEmail, req.body.password, req.headers["user-agent"], req.ip);
 
-        if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
-            res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
-            res.status(HTTPResponseStatusCodes.OK).json({accessToken: tokenPair.accessToken});
+        if (tokenPairResult.success) {
+            res.cookie("refreshToken", tokenPairResult.payload!.refreshToken, {httpOnly: true, secure: true});
+            res.status(mapStatusCode(tokenPairResult.code)).json({accessToken: tokenPairResult.payload!.accessToken});
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
+            res.sendStatus(mapStatusCode(tokenPairResult.code));
         }
     }
 
-    async refreshToken(req: RequestEmpty, res: Response<ViewLoginModel>)   {
+    async refreshToken(req: RequestEmpty, res: Response<ViewLoginModel>) {
         const userId = req.userId;
         if (!userId) {
             res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
@@ -32,85 +34,89 @@ export class AuthController {
 
         const refreshToken = req.cookies.refreshToken;
 
-        const tokenPair = await this.authServices.refreshToken(refreshToken, userId!);
-        if (tokenPair && tokenPair.accessToken && tokenPair.refreshToken) {
-            res.cookie("refreshToken", tokenPair.refreshToken, {httpOnly: true, secure: true});
-            res.status(HTTPResponseStatusCodes.OK).json({accessToken: tokenPair.accessToken});
+        const tokenPairResult = await this.authServices.refreshToken(refreshToken, userId!);
+        if (tokenPairResult.success) {
+            res.cookie("refreshToken", tokenPairResult.payload!.refreshToken, {httpOnly: true, secure: true});
+            res.status(HTTPResponseStatusCodes.OK).json({accessToken: tokenPairResult.payload!.accessToken});
         } else {
             res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
         }
     }
 
-    async registration(req: RequestWithBody<RegistrationModel>, res: ResponseEmpty)   {
-        const success = await this.authServices.registration(req.body.login, req.body.email, req.body.password);
+    async registration(req: RequestWithBody<RegistrationModel>, res: ResponseEmpty) {
+        const result = await this.authServices.registration(req.body.login, req.body.email, req.body.password);
 
-        if (success) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        if (result.success) {
+            res.sendStatus(mapStatusCode(result.code));
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(result.code));
         }
     }
 
-    async confirmRegistration(req: RequestWithBody<{ code: string }>, res: ResponseEmpty)   {
-        const isVerified = await this.authServices.verifyEmail(req.body.code);
+    async confirmRegistration(req: RequestWithBody<{ code: string }>, res: ResponseEmpty) {
+        const verifiedResult = await this.authServices.verifyEmail(req.body.code);
 
-        if (isVerified) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT)
+        if (verifiedResult.success) {
+            res.sendStatus(mapStatusCode(verifiedResult.code))
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(verifiedResult.code));
         }
     }
 
-    async logout(req: RequestEmpty, res: ResponseEmpty)   {
+    async logout(req: RequestEmpty, res: ResponseEmpty) {
         const refreshToken = req.cookies.refreshToken;
 
-        const isRevoked = await this.authServices.logout(refreshToken);
+        const revokedResult = await this.authServices.logout(refreshToken);
 
-        if (isRevoked) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        if (revokedResult.success) {
+            res.sendStatus(mapStatusCode(revokedResult.code));
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);
+            res.sendStatus(mapStatusCode(revokedResult.code));
         }
     }
 
-    async getMe(req: RequestEmpty, res: Response<ViewMeModel>)   {
+    async getMe(req: RequestEmpty, res: Response<ViewMeModel>) {
         const userId = req.userId;
-        const user = await usersQueryRepository.findUserById(userId!);
+        const userResult = await usersQueryRepository.findUserById(userId!);
 
-        if (user) {
-            res.status(HTTPResponseStatusCodes.OK).json({email: user.email, login: user.login, userId: user.id});
+        if (userResult.success) {
+            res.status(mapStatusCode(userResult.code)).json({
+                email: userResult.payload!.email,
+                login: userResult.payload!.login,
+                userId: userResult.payload!.id
+            });
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(userResult.code));
         }
 
     }
 
-    async resendConfirmationCode(req: RequestWithBody<{ email: string }>, res: ResponseEmpty)   {
-        const success = await this.authServices.resendConfirmationCode(req.body.email);
+    async resendConfirmationCode(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
+        const resendResult = await this.authServices.resendConfirmationCode(req.body.email);
 
-        if (success) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        if (resendResult.success) {
+            res.sendStatus(mapStatusCode(resendResult.code));
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(resendResult.code));
         }
     }
 
-    async recoverPass(req: RequestWithBody<{ email: string }>, res: ResponseEmpty)   {
-        const isSending = await this.authServices.recoverPass(req.body.email);
-        if (isSending) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+    async recoverPass(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
+        const sendingResult = await this.authServices.recoverPass(req.body.email);
+        if (sendingResult.success) {
+            res.sendStatus(mapStatusCode(sendingResult.code));
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT)
+            res.sendStatus(mapStatusCode(sendingResult.code));
         }
     }
 
-    async confirmNewPassword(req: RequestWithBody<{ newPassword: string, recoveryCode: string }>, res: ResponseEmpty)   {
-        const isConfirmed = await this.authServices.confirmRecoverPass(req.body.newPassword, req.body.recoveryCode);
+    async confirmNewPassword(req: RequestWithBody<{ newPassword: string, recoveryCode: string }>, res: ResponseEmpty) {
+        const confirmedResult = await this.authServices.confirmRecoverPass(req.body.newPassword, req.body.recoveryCode);
 
-        if (isConfirmed) {
-            res.sendStatus(204);
+        if (confirmedResult.success) {
+            res.sendStatus(mapStatusCode(confirmedResult.code));
         } else {
-            res.sendStatus(400);
+            res.sendStatus(mapStatusCode(confirmedResult.code));
         }
     }
 }

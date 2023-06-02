@@ -4,33 +4,37 @@ import {CreateUserModel} from "../models/user/CreateUserModel";
 import {Response} from "express";
 import {QueryParamsUserModel} from "../models/user/QueryParamsUserModel";
 import {ViewWithQueryUserModel} from "../models/user/ViewWithQueryUserModel";
-import {HTTPResponseStatusCodes} from "../shared/enums";
 import {UsersQueryRepository} from "../repositories/users/users-query-repository";
 import {UsersServices} from "../domain/users-services";
+import {mapStatusCode} from "../shared/utils";
+import {HTTPResponseStatusCodes} from "../shared/enums";
 
 
 export class UsersController {
 
     constructor(protected usersServices: UsersServices, protected usersQueryRepository: UsersQueryRepository){}
     async getUsers(req: RequestWithQueryParams<QueryParamsUserModel>, res: Response<ViewWithQueryUserModel>) {
-        const users = await this.usersQueryRepository.findUsers(req.query);
+        const usersResult = await this.usersQueryRepository.findUsers(req.query);
+        if (!usersResult.success) return res.sendStatus(mapStatusCode(usersResult.code))
 
-        res.status(HTTPResponseStatusCodes.OK).json(users);
+        res.status(mapStatusCode(usersResult.code)).json(usersResult.payload!);
     }
 
     async createUser(req: RequestWithBody<CreateUserModel>, res: Response<ViewUserModel>) {
-        const userId = await this.usersServices.createUser(req.body.login, req.body.email, req.body.password, true);
-        const user = await this.usersQueryRepository.findUserById(userId);
-        res.status(HTTPResponseStatusCodes.CREATED).json(user!);
+        const createdResult = await this.usersServices.createUser(req.body.login, req.body.email, req.body.password, true);
+        if(!createdResult.success) return res.sendStatus(mapStatusCode(createdResult.code));
+
+        const userResult = await this.usersQueryRepository.findUserById(createdResult.payload!.id);
+        res.status(HTTPResponseStatusCodes.CREATED).json(userResult.payload!);
     }
 
     async deleteUser(req: RequestWithParams<{ userId: string }>, res: ResponseEmpty) {
-        const isDeleted = await this.usersServices.deleteUserById(req.params.userId);
+        const deletedResult = await this.usersServices.deleteUserById(req.params.userId);
 
-        if (isDeleted) {
-            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        if (deletedResult.success) {
+            res.sendStatus(mapStatusCode(deletedResult.code));
         } else {
-            res.sendStatus(HTTPResponseStatusCodes.NOT_FOUND);
+            res.sendStatus(mapStatusCode(deletedResult.code));
         }
     }
 }

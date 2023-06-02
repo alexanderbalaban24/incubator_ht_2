@@ -12,8 +12,8 @@ export const resendSchema = checkSchema({
         },
         custom: {
             options: async (value) => {
-                const confirmationData = await authQueryRepository.findUserWithConfirmationDataByEmail(value);
-                if (!confirmationData || confirmationData.isConfirmed) {
+                const confirmationDataResult = await authQueryRepository.findUserWithConfirmationDataByEmail(value);
+                if (!confirmationDataResult.success) {
                     return Promise.reject();
                 }
             }

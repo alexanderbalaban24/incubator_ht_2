@@ -10,9 +10,9 @@ export const jwtAuthRefresh = (req: Request, res: Response, next: NextFunction) 
 
     const refreshToken = req.cookies.refreshToken;
 
-    const userId = jwtServices.checkCredentials(refreshToken);
-    if (userId) {
-        req.userId = userId;
+    const userResult = jwtServices.checkCredentials(refreshToken);
+    if (userResult.success) {
+        req.userId = userResult.payload!.id;
         next();
     } else {
         res.sendStatus(HTTPResponseStatusCodes.UNAUTHORIZED);

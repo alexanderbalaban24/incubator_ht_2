@@ -22,7 +22,7 @@ export class CommentsServices {
         const commentResult = await this.commentsCommandRepository.createComment(newComment);
 
         if (commentResult.success) {
-            return new ResultDTO(InternalCode.Success, postResult.payload);
+            return new ResultDTO(InternalCode.Created, postResult.payload);
         } else {
             return new ResultDTO(commentResult.code);
         }

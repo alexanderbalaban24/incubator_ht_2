@@ -1,24 +1,28 @@
 import {SecurityDeviceActiveSessions} from "./types";
 import {DeviceModelClass} from "../../models/device/DeviceModelClass";
 import {DeviceDTO} from "../../domain/dtos";
+import {ResultDTO} from "../../shared/dto";
+import {InternalCode} from "../../shared/enums";
 
 
 export class DevicesQueryRepository {
-    async findDeviceByUserId(userId: string): Promise<SecurityDeviceActiveSessions[] | null> {
+    async findDeviceByUserId(userId: string): Promise<ResultDTO<{ sessions: SecurityDeviceActiveSessions[] }>> {
         const sessions = await DeviceModelClass.find({userId}).lean();
 
-        return sessions.map(session => ({
+        const mappedSessions = sessions.map(session => ({
             ip: session.ip,
             title: session.deviceName,
             lastActiveDate: session.issuedAt.toISOString(),
             deviceId: session._id.toString()
         }));
+
+        return new ResultDTO(InternalCode.Success, {sessions: mappedSessions});
     }
-    async findDeviceById(deviceId: string): Promise<DeviceDTO & { id: string } | null> {
+    async findDeviceById(deviceId: string): Promise<ResultDTO<DeviceDTO & { id: string }>> {
         const device = await DeviceModelClass.findById(deviceId).lean();
 
         if (device) {
-            return {
+            const deviceInfo = {
                 id: device._id.toString(),
                 userId: device.userId,
                 deviceName: device.deviceName,
@@ -26,8 +30,10 @@ export class DevicesQueryRepository {
                 issuedAt: device.issuedAt,
                 expirationAt: device.expirationAt
             }
+
+            return new ResultDTO(InternalCode.Success, deviceInfo);
         } else {
-            return null;
+            return new ResultDTO(InternalCode.Not_Found);
         }
     }
 }

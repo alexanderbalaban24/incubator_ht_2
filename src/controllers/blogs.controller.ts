@@ -91,7 +91,7 @@ export class BlogsController {
             const postResult = await this.postsQueryRepository.findPostById(createResult.payload!.id);
 
             if(postResult.success) {
-                res.status(mapStatusCode(postResult.code)).json(postResult.payload);
+                res.status(HTTPResponseStatusCodes.CREATED).json(postResult.payload);
             } else {
                 res.sendStatus(mapStatusCode(postResult.code));
             }

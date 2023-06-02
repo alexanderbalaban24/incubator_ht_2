@@ -1,15 +1,24 @@
 import {emailManager} from "../managers/email-manager";
-import {EmailEvents} from "../shared/enums";
+import {EmailEvents, InternalCode} from "../shared/enums";
+import {ResultDTO} from "../shared/dto";
 
 export const businessService = {
-    async doOperation(event: EmailEvents, email: string, code: string): Promise<boolean> {
+    async doOperation(event: EmailEvents, email: string, code: string): Promise<ResultDTO<{ isSending: boolean }>> {
+        let isSending: boolean;
     switch (event) {
         case EmailEvents.Registration:
-            return await emailManager.sendEmailRegistrationMessage(email, code);
+            isSending = await emailManager.sendEmailRegistrationMessage(email, code);
+            break;
         case EmailEvents.Recover_password:
-            return await emailManager.sendEmailRecoverPasswordMessage(email, code);
+            isSending = await emailManager.sendEmailRecoverPasswordMessage(email, code);
+            break;
         default:
-            return false;
+            isSending = false;
+            break;
     }
+
+    if (!isSending) return new ResultDTO(InternalCode.Server_Error);
+
+    return new ResultDTO(InternalCode.Success, { isSending });
     }
 }

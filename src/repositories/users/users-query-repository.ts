@@ -9,15 +9,14 @@ import {InternalCode} from "../../shared/enums";
 
 
 export class UsersQueryRepository {
-    async findUsers(query: QueryParamsUserModel): Promise<ViewWithQueryUserModel> {
+    async findUsers(query: QueryParamsUserModel): Promise<ResultDTO<ViewWithQueryUserModel>> {
         const userInstances = UsersModelClass.find({}, {projection: {passwordHash: 0}});
-
         const queryResult = await this._queryBuilder(query, userInstances);
 
         const users = await userInstances;
         queryResult.items = users.map(user => this._mapUserDBToViewUserModel(user));
 
-        return queryResult;
+        return new ResultDTO(InternalCode.Success, queryResult);
     }
     async findUserById(userId: string): Promise<ResultDTO<ViewUserModel>> {
         const user = await UsersModelClass.findById(userId, {projection: {passwordHash: 0}});

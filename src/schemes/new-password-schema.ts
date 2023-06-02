@@ -16,13 +16,13 @@ export const newPasswordSchema = checkSchema({
         notEmpty: true,
         custom: {
             options: async (value: string) => {
-                const userId = await authQueryRepository.findUserByConfirmationCode(value);
-                if(!userId) {
+                const userResult = await authQueryRepository.findUserByConfirmationCode(value);
+                if(!userResult.success) {
                     return Promise.reject();
                 }
 
-                const confirmationData = await authQueryRepository.findUserWithPasswordRecoverConfirmationDataById(userId);
-                if(confirmationData?.isConfirmed || isAfter(new Date(), confirmationData!.expirationDate)) {
+                const confirmationData = await authQueryRepository.findUserWithPasswordRecoverConfirmationDataById(userResult.payload!.id);
+                if(confirmationData.payload!.isConfirmed || isAfter(new Date(), confirmationData.payload!.expirationDate)) {
                     return Promise.reject();
                 }
             }

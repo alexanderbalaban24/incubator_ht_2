@@ -8,10 +8,10 @@ export class BlogsServices {
     constructor(protected blogsCommandRepository: BlogsCommandRepository){}
     async createBlog(name: string, description: string, websiteUrl: string): Promise<ResultDTO<{id: string} | null>> {
         const newBlog = new BlogDTO(name, description, websiteUrl);
-        const result = await this.blogsCommandRepository.createBlog(newBlog);
+        const blogResult = await this.blogsCommandRepository.createBlog(newBlog);
 
-        if(result.success) {
-            return new ResultDTO(InternalCode.Success, result.payload);
+        if(blogResult.success) {
+            return new ResultDTO(InternalCode.Created, blogResult.payload);
         } else {
             return new ResultDTO(InternalCode.Server_Error);
         }

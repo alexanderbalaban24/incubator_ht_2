@@ -17,7 +17,9 @@ export enum InternalCode {
     Bad_Request = "BAD_REQUEST",
     Not_Found = "NOT_FOUND",
     Server_Error = "INTERNAL_SERVER_ERROR",
-    No_Content = "NO_CONTENT"
+    No_Content = "NO_CONTENT",
+    Unathorized = "UNAUTHORIZED",
+    Created = "CREATED"
 }
 
 export enum EmailEvents {

@@ -10,14 +10,14 @@ export const confirmationSchema = checkSchema({
         escape: true,
         custom: {
             options: async (value: string) => {
-                const userId = await authQueryRepository.findUserByConfirmationCode(value);
+                const userResult = await authQueryRepository.findUserByConfirmationCode(value);
 
-                if(!userId) {
+                if(!userResult.success) {
                     return Promise.reject();
                 }
 
-                const confirmationData = await authQueryRepository.findUserWithEmailConfirmationDataById(userId);
-                if(confirmationData?.isConfirmed || isAfter(new Date(), confirmationData!.expirationDate)) {
+                const confirmationResult = await authQueryRepository.findUserWithEmailConfirmationDataById(userResult.payload!.id);
+                if(confirmationResult.payload!.isConfirmed || isAfter(new Date(), confirmationResult.payload!.expirationDate)) {
                     return Promise.reject();
                 }
             }

@@ -48,7 +48,7 @@ export class PostsController {
             const postResult = await this.postsQueryRepository.findPostById(createdResult.payload!.id);
 
             if (postResult.success) {
-                res.status(mapStatusCode(postResult.code)).json(postResult.payload);
+                res.status(HTTPResponseStatusCodes.CREATED).json(postResult.payload);
             } else {
                 res.sendStatus(mapStatusCode(postResult.code));
             }
@@ -108,7 +108,7 @@ export class PostsController {
         const commentResult = await this.commentsQueryRepository.findCommentById(createdResult.payload!.id);
 
         if (commentResult.success) {
-            res.status(mapStatusCode(commentResult.code)).json(commentResult.payload);
+            res.status(HTTPResponseStatusCodes.CREATED).json(commentResult.payload);
         } else {
             res.sendStatus(mapStatusCode(commentResult.code));
         }
