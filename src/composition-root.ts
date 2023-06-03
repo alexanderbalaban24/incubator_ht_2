@@ -58,6 +58,6 @@ export const postsController = new PostsController(postsServices, postsQueryRepo
 export const blogsController = new BlogsController(blogsServices, blogsQueryRepository, postsServices, postsQueryRepository);
 export const commentsController = new CommentsController(commentsServices, commentsQueryRepository);
 export const usersController = new UsersController(usersServices, usersQueryRepository);
-export const authController = new AuthController(authServices);
+export const authController = new AuthController(authServices, usersQueryRepository);
 export const securityController = new SecurityController(securityServices, devicesCommandRepository, devicesQueryRepository);
 export const testingController = new TestingController(testingCommandRepository);

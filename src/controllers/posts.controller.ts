@@ -18,6 +18,7 @@ import {PostsQueryRepository} from "../repositories/posts/posts-query-repository
 import {CommentsServices} from "../domain/comments-services";
 import {CommentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {mapStatusCode} from "../shared/utils";
+import {sendResponse} from "../shared/helpers";
 
 
 export class PostsController {
@@ -33,11 +34,7 @@ export class PostsController {
     async getAllPosts(req: RequestWithQueryParams<QueryParamsPostModel>, res: Response<ViewWithQueryPostModel | null>) {
         const postsResult = await this.postsQueryRepository.findPost(req.query);
 
-        if (postsResult.success) {
-            res.status(mapStatusCode(postsResult.code)).json(postsResult.payload);
-        } else {
-            res.sendStatus(mapStatusCode(postsResult.code));
-        }
+        sendResponse<ViewWithQueryPostModel>(res, postsResult);
     }
 
     async createPost(req: RequestWithBody<CreatePostModel>, res: Response<ViewPostModel | null>) {
@@ -61,11 +58,7 @@ export class PostsController {
     async getPost(req: RequestWithParams<{ postId: string }>, res: Response<ViewPostModel | null>) {
         const postResult = await this.postsQueryRepository.findPostById(req.params.postId);
 
-        if (postResult.success) {
-            res.status(mapStatusCode(postResult.code)).json(postResult.payload);
-        } else {
-            res.sendStatus(mapStatusCode(postResult.code));
-        }
+        sendResponse<ViewPostModel>(res, postResult);
     }
 
     async updatePost(req: RequestWithParamsAndBody<{
@@ -73,13 +66,13 @@ export class PostsController {
     }, CreatePostModel>, res: ResponseEmpty) {
         const updateResult = await this.postsServices.updatePost(req.params.postId, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
 
-        res.sendStatus(mapStatusCode(updateResult.code));
+        sendResponse(res, updateResult);
     }
 
     async deletePost(req: RequestWithParams<{ postId: string }>, res: ResponseEmpty) {
         const deletedResult = await this.postsServices.deletePostById(req.params.postId);
 
-        res.sendStatus(mapStatusCode(deletedResult.code));
+        sendResponse(res, deletedResult);
     }
 
     async getAllComments(req: RequestWithQueryParamsAndURI<{
@@ -87,11 +80,7 @@ export class PostsController {
     }, QueryParamsCommentModel>, res: Response<ViewWithQueryCommentModel | null>) {
         const commentsResult = await this.commentsQueryRepository.findComments(req.params.postId, req.query);
 
-        if (commentsResult.success) {
-            res.status(mapStatusCode(commentsResult.code)).json(commentsResult.payload);
-        } else {
-            res.sendStatus(mapStatusCode(commentsResult.code));
-        }
+        sendResponse<ViewWithQueryCommentModel>(res, commentsResult);
 
     }
 

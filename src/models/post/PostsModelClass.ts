@@ -1,6 +1,7 @@
 import mongoose, {Model} from "mongoose";
 import {QueryCustomMethods} from "../../shared/types";
-import {queryHelper} from "../../shared/utils";
+
+import {queryHelper} from "../../shared/helpers";
 
 export type PostDB = {
     title: string

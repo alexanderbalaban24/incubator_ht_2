@@ -5,13 +5,14 @@ import {ViewMeModel} from "../models/auth/ViewMeModel";
 import {ViewLoginModel} from "../models/auth/ViewLoginModel";
 import {RegistrationModel} from "../models/auth/RegistrationModel";
 import {HTTPResponseStatusCodes} from "../shared/enums";
-import {usersQueryRepository} from "../composition-root";
 import {AuthServices} from "../domain/auth-services";
 import {mapStatusCode} from "../shared/utils";
+import {sendResponse} from "../shared/helpers";
+import {UsersQueryRepository} from "../repositories/users/users-query-repository";
 
 export class AuthController {
 
-    constructor(protected authServices: AuthServices) {
+    constructor(protected authServices: AuthServices, protected usersQueryRepository: UsersQueryRepository) {
     }
 
     async login(req: RequestWithBody<LoginModel>, res: Response<ViewLoginModel>) {
@@ -52,7 +53,7 @@ export class AuthController {
     async confirmRegistration(req: RequestWithBody<{ code: string }>, res: ResponseEmpty) {
         const verifiedResult = await this.authServices.verifyEmail(req.body.code);
 
-        res.sendStatus(mapStatusCode(verifiedResult.code));
+        sendResponse(res, verifiedResult);
     }
 
     async logout(req: RequestEmpty, res: ResponseEmpty) {
@@ -60,12 +61,12 @@ export class AuthController {
 
         const revokedResult = await this.authServices.logout(refreshToken);
 
-        res.sendStatus(mapStatusCode(revokedResult.code));
+        sendResponse(res, revokedResult);
     }
 
     async getMe(req: RequestEmpty, res: Response<ViewMeModel>) {
         const userId = req.userId;
-        const userResult = await usersQueryRepository.findUserById(userId!);
+        const userResult = await this.usersQueryRepository.findUserById(userId!);
 
         if (userResult.success) {
             res.status(mapStatusCode(userResult.code)).json({
@@ -82,20 +83,20 @@ export class AuthController {
     async resendConfirmationCode(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
         const resendResult = await this.authServices.resendConfirmationCode(req.body.email);
 
-        res.sendStatus(mapStatusCode(resendResult.code));
+        sendResponse(res, resendResult);
 
     }
 
     async recoverPass(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
         const sendingResult = await this.authServices.recoverPass(req.body.email);
 
-        res.sendStatus(mapStatusCode(sendingResult.code));
+        sendResponse(res, sendingResult);
 
     }
 
     async confirmNewPassword(req: RequestWithBody<{ newPassword: string, recoveryCode: string }>, res: ResponseEmpty) {
         const confirmedResult = await this.authServices.confirmRecoverPass(req.body.newPassword, req.body.recoveryCode);
 
-        res.sendStatus(mapStatusCode(confirmedResult.code));
+        sendResponse(res, confirmedResult);
     }
 }

@@ -21,6 +21,7 @@ import {BlogsQueryRepository} from "../repositories/blogs/blogs-query-repository
 import {PostsServices} from "../domain/posts-services";
 import {PostsQueryRepository} from "../repositories/posts/posts-query-repository";
 import {mapStatusCode} from "../shared/utils";
+import {sendResponse} from "../shared/helpers";
 
 export class BlogsController {
 
@@ -35,11 +36,7 @@ export class BlogsController {
     async getAllBlogs(req: RequestWithQueryParams<QueryParamsBlogModel>, res: Response<ViewWithQueryBlogModel | null>) {
         const blogsResult = await this.blogsQueryRepository.findBlogs(req.query);
 
-        if (blogsResult.success) {
-            res.status(mapStatusCode(blogsResult.code)).json(blogsResult.payload);
-        } else {
-            res.sendStatus(mapStatusCode(blogsResult.code));
-        }
+        sendResponse<ViewWithQueryBlogModel>(res, blogsResult);
     }
 
     async createBlog(req: RequestWithBody<CreateBlogModel>, res: Response<ViewBlogModel | null>) {
@@ -62,7 +59,7 @@ export class BlogsController {
     async getBlog(req: RequestWithParams<URIParamsBlogModel>, res: Response<ViewBlogModel>) {
         const blogResult = await this.blogsQueryRepository.findBlogById(req.params.blogId);
 
-        res.sendStatus(mapStatusCode(blogResult.code));
+        sendResponse<ViewBlogModel>(res, blogResult);
     }
 
     async deleteBlog(req: Request<URIParamsBlogModel>, res: ResponseEmpty) {
@@ -102,10 +99,6 @@ export class BlogsController {
     }, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel | null>) {
         const postsResult = await this.postsQueryRepository.findPost(req.query, req.params.blogId);
 
-        if (postsResult.success) {
-            res.status(mapStatusCode(postsResult.code)).json(postsResult.payload);
-        } else {
-            res.sendStatus(mapStatusCode(postsResult.code));
-        }
+        sendResponse<ViewWithQueryPostModel>(res, postsResult);
     }
 }

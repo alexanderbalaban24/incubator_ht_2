@@ -6,7 +6,7 @@ import {InternalCode} from "../../shared/enums";
 
 
 export class DevicesQueryRepository {
-    async findDeviceByUserId(userId: string): Promise<ResultDTO<{ sessions: SecurityDeviceActiveSessions[] }>> {
+    async findDeviceByUserId(userId: string): Promise<ResultDTO<SecurityDeviceActiveSessions[]>> {
         const sessions = await DeviceModelClass.find({userId}).lean();
 
         const mappedSessions = sessions.map(session => ({
@@ -16,7 +16,7 @@ export class DevicesQueryRepository {
             deviceId: session._id.toString()
         }));
 
-        return new ResultDTO(InternalCode.Success, {sessions: mappedSessions});
+        return new ResultDTO(InternalCode.Success, mappedSessions);
     }
     async findDeviceById(deviceId: string): Promise<ResultDTO<DeviceDTO & { id: string }>> {
         const device = await DeviceModelClass.findById(deviceId).lean();

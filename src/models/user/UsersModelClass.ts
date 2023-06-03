@@ -1,6 +1,6 @@
 import mongoose, {Model} from "mongoose";
-import {queryHelper} from "../../shared/utils";
 import {QueryCustomMethods} from "../../shared/types";
+import {queryHelper} from "../../shared/helpers";
 
 export type UsersDB = {
     login: string

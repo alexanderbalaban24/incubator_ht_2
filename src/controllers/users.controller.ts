@@ -8,6 +8,7 @@ import {UsersQueryRepository} from "../repositories/users/users-query-repository
 import {UsersServices} from "../domain/users-services";
 import {mapStatusCode} from "../shared/utils";
 import {HTTPResponseStatusCodes} from "../shared/enums";
+import {sendResponse} from "../shared/helpers";
 
 
 export class UsersController {
@@ -17,9 +18,8 @@ export class UsersController {
 
     async getUsers(req: RequestWithQueryParams<QueryParamsUserModel>, res: Response<ViewWithQueryUserModel>) {
         const usersResult = await this.usersQueryRepository.findUsers(req.query);
-        if (!usersResult.success) return res.sendStatus(mapStatusCode(usersResult.code))
 
-        res.status(mapStatusCode(usersResult.code)).json(usersResult.payload!);
+        sendResponse(res, usersResult);
     }
 
     async createUser(req: RequestWithBody<CreateUserModel>, res: Response<ViewUserModel>) {
@@ -33,6 +33,6 @@ export class UsersController {
     async deleteUser(req: RequestWithParams<{ userId: string }>, res: ResponseEmpty) {
         const deletedResult = await this.usersServices.deleteUserById(req.params.userId);
 
-        res.sendStatus(mapStatusCode(deletedResult.code));
+        sendResponse(res, deletedResult);
     }
 }

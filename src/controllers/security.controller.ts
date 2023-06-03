@@ -1,10 +1,12 @@
 import {Request, Response} from "express";
-import {RequestWithParams, ResponseEmpty} from "../shared/types";
+import {RequestEmpty, RequestWithParams, ResponseEmpty} from "../shared/types";
 import {HTTPResponseStatusCodes} from "../shared/enums";
 import {SecurityServices} from "../domain/security-services";
 import {DevicesCommandRepository} from "../repositories/securityDevices/devices-command-repository";
 import {DevicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
 import {mapStatusCode} from "../shared/utils";
+import {sendResponse} from "../shared/helpers";
+import {SecurityDeviceActiveSessions} from "../repositories/securityDevices/types";
 
 export class SecurityController {
 
@@ -15,20 +17,16 @@ export class SecurityController {
     ) {
     }
 
-    async getAllDevices(req: Request, res: Response) {
+    async getAllDevices(req: RequestEmpty, res: Response<SecurityDeviceActiveSessions[]>) {
         const activeSessionsResult = await this.devicesQueryRepository.findDeviceByUserId(req.userId!);
 
-        if (activeSessionsResult.success && activeSessionsResult.payload!.sessions.length) {
-            res.status(mapStatusCode(activeSessionsResult.code)).json(activeSessionsResult.payload!.sessions);
-        } else {
-            res.sendStatus(mapStatusCode(activeSessionsResult.code));
-        }
+        sendResponse<SecurityDeviceActiveSessions[]>(res, activeSessionsResult);
     }
 
-    async deleteAllDevices(req: Request, res: ResponseEmpty) {
+    async deleteAllDevices(req: RequestEmpty, res: ResponseEmpty) {
         const deletedResult = await this.securityServices.deleteAllUserSessions(req.userId!, req.cookies.refreshToken);
 
-        res.sendStatus(mapStatusCode(deletedResult.code));
+        sendResponse(res, deletedResult);
     }
 
     async deleteOneDevice(req: RequestWithParams<{ deviceId: string }>, res: ResponseEmpty) {
@@ -42,6 +40,6 @@ export class SecurityController {
 
         const deletedResult = await this.devicesCommandRepository.deleteUserSession(req.params.deviceId)
 
-        res.sendStatus(mapStatusCode(deletedResult.code));
+        sendResponse(res, deletedResult);
     }
 }

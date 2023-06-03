@@ -5,6 +5,7 @@ import {HTTPResponseStatusCodes} from "../shared/enums";
 import {CommentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {CommentsServices} from "../domain/comments-services";
 import {mapStatusCode} from "../shared/utils";
+import {sendResponse} from "../shared/helpers";
 
 export class CommentsController {
 
@@ -13,11 +14,8 @@ export class CommentsController {
 
     async getComment(req: RequestWithParams<{ commentId: string }>, res: Response<ViewCommentModel | null>) {
         const commentResult = await this.commentsQueryRepository.findCommentById(req.params.commentId);
-        if (commentResult.success) {
-            res.status(mapStatusCode(commentResult.code)).json(commentResult.payload);
-        } else {
-            res.sendStatus(mapStatusCode(commentResult.code));
-        }
+
+        sendResponse<ViewCommentModel>(res, commentResult);
     }
 
     async deleteComment(req: RequestWithParams<{ commentId: string }>, res: ResponseEmpty) {
