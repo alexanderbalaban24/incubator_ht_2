@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
-import {WithId} from "mongodb";
+import mongoose, {Model} from "mongoose";
+import {queryHelper} from "../../shared/utils";
+import {QueryCustomMethods} from "../../shared/types";
 
 export type UsersDB = {
     login: string
@@ -34,7 +35,7 @@ const PasswordRecoverSchema = new mongoose.Schema<PasswordRecover>({
     isConfirmed: {type: Boolean, required: true}
 })
 
-export const UsersSchema = new mongoose.Schema<UsersDB>({
+export const UsersSchema = new mongoose.Schema<UsersDB, Model<UsersDB, QueryCustomMethods>, {}, QueryCustomMethods>({
     login: {type: String, required: true},
     email: {type: String, required: true},
     passwordHash: {type: String, required: true},
@@ -46,6 +47,8 @@ export const UsersSchema = new mongoose.Schema<UsersDB>({
         type: PasswordRecoverSchema,
         required: true
     }
-}, {timestamps: true});
+}, { timestamps: true, query: queryHelper });
 
-export const UsersModelClass = mongoose.model<UsersDB>("users", UsersSchema);
+
+
+export const UsersModelClass = mongoose.model<UsersDB, Model<UsersDB, QueryCustomMethods>>("users", UsersSchema);

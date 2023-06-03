@@ -12,9 +12,10 @@ export class SecurityController {
         protected securityServices: SecurityServices,
         protected devicesCommandRepository: DevicesCommandRepository,
         protected devicesQueryRepository: DevicesQueryRepository
-    ){}
+    ) {
+    }
 
-    async getAllDevices(req: Request, res: Response)  {
+    async getAllDevices(req: Request, res: Response) {
         const activeSessionsResult = await this.devicesQueryRepository.findDeviceByUserId(req.userId!);
 
         if (activeSessionsResult.success && activeSessionsResult.payload!.sessions.length) {
@@ -24,31 +25,23 @@ export class SecurityController {
         }
     }
 
-    async deleteAllDevices(req: Request, res: ResponseEmpty)  {
+    async deleteAllDevices(req: Request, res: ResponseEmpty) {
         const deletedResult = await this.securityServices.deleteAllUserSessions(req.userId!, req.cookies.refreshToken);
 
-        if (deletedResult.success) {
-            res.sendStatus(mapStatusCode(deletedResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(deletedResult.code));
-        }
+        res.sendStatus(mapStatusCode(deletedResult.code));
     }
 
-    async deleteOneDevice(req: RequestWithParams<{ deviceId: string }>, res: ResponseEmpty)  {
+    async deleteOneDevice(req: RequestWithParams<{ deviceId: string }>, res: ResponseEmpty) {
         const deviceInfoResult = await this.devicesQueryRepository.findDeviceById(req.params.deviceId);
-        if(!deviceInfoResult.success) return res.sendStatus(mapStatusCode(deviceInfoResult.code));
+        if (!deviceInfoResult.success) return res.sendStatus(mapStatusCode(deviceInfoResult.code));
 
-        if(deviceInfoResult.payload!.userId !== req.userId) {
+        if (deviceInfoResult.payload!.userId !== req.userId) {
             res.sendStatus(HTTPResponseStatusCodes.FORBIDDEN);
             return;
         }
 
         const deletedResult = await this.devicesCommandRepository.deleteUserSession(req.params.deviceId)
 
-        if (deletedResult.success) {
-            res.sendStatus(mapStatusCode(deletedResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(deletedResult.code));
-        }
+        res.sendStatus(mapStatusCode(deletedResult.code));
     }
 }

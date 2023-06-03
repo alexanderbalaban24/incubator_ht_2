@@ -1,16 +1,16 @@
-import {blogsQueryRepository} from "../composition-root";
 import {PostsCommandRepository} from "../repositories/posts/posts-command-repository";
 import {PostDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
 import {InternalCode} from "../shared/enums";
+import {BlogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 
 export class PostsServices {
 
-    constructor(protected postsCommandRepository: PostsCommandRepository) {
+    constructor(protected postsCommandRepository: PostsCommandRepository, protected blogsQueryRepository: BlogsQueryRepository) {
     }
 
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<ResultDTO<{id: string}>> {
-        const blogResult = await blogsQueryRepository.findBlogById(blogId);
+        const blogResult = await this.blogsQueryRepository.findBlogById(blogId);
         if (blogResult.success) {
 
             const newPost = new PostDTO(
@@ -37,7 +37,7 @@ export class PostsServices {
     }
 
     async updatePost(postId: string, title: string, shortDescription: string, content: string, blogId: string): Promise<ResultDTO<{isUpdate: boolean}>> {
-        const blogResult = await blogsQueryRepository.findBlogById(blogId);
+        const blogResult = await this.blogsQueryRepository.findBlogById(blogId);
         if (!blogResult) return new ResultDTO(InternalCode.Not_Found);
 
         const updatedResult =  await this.postsCommandRepository.updatePost(postId, title, shortDescription, content, blogId, blogResult.payload!.name);

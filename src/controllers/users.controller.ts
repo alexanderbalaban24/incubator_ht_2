@@ -12,7 +12,9 @@ import {HTTPResponseStatusCodes} from "../shared/enums";
 
 export class UsersController {
 
-    constructor(protected usersServices: UsersServices, protected usersQueryRepository: UsersQueryRepository){}
+    constructor(protected usersServices: UsersServices, protected usersQueryRepository: UsersQueryRepository) {
+    }
+
     async getUsers(req: RequestWithQueryParams<QueryParamsUserModel>, res: Response<ViewWithQueryUserModel>) {
         const usersResult = await this.usersQueryRepository.findUsers(req.query);
         if (!usersResult.success) return res.sendStatus(mapStatusCode(usersResult.code))
@@ -22,7 +24,7 @@ export class UsersController {
 
     async createUser(req: RequestWithBody<CreateUserModel>, res: Response<ViewUserModel>) {
         const createdResult = await this.usersServices.createUser(req.body.login, req.body.email, req.body.password, true);
-        if(!createdResult.success) return res.sendStatus(mapStatusCode(createdResult.code));
+        if (!createdResult.success) return res.sendStatus(mapStatusCode(createdResult.code));
 
         const userResult = await this.usersQueryRepository.findUserById(createdResult.payload!.id);
         res.status(HTTPResponseStatusCodes.CREATED).json(userResult.payload!);
@@ -31,10 +33,6 @@ export class UsersController {
     async deleteUser(req: RequestWithParams<{ userId: string }>, res: ResponseEmpty) {
         const deletedResult = await this.usersServices.deleteUserById(req.params.userId);
 
-        if (deletedResult.success) {
-            res.sendStatus(mapStatusCode(deletedResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(deletedResult.code));
-        }
+        res.sendStatus(mapStatusCode(deletedResult.code));
     }
 }

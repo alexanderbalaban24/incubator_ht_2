@@ -5,7 +5,7 @@ import {InternalCode} from "../../shared/enums";
 
 export class AuthQueryRepository {
     async searchUserByCredentials(loginOrEmail: string): Promise<ResultDTO<UserInfoType>> {
-        console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS", loginOrEmail)
+        const test = await UsersModelClass.find({}).lean()
         const user = await UsersModelClass.findOne().or([{login: loginOrEmail}, {email: loginOrEmail}]).lean();
         if (user) {
             return new ResultDTO(InternalCode.Success, {passwordHash: user.passwordHash, id: user._id.toString()});

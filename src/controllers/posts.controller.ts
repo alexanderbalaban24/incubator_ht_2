@@ -73,11 +73,7 @@ export class PostsController {
     }, CreatePostModel>, res: ResponseEmpty) {
         const updateResult = await this.postsServices.updatePost(req.params.postId, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
 
-        if (updateResult.success) {
-            res.sendStatus(mapStatusCode(updateResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(updateResult.code));
-        }
+        res.sendStatus(mapStatusCode(updateResult.code));
     }
 
     async deletePost(req: RequestWithParams<{ postId: string }>, res: ResponseEmpty) {

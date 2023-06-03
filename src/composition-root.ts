@@ -46,7 +46,7 @@ const devicesCommandRepository = new DevicesCommandRepository();
 const testingCommandRepository = new TestingCommandRepository();
 const rateLimitCommandRepository = new RateLimitCommandRepository();
 
-export const postsServices = new PostsServices(postsCommandRepository);
+export const postsServices = new PostsServices(postsCommandRepository, blogsQueryRepository);
 const blogsServices = new BlogsServices(blogsCommandRepository);
 const commentsServices = new CommentsServices(commentsCommandRepository, postsQueryRepository, usersQueryRepository);
 export const usersServices = new UsersServices(usersCommandRepository);

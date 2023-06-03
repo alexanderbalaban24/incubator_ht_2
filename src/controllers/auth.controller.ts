@@ -46,21 +46,13 @@ export class AuthController {
     async registration(req: RequestWithBody<RegistrationModel>, res: ResponseEmpty) {
         const result = await this.authServices.registration(req.body.login, req.body.email, req.body.password);
 
-        if (result.success) {
-            res.sendStatus(mapStatusCode(result.code));
-        } else {
-            res.sendStatus(mapStatusCode(result.code));
-        }
+        res.sendStatus(mapStatusCode(result.code));
     }
 
     async confirmRegistration(req: RequestWithBody<{ code: string }>, res: ResponseEmpty) {
         const verifiedResult = await this.authServices.verifyEmail(req.body.code);
 
-        if (verifiedResult.success) {
-            res.sendStatus(mapStatusCode(verifiedResult.code))
-        } else {
-            res.sendStatus(mapStatusCode(verifiedResult.code));
-        }
+        res.sendStatus(mapStatusCode(verifiedResult.code));
     }
 
     async logout(req: RequestEmpty, res: ResponseEmpty) {
@@ -68,11 +60,7 @@ export class AuthController {
 
         const revokedResult = await this.authServices.logout(refreshToken);
 
-        if (revokedResult.success) {
-            res.sendStatus(mapStatusCode(revokedResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(revokedResult.code));
-        }
+        res.sendStatus(mapStatusCode(revokedResult.code));
     }
 
     async getMe(req: RequestEmpty, res: Response<ViewMeModel>) {
@@ -94,29 +82,20 @@ export class AuthController {
     async resendConfirmationCode(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
         const resendResult = await this.authServices.resendConfirmationCode(req.body.email);
 
-        if (resendResult.success) {
-            res.sendStatus(mapStatusCode(resendResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(resendResult.code));
-        }
+        res.sendStatus(mapStatusCode(resendResult.code));
+
     }
 
     async recoverPass(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
         const sendingResult = await this.authServices.recoverPass(req.body.email);
-        if (sendingResult.success) {
-            res.sendStatus(mapStatusCode(sendingResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(sendingResult.code));
-        }
+
+        res.sendStatus(mapStatusCode(sendingResult.code));
+
     }
 
     async confirmNewPassword(req: RequestWithBody<{ newPassword: string, recoveryCode: string }>, res: ResponseEmpty) {
         const confirmedResult = await this.authServices.confirmRecoverPass(req.body.newPassword, req.body.recoveryCode);
 
-        if (confirmedResult.success) {
-            res.sendStatus(mapStatusCode(confirmedResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(confirmedResult.code));
-        }
+        res.sendStatus(mapStatusCode(confirmedResult.code));
     }
 }

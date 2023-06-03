@@ -1,6 +1,6 @@
 export type QueryParamsCommentModel = {
-    pageNumber: number,
-    pageSize: number,
+    pageNumber: string,
+    pageSize: string,
     sortBy: string,
     sortDirection: "asc" | "desc"
 }

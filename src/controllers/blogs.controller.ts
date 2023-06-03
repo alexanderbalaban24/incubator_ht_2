@@ -62,11 +62,7 @@ export class BlogsController {
     async getBlog(req: RequestWithParams<URIParamsBlogModel>, res: Response<ViewBlogModel>) {
         const blogResult = await this.blogsQueryRepository.findBlogById(req.params.blogId);
 
-        if (blogResult.success) {
-            res.status(mapStatusCode(blogResult.code)).json(blogResult.payload!);
-        } else {
-            res.sendStatus(mapStatusCode(blogResult.code));
-        }
+        res.sendStatus(mapStatusCode(blogResult.code));
     }
 
     async deleteBlog(req: Request<URIParamsBlogModel>, res: ResponseEmpty) {
@@ -90,7 +86,7 @@ export class BlogsController {
         if (createResult.success) {
             const postResult = await this.postsQueryRepository.findPostById(createResult.payload!.id);
 
-            if(postResult.success) {
+            if (postResult.success) {
                 res.status(HTTPResponseStatusCodes.CREATED).json(postResult.payload);
             } else {
                 res.sendStatus(mapStatusCode(postResult.code));
@@ -106,7 +102,7 @@ export class BlogsController {
     }, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel | null>) {
         const postsResult = await this.postsQueryRepository.findPost(req.query, req.params.blogId);
 
-        if(postsResult.success) {
+        if (postsResult.success) {
             res.status(mapStatusCode(postsResult.code)).json(postsResult.payload);
         } else {
             res.sendStatus(mapStatusCode(postsResult.code));

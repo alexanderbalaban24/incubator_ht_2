@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
-import {WithId} from "mongodb";
+import mongoose, {Model} from "mongoose";
+import {QueryCustomMethods} from "../../shared/types";
+import {queryHelper} from "../../shared/utils";
 
 export type PostDB = {
     title: string
@@ -10,12 +11,12 @@ export type PostDB = {
     createdAt: string
 }
 
-export const PostsSchema = new mongoose.Schema<PostDB>({
+export const PostsSchema = new mongoose.Schema<PostDB, Model<PostDB, QueryCustomMethods>, {}, QueryCustomMethods>({
     title: {type: String, required: true},
     shortDescription: {type: String, required: true},
     content: {type: String, required: true},
     blogId: {type: String, required: true},
     blogName: {type: String, required: true}
-}, {timestamps: true});
+}, {timestamps: true, query: queryHelper});
 
-export const PostsModelClass = mongoose.model<PostDB>("posts", PostsSchema);
+export const PostsModelClass = mongoose.model<PostDB, Model<PostDB, QueryCustomMethods>>("posts", PostsSchema);

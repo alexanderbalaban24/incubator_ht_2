@@ -97,8 +97,7 @@ export class AuthServices {
 
     async recoverPass(email: string): Promise<ResultDTO<{ isRecovered: boolean }>> {
         const userInfoResult = await this.authQueryRepository.searchUserByCredentials(email);
-        console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ", userInfoResult)
-        if (!userInfoResult.success) return new ResultDTO(InternalCode.Not_Found);
+        if (!userInfoResult.success) return new ResultDTO(InternalCode.No_Content);
 
         const recoverPasswordData = new RecoveryPasswordDTO();
 

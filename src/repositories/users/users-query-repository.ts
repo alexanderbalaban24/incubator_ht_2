@@ -1,23 +1,21 @@
 import {WithId} from "mongodb";
 import {ViewUserModel} from "../../models/user/ViewUserModel";
 import {QueryParamsUserModel} from "../../models/user/QueryParamsUserModel";
-import {ViewWithQueryUserModel} from "../../models/user/ViewWithQueryUserModel";
-import {Query} from "mongoose";
 import {UsersDB, UsersModelClass} from "../../models/user/UsersModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
+import {ViewWithQueryUserModel} from "../../models/user/ViewWithQueryUserModel";
 
 
 export class UsersQueryRepository {
+
     async findUsers(query: QueryParamsUserModel): Promise<ResultDTO<ViewWithQueryUserModel>> {
-        const userInstances = UsersModelClass.find({}, {projection: {passwordHash: 0}});
-        const queryResult = await this._queryBuilder(query, userInstances);
+        const usersData = await UsersModelClass.find({}, {projection: {passwordHash: 0}}).customFind<WithId<UsersDB>, ViewUserModel>(query);
+        usersData.map(this._mapUserDBToViewUserModel);
 
-        const users = await userInstances;
-        queryResult.items = users.map(user => this._mapUserDBToViewUserModel(user));
-
-        return new ResultDTO(InternalCode.Success, queryResult);
+        return new ResultDTO(InternalCode.Success, usersData as ViewWithQueryUserModel);
     }
+
     async findUserById(userId: string): Promise<ResultDTO<ViewUserModel>> {
         const user = await UsersModelClass.findById(userId, {projection: {passwordHash: 0}});
 
@@ -29,40 +27,13 @@ export class UsersQueryRepository {
         }
 
     }
+
     _mapUserDBToViewUserModel(user: WithId<UsersDB>): ViewUserModel {
         return {
             id: user._id.toString(),
             login: user.login,
             email: user.email,
             createdAt: user.createdAt
-        }
-    }
-    async _queryBuilder(queryUserData: QueryParamsUserModel, query: Query<any, any>): Promise<ViewWithQueryUserModel> {
-        const sortBy = queryUserData.sortBy ? queryUserData.sortBy : "createdAt";
-        const sortDirection = queryUserData.sortDirection ? queryUserData.sortDirection : "desc"
-        const pageNumber = queryUserData.pageNumber ? +queryUserData.pageNumber : 1
-        const pageSize = queryUserData.pageSize ? +queryUserData.pageSize : 10
-
-        const skip = pageSize * (pageNumber - 1);
-
-        if (queryUserData.searchLoginTerm) {
-            query.regex("login", new RegExp(queryUserData.searchLoginTerm));
-        }
-        if (queryUserData.searchEmailTerm) {
-            query.regex("email", new RegExp(queryUserData.searchEmailTerm))
-        }
-
-        const totalCount = await query.clone().count();
-
-        query.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
-        const pagesCount = Math.ceil(totalCount / pageSize);
-
-        return {
-            pagesCount: pagesCount,
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: totalCount,
-            items: []
         }
     }
 }

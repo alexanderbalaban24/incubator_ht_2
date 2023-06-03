@@ -28,11 +28,7 @@ export class CommentsController {
 
         const deleteResult = await this.commentsServices.deleteComment(req.params.commentId);
 
-        if (deleteResult.success) {
-            res.sendStatus(mapStatusCode(deleteResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(deleteResult.code));
-        }
+        res.sendStatus(mapStatusCode(deleteResult.code));
     }
 
     async updateComment(req: RequestWithParamsAndBody<{ commentId: string }, {
@@ -45,10 +41,6 @@ export class CommentsController {
 
         const updateResult = await this.commentsServices.updateComment(req.params.commentId, req.body.content);
 
-        if (updateResult.success) {
-            res.sendStatus(mapStatusCode(updateResult.code));
-        } else {
-            res.sendStatus(mapStatusCode(updateResult.code));
-        }
+        res.sendStatus(mapStatusCode(updateResult.code));
     }
 }
