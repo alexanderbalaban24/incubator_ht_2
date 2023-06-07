@@ -1,12 +1,5 @@
 import {HTTPResponseStatusCodes, InternalCode} from "./enums";
 
-export const mapStatusCode = (internalCode: InternalCode) => {
-    const code = HTTPResponseStatusCodes[internalCode];
-    if (!code) return HTTPResponseStatusCodes.INTERNAL_SERVER_ERROR;
-
-    return code;
-}
-
 export const VALID_BLOG_DATA = {
     name: "test auth",
     description: "string descriptin",

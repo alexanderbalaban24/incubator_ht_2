@@ -1,21 +1,18 @@
-import {ViewBlogModel} from "../../models/blog/ViewBlogModel";
-import {QueryParamsBlogModel} from "../../models/blog/QueryParamsBlogModel";
+import {ViewBlogModel} from "../../models/view/ViewBlogModel";
+import {QueryParamsBlogModel} from "../../models/input/QueryParamsBlogModel";
 import {WithId} from "mongodb";
-import {ViewWithQueryBlogModel} from "../../models/blog/ViewWithQueryBlogModel";
-import {Query} from "mongoose";
-import {BlogDB, BlogsModelClass} from "../../models/blog/BlogsModelClass";
+import {ViewWithQueryBlogModel} from "../../models/view/ViewWithQueryBlogModel";
+import {BlogDB, BlogsModelClass} from "../../models/database/BlogsModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 
 
 export class BlogsQueryRepository {
     async findBlogs(query: QueryParamsBlogModel): Promise<ResultDTO<ViewWithQueryBlogModel>> {
-        const blogInstances = BlogsModelClass.find({});
-        const queryResult = await this._queryBuilder(query, blogInstances);
-        const blogs = await blogInstances;
+        const blogsData = await BlogsModelClass.find({}).customFind<WithId<BlogDB>, ViewBlogModel>(query);
+        blogsData.map(this._mapBlogDBToViewBlogModel);
 
-        queryResult.items = blogs.map(blog => this._mapBlogDBToViewBlogModel(blog));
-        return new ResultDTO(InternalCode.Success, queryResult);
+        return new ResultDTO(InternalCode.Success, blogsData as ViewWithQueryBlogModel);
     }
     async findBlogById(blogId: string): Promise<ResultDTO<ViewBlogModel>> {
         const blog = await BlogsModelClass.findById(blogId).lean();
@@ -34,30 +31,6 @@ export class BlogsQueryRepository {
             websiteUrl: blog.websiteUrl,
             createdAt: blog.createdAt,
             isMembership: blog.isMembership
-        }
-    }
-    async _queryBuilder(queryBlogData: QueryParamsBlogModel, query: Query<any, any>): Promise<ViewWithQueryBlogModel> {
-        const sortBy = queryBlogData.sortBy ? queryBlogData.sortBy : "createdAt";
-        const sortDirection = queryBlogData.sortDirection ? queryBlogData.sortDirection : "desc";
-        const pageNumber = queryBlogData.pageNumber ? +queryBlogData.pageNumber : 1;
-        const pageSize = queryBlogData.pageSize ? +queryBlogData.pageSize : 10;
-
-        const skip = pageSize * (pageNumber - 1);
-        if (queryBlogData.searchNameTerm) {
-            query.regex("name", new RegExp(queryBlogData.searchNameTerm));
-        }
-
-        const totalCount = await query.clone().count();
-
-        query.sort({[sortBy]: sortDirection}).skip(skip).limit(pageSize);
-        const pagesCount = Math.ceil(totalCount / pageSize);
-
-        return {
-            pagesCount: pagesCount,
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: totalCount,
-            items: []
         }
     }
 }

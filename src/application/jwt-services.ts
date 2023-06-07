@@ -32,7 +32,6 @@ export const jwtServices = {
     },
     checkCredentials(token: string): ResultDTO<{ id: string }> {
         const result = jwt.verify(token, this.secret!) as JwtPayload;
-
         if (result) {
             return new ResultDTO(InternalCode.Success, {id: result.userId});
         } else {

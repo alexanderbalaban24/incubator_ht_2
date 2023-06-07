@@ -1,4 +1,4 @@
-import {PostsModelClass} from "../../models/post/PostsModelClass";
+import {PostsModelClass} from "../../models/database/PostsModelClass";
 import {PostDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";

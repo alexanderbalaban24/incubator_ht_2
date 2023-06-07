@@ -1,5 +1,5 @@
 import {ConfirmationDataType, UserInfoType} from "../../domain/types";
-import {UsersModelClass} from "../../models/user/UsersModelClass";
+import {UsersModelClass} from "../../models/database/UsersModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 

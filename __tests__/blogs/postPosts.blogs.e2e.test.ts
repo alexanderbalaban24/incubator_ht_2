@@ -2,7 +2,7 @@ import request from "supertest";
 import {app} from "../../src/app";
 import {client} from "../../src/db";
 import {INVALID_VALUE, VALID_BLOG_DATA, VALID_POST_DATA} from "../../src/shared/utils";
-import {ViewBlogModel} from "../../src/models/blog/ViewBlogModel";
+import {ViewBlogModel} from "../../src/models/view/ViewBlogModel";
 import {HTTPResponseStatusCodes} from "../../src/shared/enums";
 
 

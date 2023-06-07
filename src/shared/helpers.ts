@@ -1,8 +1,7 @@
 import {QueryDataType} from "./types";
 import {QueryBuildDTO, ResultDTO} from "./dto";
-import {mapStatusCode} from "./utils";
 import {Response} from "express";
-import {HTTPResponseStatusCodes} from "./enums";
+import {HTTPResponseStatusCodes, InternalCode} from "./enums";
 
 export const queryHelper = {
     async customFind<T, C>(queryData: QueryDataType, id?: string) {
@@ -20,6 +19,10 @@ export const queryHelper = {
             this.regex("email", new RegExp(queryData.searchEmailTerm))
         }
 
+        if (queryData.searchNameTerm) {
+            this.regex("name", new RegExp(queryData.searchNameTerm));
+        }
+
         if (id !== undefined) {
             this.where("blogId").equals(id);
         }
@@ -30,21 +33,29 @@ export const queryHelper = {
         const pagesCount = Math.ceil(totalCount / pageSize);
 
         const items = await this;
-
         return new QueryBuildDTO<T, C>(pagesCount, pageNumber, pageSize, totalCount, items)
     }
 }
 
-export const sendResponse = <T>(res: Response<T>, resultMain: ResultDTO<T>) => {
-    const code = mapStatusCode(resultMain.code);
+export class ResponseHelper {
 
-    if (code === HTTPResponseStatusCodes.NO_CONTENT) return res.sendStatus(code);
+    mapStatusCode(internalCode: InternalCode) {
+        const code = HTTPResponseStatusCodes[internalCode];
+        if (!code) return HTTPResponseStatusCodes.INTERNAL_SERVER_ERROR;
 
-
-    if (resultMain.success) {
-        res.status(code).json(resultMain.payload!);
-    } else {
-        res.sendStatus(code);
+        return code;
     }
+    sendResponse<T>(res: Response<T>, resultMain: ResultDTO<T>) {
+        const code = this.mapStatusCode(resultMain.code);
 
+        if (code === HTTPResponseStatusCodes.NO_CONTENT) return res.sendStatus(code);
+
+
+        if (resultMain.success) {
+            res.status(code).json(resultMain.payload!);
+        } else {
+            res.sendStatus(code);
+        }
+
+    }
 }

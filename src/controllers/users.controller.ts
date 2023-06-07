@@ -1,30 +1,30 @@
 import {RequestWithBody, RequestWithParams, RequestWithQueryParams, ResponseEmpty} from "../shared/types";
-import {ViewUserModel} from "../models/user/ViewUserModel";
-import {CreateUserModel} from "../models/user/CreateUserModel";
+import {ViewUserModel} from "../models/view/ViewUserModel";
+import {CreateUserModel} from "../models/input/CreateUserModel";
 import {Response} from "express";
-import {QueryParamsUserModel} from "../models/user/QueryParamsUserModel";
-import {ViewWithQueryUserModel} from "../models/user/ViewWithQueryUserModel";
+import {QueryParamsUserModel} from "../models/input/QueryParamsUserModel";
+import {ViewWithQueryUserModel} from "../models/view/ViewWithQueryUserModel";
 import {UsersQueryRepository} from "../repositories/users/users-query-repository";
 import {UsersServices} from "../domain/users-services";
-import {mapStatusCode} from "../shared/utils";
 import {HTTPResponseStatusCodes} from "../shared/enums";
-import {sendResponse} from "../shared/helpers";
+import {ResponseHelper} from "../shared/helpers";
 
 
-export class UsersController {
+export class UsersController extends ResponseHelper {
 
     constructor(protected usersServices: UsersServices, protected usersQueryRepository: UsersQueryRepository) {
+        super();
     }
 
     async getUsers(req: RequestWithQueryParams<QueryParamsUserModel>, res: Response<ViewWithQueryUserModel>) {
         const usersResult = await this.usersQueryRepository.findUsers(req.query);
 
-        sendResponse(res, usersResult);
+        this.sendResponse(res, usersResult);
     }
 
     async createUser(req: RequestWithBody<CreateUserModel>, res: Response<ViewUserModel>) {
         const createdResult = await this.usersServices.createUser(req.body.login, req.body.email, req.body.password, true);
-        if (!createdResult.success) return res.sendStatus(mapStatusCode(createdResult.code));
+        if (!createdResult.success) return res.sendStatus(this.mapStatusCode(createdResult.code));
 
         const userResult = await this.usersQueryRepository.findUserById(createdResult.payload!.id);
         res.status(HTTPResponseStatusCodes.CREATED).json(userResult.payload!);
@@ -33,6 +33,6 @@ export class UsersController {
     async deleteUser(req: RequestWithParams<{ userId: string }>, res: ResponseEmpty) {
         const deletedResult = await this.usersServices.deleteUserById(req.params.userId);
 
-        sendResponse(res, deletedResult);
+        this.sendResponse(res, deletedResult);
     }
 }

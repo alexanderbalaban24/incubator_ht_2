@@ -2,6 +2,8 @@ import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {addMilliseconds} from "date-fns";
 
+import {LikeStatusEnum} from "../models/database/CommentsModelClass";
+
 export class RecoveryPasswordDTO {
     public confirmationCode: string;
     public expirationDate: Date;
@@ -23,9 +25,21 @@ export class BlogDTO {
     }
 }
 
+export class UsersLikesDTO {
+    constructor(
+        public userId: string,
+        public likeStatus: LikeStatusEnum,
+        public likedAt: Date
+    ){}
+}
+
 export class CommentDTO {
 
     public commentatorInfo: { userId: string, userLogin: string };
+    public likesCount: number = 0;
+    public dislikesCount: number = 0;
+    public usersLikes: UsersLikesDTO[] = [];
+    public createdAt: Date
 
     constructor(
         public postId: string,
@@ -33,7 +47,10 @@ export class CommentDTO {
         userId: string,
         userLogin: string
     ) {
-        this.commentatorInfo = {userId, userLogin}
+        this.likesCount = 0;
+        this.dislikesCount = 0;
+        this.commentatorInfo = {userId, userLogin};
+        this.createdAt = new Date;
     }
 }
 

@@ -5,5 +5,5 @@ export type ViewWithQueryCommentModel = {
     page: number,
     pageSize: number,
     totalCount: number,
-    items: ViewCommentModel[]
+    items: ViewCommentModel[],
 }

@@ -6,6 +6,7 @@ import {jwtAuthAccess} from "../middlewares/jwt-auth-access";
 import {commentsSchema} from "../schemes/comments-schema";
 import {postIdValidation} from "../middlewares/postId-validation";
 import {postsController} from "../composition-root";
+import {addUserId} from "../middlewares/add-user-id";
 
 export const postsRouter = Router();
 
@@ -19,5 +20,5 @@ postsRouter.route('/:postId')
     .delete(basicAuthMiddleware, postsController.deletePost.bind(postsController));
 
 postsRouter.route('/:postId/comments')
-    .get(postIdValidation, postsController.getAllComments.bind(postsController))
+    .get(addUserId, postIdValidation, postsController.getAllComments.bind(postsController))
     .post(jwtAuthAccess, postIdValidation, commentsSchema, inputValidationMiddleware, postsController.createComment.bind(postsController));

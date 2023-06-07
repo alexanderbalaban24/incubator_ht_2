@@ -1,6 +1,6 @@
 import {RequestWithParams, RequestWithQueryParamsAndURI, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
-import {QueryParamsCommentModel} from "../models/comment/QueryParamsCommentModel";
+import {QueryParamsCommentModel} from "../models/input/QueryParamsCommentModel";
 import {HTTPResponseStatusCodes} from "../shared/enums";
 import {postsQueryRepository} from "../composition-root";
 

@@ -1,10 +1,10 @@
 import {WithId} from "mongodb";
-import {ViewUserModel} from "../../models/user/ViewUserModel";
-import {QueryParamsUserModel} from "../../models/user/QueryParamsUserModel";
-import {UsersDB, UsersModelClass} from "../../models/user/UsersModelClass";
+import {ViewUserModel} from "../../models/view/ViewUserModel";
+import {QueryParamsUserModel} from "../../models/input/QueryParamsUserModel";
+import {UsersDB, UsersModelClass} from "../../models/database/UsersModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
-import {ViewWithQueryUserModel} from "../../models/user/ViewWithQueryUserModel";
+import {ViewWithQueryUserModel} from "../../models/view/ViewWithQueryUserModel";
 
 
 export class UsersQueryRepository {

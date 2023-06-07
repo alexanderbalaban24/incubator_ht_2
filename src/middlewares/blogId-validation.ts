@@ -1,6 +1,6 @@
 import {RequestWithParamsAndBody, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
-import {CreatePostModel} from "../models/post/CreatePostModel";
+import {CreatePostModel} from "../models/input/CreatePostModel";
 import {HTTPResponseStatusCodes} from "../shared/enums";
 import {blogsQueryRepository} from "../composition-root";
 

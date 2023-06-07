@@ -1,9 +1,9 @@
-import {BlogsModelClass} from "../../models/blog/BlogsModelClass";
-import {PostsModelClass} from "../../models/post/PostsModelClass";
-import {UsersModelClass} from "../../models/user/UsersModelClass";
-import {CommentsModelClass} from "../../models/comment/CommentsModelClass";
-import {DeviceModelClass} from "../../models/device/DeviceModelClass";
-import {RateLimitModelClass} from "../../models/rateLimit/RateLimitModelClass";
+import {BlogsModelClass} from "../../models/database/BlogsModelClass";
+import {PostsModelClass} from "../../models/database/PostsModelClass";
+import {UsersModelClass} from "../../models/database/UsersModelClass";
+import {CommentsModelClass} from "../../models/database/CommentsModelClass";
+import {DeviceModelClass} from "../../models/database/DeviceModelClass";
+import {RateLimitModelClass} from "../../models/database/RateLimitModelClass";
 
 
 export class TestingCommandRepository {

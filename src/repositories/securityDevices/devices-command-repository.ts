@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {DeviceModelClass} from "../../models/device/DeviceModelClass";
+import {DeviceModelClass} from "../../models/database/DeviceModelClass";
 import {DeviceDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";

@@ -1,4 +1,4 @@
-import {BlogsModelClass} from "../../models/blog/BlogsModelClass";
+import {BlogsModelClass} from "../../models/database/BlogsModelClass";
 import {BlogDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";

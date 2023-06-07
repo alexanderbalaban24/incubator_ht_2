@@ -13,9 +13,9 @@ export const registrationValidateSchema = checkSchema({
         },
         custom: {
             options: async (value) => {
-                const user = await authQueryRepository.searchUserByCredentials(value);
+                const userResult = await authQueryRepository.searchUserByCredentials(value);
 
-                if (user) {
+                if (!userResult.success) {
                     return Promise.reject();
                 }
             }
@@ -32,9 +32,9 @@ export const registrationValidateSchema = checkSchema({
         },
         custom: {
             options: async (value) => {
-                const user = await authQueryRepository.searchUserByCredentials(value);
+                const userResult = await authQueryRepository.searchUserByCredentials(value);
 
-                if (user) {
+                if (!userResult.success) {
                     return Promise.reject();
                 }
             }

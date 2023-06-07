@@ -1,8 +1,8 @@
-import {ViewPostModel} from "../../models/post/ViewPostModel";
-import {ViewWithQueryPostModel} from "../../models/post/ViewWithQueryPostModel";
+import {ViewPostModel} from "../../models/view/ViewPostModel";
+import {ViewWithQueryPostModel} from "../../models/view/ViewWithQueryPostModel";
 import {WithId} from "mongodb";
-import {QueryParamsPostModel} from "../../models/post/QueryParamsPostModel";
-import {PostDB, PostsModelClass} from "../../models/post/PostsModelClass";
+import {QueryParamsPostModel} from "../../models/input/QueryParamsPostModel";
+import {PostDB, PostsModelClass} from "../../models/database/PostsModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 

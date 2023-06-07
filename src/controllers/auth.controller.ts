@@ -1,18 +1,18 @@
 import {Response} from "express";
 import {RequestEmpty, RequestWithBody, ResponseEmpty} from "../shared/types";
-import {LoginModel} from "../models/auth/LoginModel";
-import {ViewMeModel} from "../models/auth/ViewMeModel";
-import {ViewLoginModel} from "../models/auth/ViewLoginModel";
-import {RegistrationModel} from "../models/auth/RegistrationModel";
+import {LoginModel} from "../models/input/LoginModel";
+import {ViewMeModel} from "../models/view/ViewMeModel";
+import {ViewLoginModel} from "../models/view/ViewLoginModel";
+import {RegistrationModel} from "../models/input/RegistrationModel";
 import {HTTPResponseStatusCodes} from "../shared/enums";
 import {AuthServices} from "../domain/auth-services";
-import {mapStatusCode} from "../shared/utils";
-import {sendResponse} from "../shared/helpers";
 import {UsersQueryRepository} from "../repositories/users/users-query-repository";
+import {ResponseHelper} from "../shared/helpers";
 
-export class AuthController {
+export class AuthController extends ResponseHelper{
 
     constructor(protected authServices: AuthServices, protected usersQueryRepository: UsersQueryRepository) {
+        super();
     }
 
     async login(req: RequestWithBody<LoginModel>, res: Response<ViewLoginModel>) {
@@ -20,9 +20,9 @@ export class AuthController {
 
         if (tokenPairResult.success) {
             res.cookie("refreshToken", tokenPairResult.payload!.refreshToken, {httpOnly: true, secure: true});
-            res.status(mapStatusCode(tokenPairResult.code)).json({accessToken: tokenPairResult.payload!.accessToken});
+            res.status(this.mapStatusCode(tokenPairResult.code)).json({accessToken: tokenPairResult.payload!.accessToken});
         } else {
-            res.sendStatus(mapStatusCode(tokenPairResult.code));
+            res.sendStatus(this.mapStatusCode(tokenPairResult.code));
         }
     }
 
@@ -47,13 +47,13 @@ export class AuthController {
     async registration(req: RequestWithBody<RegistrationModel>, res: ResponseEmpty) {
         const result = await this.authServices.registration(req.body.login, req.body.email, req.body.password);
 
-        res.sendStatus(mapStatusCode(result.code));
+        res.sendStatus(this.mapStatusCode(result.code));
     }
 
     async confirmRegistration(req: RequestWithBody<{ code: string }>, res: ResponseEmpty) {
         const verifiedResult = await this.authServices.verifyEmail(req.body.code);
 
-        sendResponse(res, verifiedResult);
+        this.sendResponse(res, verifiedResult);
     }
 
     async logout(req: RequestEmpty, res: ResponseEmpty) {
@@ -61,7 +61,7 @@ export class AuthController {
 
         const revokedResult = await this.authServices.logout(refreshToken);
 
-        sendResponse(res, revokedResult);
+        this.sendResponse(res, revokedResult);
     }
 
     async getMe(req: RequestEmpty, res: Response<ViewMeModel>) {
@@ -69,13 +69,13 @@ export class AuthController {
         const userResult = await this.usersQueryRepository.findUserById(userId!);
 
         if (userResult.success) {
-            res.status(mapStatusCode(userResult.code)).json({
+            res.status(this.mapStatusCode(userResult.code)).json({
                 email: userResult.payload!.email,
                 login: userResult.payload!.login,
                 userId: userResult.payload!.id
             });
         } else {
-            res.sendStatus(mapStatusCode(userResult.code));
+            res.sendStatus(this.mapStatusCode(userResult.code));
         }
 
     }
@@ -83,20 +83,20 @@ export class AuthController {
     async resendConfirmationCode(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
         const resendResult = await this.authServices.resendConfirmationCode(req.body.email);
 
-        sendResponse(res, resendResult);
+        this.sendResponse(res, resendResult);
 
     }
 
     async recoverPass(req: RequestWithBody<{ email: string }>, res: ResponseEmpty) {
         const sendingResult = await this.authServices.recoverPass(req.body.email);
 
-        sendResponse(res, sendingResult);
+        this.sendResponse(res, sendingResult);
 
     }
 
     async confirmNewPassword(req: RequestWithBody<{ newPassword: string, recoveryCode: string }>, res: ResponseEmpty) {
         const confirmedResult = await this.authServices.confirmRecoverPass(req.body.newPassword, req.body.recoveryCode);
 
-        sendResponse(res, confirmedResult);
+        this.sendResponse(res, confirmedResult);
     }
 }

@@ -1,4 +1,4 @@
-import {RateLimitModelClass} from "../../models/rateLimit/RateLimitModelClass";
+import {RateLimitModelClass} from "../../models/database/RateLimitModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 
