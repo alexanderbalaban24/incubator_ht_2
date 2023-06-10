@@ -81,8 +81,10 @@ PostsSchema.method("like", function (userId: string, likeStatus: LikeStatusEnum)
             addedAt: new Date()
         }
 
-        if (likeStatus === LikeStatusEnum.Like) this.likesCount++;
-        else this.dislikesCount++;
+        if (likeStatus !== LikeStatusEnum.None) {
+            if (likeStatus === LikeStatusEnum.Like && likeStatus) this.likesCount++;
+            else this.dislikesCount++;
+        }
 
         this.usersLikes.push(newLike);
         return this;
@@ -107,16 +109,10 @@ PostsSchema.method("like", function (userId: string, likeStatus: LikeStatusEnum)
         return this;
     }
 
-    if (likeStatus === LikeStatusEnum.None) {
-        myLike.likeStatus = likeStatus;
+    myLike.likeStatus = likeStatus;
 
-        // @ts-ignore
-        if (myLike.likeStatus === LikeStatusEnum.Like) {
-            this.likesCount--
-        } else {
-            this.dislikesCount--
-        }
-    }
+    if (myLike.likeStatus === LikeStatusEnum.Like) this.likesCount--;
+    else this.dislikesCount--;
 
     return this;
 
