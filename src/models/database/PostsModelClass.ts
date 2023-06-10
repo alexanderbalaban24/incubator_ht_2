@@ -3,7 +3,7 @@ import {QueryCustomMethods} from "../../shared/types";
 
 import {queryHelper} from "../../shared/helpers";
 import {LikeStatusEnum} from "../../shared/enums";
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId} from "mongodb";
 
 export enum ReverseLike {
     Like = "Dislike",
@@ -107,10 +107,16 @@ PostsSchema.method("like", function (userId: string, likeStatus: LikeStatusEnum)
         return this;
     }
 
-    myLike.likeStatus = likeStatus;
+    if (likeStatus === LikeStatusEnum.None) {
+        myLike.likeStatus = likeStatus;
 
-    if (myLike.likeStatus === LikeStatusEnum.Like) this.likesCount--;
-    else this.dislikesCount--;
+        // @ts-ignore
+        if (myLike.likeStatus === LikeStatusEnum.Like) {
+            this.likesCount--
+        } else {
+            this.dislikesCount--
+        }
+    }
 
     return this;
 
