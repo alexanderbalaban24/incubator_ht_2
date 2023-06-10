@@ -5,12 +5,13 @@ import {UsersDB, UsersModelClass} from "../../models/database/UsersModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 import {ViewWithQueryUserModel} from "../../models/view/ViewWithQueryUserModel";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class UsersQueryRepository {
 
     async findUsers(query: QueryParamsUserModel): Promise<ResultDTO<ViewWithQueryUserModel>> {
-        const usersData = await UsersModelClass.find({}, {projection: {passwordHash: 0}}).customFind<WithId<UsersDB>, ViewUserModel>(query);
+        const usersData = await UsersModelClass.find({}, {projection: {passwordHash: 0}}).findWithQuery<WithId<UsersDB>, ViewUserModel>(query);
         usersData.map(this._mapUserDBToViewUserModel);
 
         return new ResultDTO(InternalCode.Success, usersData as ViewWithQueryUserModel);

@@ -1,6 +1,8 @@
 import {checkSchema} from "express-validator";
-import {blogsQueryRepository} from "../composition-root";
+import {container} from "../inversify.config";
+import {BlogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 
+const blogsQueryRepository = container.resolve(BlogsQueryRepository);
 
 export const postValidateSchema = checkSchema({
     title: {

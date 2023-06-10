@@ -1,16 +1,18 @@
-import {CommentsDB, CommentsModelClass} from "../../models/database/CommentsModelClass";
+import {CommentsDB, CommentsModelClass, IWithMethod} from "../../models/database/CommentsModelClass";
 import {CommentDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 import {HydratedDocument} from "mongoose";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentsCommandRepository {
 
-    async findCommentById(commentId: string): Promise<ResultDTO<HydratedDocument<CommentsDB>>> {
-        const commentResult = await CommentsModelClass.findById(commentId);
-        if(!commentResult) return new ResultDTO(InternalCode.Not_Found);
+    async findCommentById(commentId: string): Promise<ResultDTO<HydratedDocument<CommentsDB, IWithMethod>>> {
+        const commentInstance = await CommentsModelClass.findById(commentId);
+        if(!commentInstance) return new ResultDTO(InternalCode.Not_Found);
 
-        return new ResultDTO(InternalCode.Success, commentResult);
+        return new ResultDTO(InternalCode.Success, commentInstance);
     }
     async createComment(newComment: CommentDTO): Promise<ResultDTO<{ id: string }>> {
         const result = await new CommentsModelClass(newComment).save();

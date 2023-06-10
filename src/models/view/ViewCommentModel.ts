@@ -1,4 +1,4 @@
-import {LikeStatusEnum} from "../database/CommentsModelClass";
+import {LikeStatusEnum} from "../../shared/enums";
 
 export type ViewCommentModel = {
     id: string,

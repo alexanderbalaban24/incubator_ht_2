@@ -2,7 +2,9 @@ import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {addMilliseconds} from "date-fns";
 
-import {LikeStatusEnum} from "../models/database/CommentsModelClass";
+
+import {LikeStatusEnum} from "../shared/enums";
+import {ObjectId} from "mongodb";
 
 export class RecoveryPasswordDTO {
     public confirmationCode: string;
@@ -28,16 +30,15 @@ export class BlogDTO {
 export class UsersLikesDTO {
     constructor(
         public userId: string,
-        public likeStatus: LikeStatusEnum,
-        public likedAt: Date
+        public likeStatus: LikeStatusEnum
     ){}
 }
 
 export class CommentDTO {
 
     public commentatorInfo: { userId: string, userLogin: string };
-    public likesCount: number = 0;
-    public dislikesCount: number = 0;
+    public likesCount: number;
+    public dislikesCount: number;
     public usersLikes: UsersLikesDTO[] = [];
     public createdAt: Date
 
@@ -54,7 +55,19 @@ export class CommentDTO {
     }
 }
 
+export class PostUserLikesDTO {
+    constructor(
+        public user: ObjectId,
+        public likeStatus: LikeStatusEnum,
+        public addedAt: Date
+    ){}
+}
+
 export class PostDTO {
+
+    public likesCount: number;
+    public dislikesCount: number;
+    public userLikes: PostUserLikesDTO[] = [];
 
     constructor(
         public title: string,
@@ -63,6 +76,8 @@ export class PostDTO {
         public blogId: string,
         public blogName: string,
     ) {
+        this.likesCount = 0;
+        this.dislikesCount = 0;
     }
 }
 

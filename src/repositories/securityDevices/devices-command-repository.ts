@@ -3,8 +3,9 @@ import {DeviceModelClass} from "../../models/database/DeviceModelClass";
 import {DeviceDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class DevicesCommandRepository {
     async createDevice(newDevice: DeviceDTO): Promise<ResultDTO<{ id: string }>> {
         const result = await new DeviceModelClass(newDevice).save();

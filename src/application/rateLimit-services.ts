@@ -3,15 +3,20 @@ import {RateLimitCommandRepository} from "../repositories/rateLimit/rateLimit-co
 import {RateLimitQueryRepository} from "../repositories/rateLimit/rateLimit-query-repository";
 import {ResultDTO} from "../shared/dto";
 import {InternalCode} from "../shared/enums";
+import {inject, injectable} from "inversify";
 
 export type AttemptType = {
     IP: string
     URL: string
 }
 
+@injectable()
 export class RateLimitServices {
 
-    constructor(protected rateLimitCommandRepository: RateLimitCommandRepository, protected rateLimitQueryRepository: RateLimitQueryRepository) {
+    constructor(
+        @inject(RateLimitCommandRepository) protected rateLimitCommandRepository: RateLimitCommandRepository,
+        @inject(RateLimitQueryRepository) protected rateLimitQueryRepository: RateLimitQueryRepository
+    ) {
     }
 
     async addAttempt(IP: string, URL: string): Promise<ResultDTO<{ id: string }>> {

@@ -1,16 +1,17 @@
 import {Response} from "express";
 import {ViewCommentModel} from "../models/view/ViewCommentModel";
 import {RequestWithParams, RequestWithParamsAndBody, ResponseEmpty} from "../shared/types";
-import {HTTPResponseStatusCodes} from "../shared/enums";
+import {HTTPResponseStatusCodes, LikeStatusEnum} from "../shared/enums";
 import {CommentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {CommentsServices} from "../domain/comments-services";
 import {ResponseHelper} from "../shared/helpers";
 
-import {LikeStatusEnum} from "../models/database/CommentsModelClass";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class CommentsController extends ResponseHelper {
 
-    constructor(protected commentsServices: CommentsServices, protected commentsQueryRepository: CommentsQueryRepository) {
+    constructor(@inject(CommentsServices) protected commentsServices: CommentsServices, @inject(CommentsQueryRepository) protected commentsQueryRepository: CommentsQueryRepository) {
         super();
     }
 
@@ -47,12 +48,10 @@ export class CommentsController extends ResponseHelper {
     async likeStatus(req: RequestWithParamsAndBody<{commentId: string}, { likeStatus: LikeStatusEnum }>, res: ResponseEmpty) {
         const likeResult = await this.commentsServices.likeStatus(req.params.commentId, req.userId!, req.body.likeStatus);
 
-        // @ts-ignore
         if(likeResult.success) {
             res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
         } else {
-            // @ts-ignore
-            this.sendResponse(res, likeResult);
+            this.sendResponse<{}>(res, likeResult);
         }
     }
 }

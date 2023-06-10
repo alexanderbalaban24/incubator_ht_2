@@ -3,8 +3,9 @@ import {DeviceModelClass} from "../../models/database/DeviceModelClass";
 import {DeviceDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class DevicesQueryRepository {
     async findDeviceByUserId(userId: string): Promise<ResultDTO<SecurityDeviceActiveSessions[]>> {
         const sessions = await DeviceModelClass.find({userId}).lean();

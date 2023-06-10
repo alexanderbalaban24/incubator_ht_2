@@ -9,9 +9,12 @@ import {jwtAuthRefresh} from "../middlewares/jwt-auth-refresh";
 import {rateLimitMiddleware} from "../middlewares/rate-limit";
 import {passwordRecoverSchema} from "../schemes/password-recover-schema";
 import {newPasswordSchema} from "../schemes/new-password-schema";
-import {authController} from "../composition-root";
+import {container} from "../inversify.config";
+import {AuthController} from "../controllers/auth.controller";
 
 export const authRouter = Router();
+
+const authController = container.resolve(AuthController);
 
 authRouter.route('/login').post(rateLimitMiddleware, authValidateSchema, inputValidationMiddleware, authController.login.bind(authController));
 authRouter.route('/refresh-token').post(jwtAuthRefresh, authController.refreshToken.bind(authController));

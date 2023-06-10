@@ -2,7 +2,10 @@ import {RequestWithParams, RequestWithQueryParamsAndURI, ResponseEmpty} from "..
 import {NextFunction} from "express";
 import {QueryParamsCommentModel} from "../models/input/QueryParamsCommentModel";
 import {HTTPResponseStatusCodes} from "../shared/enums";
-import {postsQueryRepository} from "../composition-root";
+import {container} from "../inversify.config";
+import {PostsQueryRepository} from "../repositories/posts/posts-query-repository";
+
+const postsQueryRepository = container.resolve(PostsQueryRepository);
 
 export const postIdValidation = async (req: RequestWithQueryParamsAndURI<{
     postId: string

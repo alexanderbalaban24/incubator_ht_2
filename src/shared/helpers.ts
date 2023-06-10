@@ -2,9 +2,10 @@ import {QueryDataType} from "./types";
 import {QueryBuildDTO, ResultDTO} from "./dto";
 import {Response} from "express";
 import {HTTPResponseStatusCodes, InternalCode} from "./enums";
+import {injectable} from "inversify";
 
 export const queryHelper = {
-    async customFind<T, C>(queryData: QueryDataType, id?: string) {
+    async findWithQuery<T, C>(queryData: QueryDataType, id?: string) {
         const sortBy = queryData.sortBy ? queryData.sortBy : "createdAt";
         const sortDirection = queryData.sortDirection ? queryData.sortDirection : "desc"
         const pageNumber = queryData.pageNumber ? +queryData.pageNumber : 1;
@@ -37,6 +38,7 @@ export const queryHelper = {
     }
 }
 
+@injectable()
 export class ResponseHelper {
 
     mapStatusCode(internalCode: InternalCode) {

@@ -3,11 +3,13 @@ import {UsersCommandRepository} from "../repositories/users/users-command-reposi
 import {UserDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
 import {InternalCode} from "../shared/enums";
+import {inject, injectable} from "inversify";
 
 
+@injectable()
 export class UsersServices {
 
-    constructor(protected usersCommandRepository: UsersCommandRepository){}
+    constructor(@inject(UsersCommandRepository) protected usersCommandRepository: UsersCommandRepository){}
     async createUser(login: string, email: string, password: string, isConfirmed: boolean): Promise<ResultDTO<{ id: string }>> {
         const passwordSalt = await genSalt(10);
         const passwordHash = await hash(password, passwordSalt);

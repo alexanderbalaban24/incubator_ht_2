@@ -8,11 +8,16 @@ import {UsersQueryRepository} from "../repositories/users/users-query-repository
 import {UsersServices} from "../domain/users-services";
 import {HTTPResponseStatusCodes} from "../shared/enums";
 import {ResponseHelper} from "../shared/helpers";
+import {inject, injectable} from "inversify";
 
 
+@injectable()
 export class UsersController extends ResponseHelper {
 
-    constructor(protected usersServices: UsersServices, protected usersQueryRepository: UsersQueryRepository) {
+    constructor(
+        @inject(UsersServices) protected usersServices: UsersServices,
+        @inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository
+    ) {
         super();
     }
 

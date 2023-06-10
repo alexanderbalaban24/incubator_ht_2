@@ -26,3 +26,9 @@ export enum EmailEvents {
     Registration,
     Recover_password
 }
+
+export enum LikeStatusEnum {
+    None = "None",
+    Like = "Like",
+    Dislike = "Dislike"
+}

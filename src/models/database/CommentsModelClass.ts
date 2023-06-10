@@ -1,12 +1,7 @@
 import mongoose, {HydratedDocument, Model} from "mongoose";
 import {QueryCustomMethods} from "../../shared/types";
 import {queryHelper} from "../../shared/helpers";
-
-export enum LikeStatusEnum {
-    None = "None",
-    Like = "Like",
-    Dislike = "Dislike"
-}
+import {LikeStatusEnum} from "../../shared/enums";
 
 export enum ReverseLike {
     Like = "Dislike",
@@ -21,8 +16,7 @@ type CommentatorInfoType = {
 
 type UserLikeType = {
     userId: string,
-    likeStatus: LikeStatusEnum,
-    likedAt: Date
+    likeStatus: LikeStatusEnum
 }
 
 export interface CommentsDB {
@@ -36,7 +30,7 @@ export interface CommentsDB {
 }
 
 
-interface IWithMethod extends CommentsDB, Document {
+export interface IWithMethod extends CommentsDB, Document {
     like(userId: string, likeStatus: LikeStatusEnum): HydratedDocument<CommentsDB>
 }
 
@@ -47,8 +41,7 @@ const CommentatorSchema = new mongoose.Schema<CommentatorInfoType>({
 
 const UserLikesSchema = new mongoose.Schema<UserLikeType>({
     userId: {type: String, required: true},
-    likeStatus: {type: String, enum: ["None", "Like", "Dislike"], required: true},
-    likedAt: {type: Date, required: true}
+    likeStatus: {type: String, enum: LikeStatusEnum, required: true}
 })
 
 export const CommentsSchema = new mongoose.Schema<CommentsDB, Model<CommentsDB, QueryCustomMethods, IWithMethod>, IWithMethod, QueryCustomMethods>({
@@ -72,8 +65,7 @@ CommentsSchema.method("like", function (userId: string, likeStatus: LikeStatusEn
     if (ind === -1) {
         const newLike: UserLikeType = {
             userId,
-            likeStatus,
-            likedAt: new Date()
+            likeStatus
         }
 
         if (likeStatus === LikeStatusEnum.Like) this.likesCount++;
@@ -113,3 +105,5 @@ CommentsSchema.method("like", function (userId: string, likeStatus: LikeStatusEn
 })
 
 export const CommentsModelClass = mongoose.model<CommentsDB, Model<CommentsDB, QueryCustomMethods, IWithMethod>>("comments", CommentsSchema);
+
+//const instance = new CommentsModelClass().like()

@@ -26,5 +26,5 @@ export type RequestEmpty = Request<{}, {}, {}, {}>;
 export type ResponseEmpty = Response<{}, {}>;
 
 export type QueryCustomMethods = {
-    customFind<T, C>(queryData: QueryDataType, id?:string): Promise<QueryBuildDTO<T, C>>
+    findWithQuery<T, C>(queryData: QueryDataType, id?:string): Promise<QueryBuildDTO<T, C>>
 }

@@ -1,7 +1,10 @@
 import {RequestWithParams, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
 import {HTTPResponseStatusCodes} from "../shared/enums";
-import {commentsQueryRepository} from "../composition-root";
+import {container} from "../inversify.config";
+import {CommentsQueryRepository} from "../repositories/comments/comments-query-repository";
+
+const commentsQueryRepository = container.resolve(CommentsQueryRepository);
 
 export const commentIdValidation = async (req: RequestWithParams<{
     commentId: string

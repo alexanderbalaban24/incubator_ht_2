@@ -2,8 +2,9 @@ import {UsersModelClass} from "../../models/database/UsersModelClass";
 import {UserDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class UsersCommandRepository {
     async createUser(user: UserDTO): Promise<ResultDTO<{ id: string }>> {
         const result = await new UsersModelClass(user).save();

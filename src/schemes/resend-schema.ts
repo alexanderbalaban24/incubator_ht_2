@@ -1,6 +1,8 @@
 import {checkSchema} from "express-validator";
-import {authQueryRepository} from "../composition-root";
+import {container} from "../inversify.config";
+import {AuthQueryRepository} from "../repositories/auth/auth-query-repository";
 
+const authQueryRepository = container.resolve(AuthQueryRepository);
 
 export const resendSchema = checkSchema({
     email: {

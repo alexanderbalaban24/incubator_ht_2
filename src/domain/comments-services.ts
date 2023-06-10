@@ -3,15 +3,16 @@ import {PostsQueryRepository} from "../repositories/posts/posts-query-repository
 import {CommentDTO} from "./dtos";
 import {UsersQueryRepository} from "../repositories/users/users-query-repository";
 import {ResultDTO} from "../shared/dto";
-import {InternalCode} from "../shared/enums";
-import {LikeStatusEnum} from "../models/database/CommentsModelClass";
+import {InternalCode, LikeStatusEnum} from "../shared/enums";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class CommentsServices {
 
     constructor(
-        protected commentsCommandRepository: CommentsCommandRepository,
-        protected postsQueryRepository: PostsQueryRepository,
-        protected usersQueryRepository: UsersQueryRepository
+        @inject(CommentsCommandRepository) protected commentsCommandRepository: CommentsCommandRepository,
+        @inject(PostsQueryRepository) protected postsQueryRepository: PostsQueryRepository,
+        @inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository
     ) {}
 
     async createComment(postId: string, content: string, userId: string): Promise<ResultDTO<{ id: string }>> {
@@ -56,11 +57,10 @@ export class CommentsServices {
         const commentResult = await this.commentsCommandRepository.findCommentById(commentId);
         if (!commentResult.success) return commentResult;
 
-        const commentInstances = commentResult.payload;
+        const commentInstance = commentResult.payload;
 
-        // @ts-ignore
-        const updatedCommentInstances = commentInstances!.like(userId, likeStatus);
+        const updatedCommentInstance = commentInstance!.like(userId, likeStatus);
 
-        return this.commentsCommandRepository.save(updatedCommentInstances);
+        return this.commentsCommandRepository.save(updatedCommentInstance);
     }
 }

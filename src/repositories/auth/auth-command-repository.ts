@@ -2,7 +2,9 @@ import {UsersModelClass} from "../../models/database/UsersModelClass";
 import {RecoveryPasswordDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
+import {injectable} from "inversify";
 
+@injectable()
 export class AuthCommandRepository {
     async updateIsConfirmedEmailConfirmationFieldById(userId: string): Promise<ResultDTO<{ isUpdated: boolean }>> {
         const userInstances = await UsersModelClass.findById(userId);

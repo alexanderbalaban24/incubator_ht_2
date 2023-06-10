@@ -3,10 +3,12 @@ import {DevicesCommandRepository} from "../repositories/securityDevices/devices-
 import {DeviceDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
 import {InternalCode} from "../shared/enums";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class SecurityServices {
 
-    constructor(protected devicesCommandRepository: DevicesCommandRepository) {
+    constructor(@inject(DevicesCommandRepository) protected devicesCommandRepository: DevicesCommandRepository) {
     }
 
     async createDevice(userId: string, deviceName: string, ip: string, expiration: number): Promise<ResultDTO<{

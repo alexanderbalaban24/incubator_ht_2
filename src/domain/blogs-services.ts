@@ -2,10 +2,12 @@ import {BlogsCommandRepository} from "../repositories/blogs/blogs-command-reposi
 import {BlogDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
 import {InternalCode} from "../shared/enums";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class BlogsServices {
 
-    constructor(protected blogsCommandRepository: BlogsCommandRepository){}
+    constructor(@inject(BlogsCommandRepository) protected blogsCommandRepository: BlogsCommandRepository){}
     async createBlog(name: string, description: string, websiteUrl: string): Promise<ResultDTO<{id: string} | null>> {
         const newBlog = new BlogDTO(name, description, websiteUrl);
         const blogResult = await this.blogsCommandRepository.createBlog(newBlog);

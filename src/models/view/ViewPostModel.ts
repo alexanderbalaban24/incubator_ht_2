@@ -1,3 +1,18 @@
+import {LikeStatusEnum} from "../../shared/enums";
+
+type NewLikeType = {
+    addedAt: Date,
+    userId: string,
+    login: string
+}
+
+type ExtendedLikesInfoType = {
+    likesCount: number,
+    dislikesCount: number,
+    myStatus: LikeStatusEnum,
+    newestLikes: NewLikeType[]
+}
+
 export type ViewPostModel = {
     id: string,
     title: string,
@@ -5,5 +20,6 @@ export type ViewPostModel = {
     content: string,
     blogId: string,
     blogName: string,
-    createdAt: string
+    createdAt: string,
+    extendedLikesInfo: ExtendedLikesInfoType,
 }

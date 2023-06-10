@@ -13,27 +13,29 @@ import {QueryParamsPostModel} from "../models/input/QueryParamsPostModel";
 import {ViewCommentModel} from "../models/view/ViewCommentModel";
 import {ViewWithQueryCommentModel} from "../models/view/ViewWithQueryCommentModel";
 import {QueryParamsCommentModel} from "../models/input/QueryParamsCommentModel";
-import {HTTPResponseStatusCodes} from "../shared/enums";
+import {HTTPResponseStatusCodes, LikeStatusEnum} from "../shared/enums";
 import {PostsQueryRepository} from "../repositories/posts/posts-query-repository";
 import {CommentsServices} from "../domain/comments-services";
 import {CommentsQueryRepository} from "../repositories/comments/comments-query-repository";
 import {ResponseHelper} from "../shared/helpers";
+import {inject, injectable} from "inversify";
 
 
+@injectable()
 export class PostsController extends ResponseHelper {
 
     constructor(
-        protected postsServices: PostsServices,
-        protected postsQueryRepository: PostsQueryRepository,
-        protected commentsServices: CommentsServices,
-        protected commentsQueryRepository: CommentsQueryRepository
+        @inject(PostsServices) protected postsServices: PostsServices,
+        @inject(PostsQueryRepository) protected postsQueryRepository: PostsQueryRepository,
+        @inject(CommentsServices) protected commentsServices: CommentsServices,
+        @inject(CommentsQueryRepository) protected commentsQueryRepository: CommentsQueryRepository
     ) {
         super();
     }
 
     async getAllPosts(req: RequestWithQueryParams<QueryParamsPostModel>, res: Response<ViewWithQueryPostModel | null>) {
-        const postsResult = await this.postsQueryRepository.findPost(req.query);
-
+        const postsResult = await this.postsQueryRepository.findPost(req.query, undefined, req.userId!);
+        console.log(postsResult)
         this.sendResponse<ViewWithQueryPostModel>(res, postsResult);
     }
 
@@ -56,8 +58,8 @@ export class PostsController extends ResponseHelper {
     }
 
     async getPost(req: RequestWithParams<{ postId: string }>, res: Response<ViewPostModel | null>) {
-        const postResult = await this.postsQueryRepository.findPostById(req.params.postId);
-
+        const postResult = await this.postsQueryRepository.findPostById(req.params.postId, req.userId!);
+        console.log(postResult)
         this.sendResponse<ViewPostModel>(res, postResult);
     }
 
@@ -89,12 +91,23 @@ export class PostsController extends ResponseHelper {
     }>, res: Response<ViewCommentModel | null>) {
         const createdResult = await this.commentsServices.createComment(req.params.postId, req.body.content, req.userId!);
         if (!createdResult.success) return res.sendStatus(this.mapStatusCode(createdResult.code));
+
         const commentResult = await this.commentsQueryRepository.findCommentById(createdResult.payload!.id, req.userId!);
 
         if (commentResult.success) {
             res.status(HTTPResponseStatusCodes.CREATED).json(commentResult.payload);
         } else {
             res.sendStatus(this.mapStatusCode(commentResult.code));
+        }
+    }
+
+    async likeStatus(req: RequestWithParamsAndBody<{ postId: string }, { likeStatus: LikeStatusEnum }>, res: ResponseEmpty) {
+        const likeResult = await this.postsServices.likeStatus(req.params.postId, req.userId!, req.body.likeStatus);
+
+        if(likeResult.success) {
+            res.sendStatus(HTTPResponseStatusCodes.NO_CONTENT);
+        } else {
+            this.sendResponse<{}>(res, likeResult)
         }
     }
 }

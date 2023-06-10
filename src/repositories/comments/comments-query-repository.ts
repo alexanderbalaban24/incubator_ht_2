@@ -2,14 +2,16 @@ import {ViewCommentModel} from "../../models/view/ViewCommentModel";
 import {WithId} from "mongodb";
 import {ViewWithQueryCommentModel} from "../../models/view/ViewWithQueryCommentModel";
 import {QueryParamsCommentModel} from "../../models/input/QueryParamsCommentModel";
-import {CommentsDB, CommentsModelClass, LikeStatusEnum} from "../../models/database/CommentsModelClass";
+import {CommentsDB, CommentsModelClass} from "../../models/database/CommentsModelClass";
 import {ResultDTO} from "../../shared/dto";
-import {InternalCode} from "../../shared/enums";
+import {InternalCode, LikeStatusEnum} from "../../shared/enums";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentsQueryRepository {
     async findComments(postId: string, query: QueryParamsCommentModel, userId?: string): Promise<ResultDTO<ViewWithQueryCommentModel>> {
 const test =  await CommentsModelClass.find().lean();
-        const commentsData = await CommentsModelClass.find({postId}).customFind<WithId<CommentsDB>, ViewCommentModel>(query);
+        const commentsData = await CommentsModelClass.find({postId}).findWithQuery<WithId<CommentsDB>, ViewCommentModel>(query);
         commentsData.map((comment) => this._mapCommentDBByViewCommentModel(comment, userId));
 
         return new ResultDTO(InternalCode.Success, commentsData as ViewWithQueryCommentModel);
@@ -36,7 +38,7 @@ const test =  await CommentsModelClass.find().lean();
             likesInfo: {
                 likesCount: comment.likesCount,
                 dislikesCount: comment.dislikesCount,
-                myStatus: userLikeData?.likeStatus ? userLikeData.likeStatus : LikeStatusEnum.None
+                myStatus: userLikeData?.likeStatus ?? LikeStatusEnum.None
             }
         }
     }

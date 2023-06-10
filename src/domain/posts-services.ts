@@ -1,12 +1,17 @@
 import {PostsCommandRepository} from "../repositories/posts/posts-command-repository";
 import {PostDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
-import {InternalCode} from "../shared/enums";
+import {InternalCode, LikeStatusEnum} from "../shared/enums";
 import {BlogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class PostsServices {
 
-    constructor(protected postsCommandRepository: PostsCommandRepository, protected blogsQueryRepository: BlogsQueryRepository) {
+    constructor(
+        @inject(PostsCommandRepository) protected postsCommandRepository: PostsCommandRepository,
+        @inject(BlogsQueryRepository) protected blogsQueryRepository: BlogsQueryRepository
+    ) {
     }
 
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<ResultDTO<{id: string}>> {
@@ -57,5 +62,16 @@ export class PostsServices {
         } else {
             return new ResultDTO(deletedResult.code);
         }
+    }
+
+    async likeStatus(postId: string, userId: string, likeStatus: LikeStatusEnum) {
+        const postResult = await this.postsCommandRepository.findPostById(postId);
+        if (!postResult.success) return postResult;
+
+        const postInstance = postResult.payload;
+
+        const updatedPostInstance = postInstance!.like(userId, likeStatus);
+
+        return this.postsCommandRepository.save(updatedPostInstance);
     }
 }

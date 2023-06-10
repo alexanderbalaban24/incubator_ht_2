@@ -1,7 +1,10 @@
 import {RequestEmpty, ResponseEmpty} from "../shared/types";
 import {NextFunction} from "express";
 import {HTTPResponseStatusCodes} from "../shared/enums";
-import {rateLimitServices} from "../composition-root";
+import {container} from "../inversify.config";
+import {RateLimitServices} from "../application/rateLimit-services";
+
+const rateLimitServices = container.resolve(RateLimitServices);
 
 export const rateLimitMiddleware = async (req: RequestEmpty, res: ResponseEmpty, next: NextFunction) => {
     await rateLimitServices.addAttempt(req.ip, req.originalUrl);

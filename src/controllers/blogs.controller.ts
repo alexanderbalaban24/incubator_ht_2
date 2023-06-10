@@ -21,14 +21,16 @@ import {BlogsQueryRepository} from "../repositories/blogs/blogs-query-repository
 import {PostsServices} from "../domain/posts-services";
 import {PostsQueryRepository} from "../repositories/posts/posts-query-repository";
 import {ResponseHelper} from "../shared/helpers";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class BlogsController extends ResponseHelper {
 
     constructor(
-        protected blogsServices: BlogsServices,
-        protected blogsQueryRepository: BlogsQueryRepository,
-        protected postsServices: PostsServices,
-        protected postsQueryRepository: PostsQueryRepository
+        @inject(BlogsServices) protected blogsServices: BlogsServices,
+        @inject(BlogsQueryRepository) protected blogsQueryRepository: BlogsQueryRepository,
+        @inject(PostsServices) protected postsServices: PostsServices,
+        @inject(PostsQueryRepository) protected postsQueryRepository: PostsQueryRepository
     ) {
         super();
     }

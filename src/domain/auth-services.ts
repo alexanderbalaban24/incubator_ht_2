@@ -4,22 +4,25 @@ import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {jwtServices} from "../application/jwt-services";
 import {EmailEvents, InternalCode} from "../shared/enums";
-import {usersServices} from "../composition-root";
 import {AuthQueryRepository} from "../repositories/auth/auth-query-repository";
 import {AuthCommandRepository} from "../repositories/auth/auth-command-repository";
 import {SecurityServices} from "./security-services";
 import {DevicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
 import {RecoveryPasswordDTO, TokenPairDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
+import {UsersServices} from "./users-services";
+import {inject, injectable} from "inversify";
 
 
+@injectable()
 export class AuthServices {
 
     constructor(
-        protected authQueryRepository: AuthQueryRepository,
-        protected authCommandRepository: AuthCommandRepository,
-        protected securityServices: SecurityServices,
-        protected devicesQueryRepository: DevicesQueryRepository
+        @inject(AuthQueryRepository) protected authQueryRepository: AuthQueryRepository,
+        @inject(AuthCommandRepository) protected authCommandRepository: AuthCommandRepository,
+        @inject(SecurityServices) protected securityServices: SecurityServices,
+        @inject(DevicesQueryRepository) protected devicesQueryRepository: DevicesQueryRepository,
+        @inject(UsersServices) protected usersServices: UsersServices
     ) {
     }
 
@@ -79,7 +82,7 @@ export class AuthServices {
     }
 
     async registration(login: string, email: string, password: string): Promise<ResultDTO<{ isRegistered: boolean }>> {
-        const userResult = await usersServices.createUser(login, email, password, false);
+        const userResult = await this.usersServices.createUser(login, email, password, false);
         if (!userResult.success) return new ResultDTO(InternalCode.Server_Error);
 
         const confirmationResult = await this.authQueryRepository.findUserWithEmailConfirmationDataById(userResult.payload!.id);
@@ -90,7 +93,7 @@ export class AuthServices {
         if (sendingResult.success) {
             return new ResultDTO(InternalCode.No_Content, {isRegistered: true});
         } else {
-            await usersServices.deleteUserById(userResult.payload!.id);
+            await this.usersServices.deleteUserById(userResult.payload!.id);
             return new ResultDTO(InternalCode.Server_Error);
         }
     }

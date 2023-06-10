@@ -8,10 +8,12 @@ import {HTTPResponseStatusCodes} from "../shared/enums";
 import {AuthServices} from "../domain/auth-services";
 import {UsersQueryRepository} from "../repositories/users/users-query-repository";
 import {ResponseHelper} from "../shared/helpers";
+import {inject, injectable} from "inversify";
 
-export class AuthController extends ResponseHelper{
+@injectable()
+export class AuthController extends ResponseHelper {
 
-    constructor(protected authServices: AuthServices, protected usersQueryRepository: UsersQueryRepository) {
+    constructor(@inject(AuthServices) protected authServices: AuthServices, @inject(UsersQueryRepository) protected usersQueryRepository: UsersQueryRepository) {
         super();
     }
 

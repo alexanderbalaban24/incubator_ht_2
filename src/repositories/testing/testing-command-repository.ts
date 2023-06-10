@@ -4,8 +4,9 @@ import {UsersModelClass} from "../../models/database/UsersModelClass";
 import {CommentsModelClass} from "../../models/database/CommentsModelClass";
 import {DeviceModelClass} from "../../models/database/DeviceModelClass";
 import {RateLimitModelClass} from "../../models/database/RateLimitModelClass";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class TestingCommandRepository {
     async deleteAllDB(): Promise<boolean> {
         try {

@@ -1,5 +1,8 @@
 import {checkSchema} from "express-validator";
-import {authQueryRepository} from "../composition-root";
+import {container} from "../inversify.config";
+import {AuthQueryRepository} from "../repositories/auth/auth-query-repository";
+
+const authQueryRepository = container.resolve(AuthQueryRepository);
 
 export const registrationValidateSchema = checkSchema({
     login: {
@@ -14,8 +17,7 @@ export const registrationValidateSchema = checkSchema({
         custom: {
             options: async (value) => {
                 const userResult = await authQueryRepository.searchUserByCredentials(value);
-
-                if (!userResult.success) {
+                if (userResult.success) {
                     return Promise.reject();
                 }
             }
@@ -34,7 +36,7 @@ export const registrationValidateSchema = checkSchema({
             options: async (value) => {
                 const userResult = await authQueryRepository.searchUserByCredentials(value);
 
-                if (!userResult.success) {
+                if (userResult.success) {
                     return Promise.reject();
                 }
             }

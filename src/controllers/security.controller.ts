@@ -6,13 +6,15 @@ import {DevicesCommandRepository} from "../repositories/securityDevices/devices-
 import {DevicesQueryRepository} from "../repositories/securityDevices/devices-query-repository";
 import {SecurityDeviceActiveSessions} from "../repositories/securityDevices/types";
 import {ResponseHelper} from "../shared/helpers";
+import {inject, injectable} from "inversify";
 
+@injectable()
 export class SecurityController extends ResponseHelper {
 
     constructor(
-        protected securityServices: SecurityServices,
-        protected devicesCommandRepository: DevicesCommandRepository,
-        protected devicesQueryRepository: DevicesQueryRepository
+        @inject(SecurityServices) protected securityServices: SecurityServices,
+        @inject(DevicesCommandRepository) protected devicesCommandRepository: DevicesCommandRepository,
+        @inject(DevicesQueryRepository) protected devicesQueryRepository: DevicesQueryRepository
     ) {
         super();
     }

@@ -4,10 +4,13 @@ import {blogValidateSchema} from "../schemes/blogs-schema";
 import {basicAuthMiddleware} from "../middlewares/basic-auth";
 import {postValidateSchema} from "../schemes/posts-schema";
 import {blogIdValidation} from "../middlewares/blogId-validation";
-import {blogsController} from "../composition-root";
+import {container} from "../inversify.config";
+import {BlogsController} from "../controllers/blogs.controller";
 
 
 export const blogsRouter = Router();
+
+const blogsController = container.resolve(BlogsController);
 
 blogsRouter.route('/')
     .get(blogsController.getAllBlogs.bind(blogsController))

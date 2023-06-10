@@ -2,10 +2,11 @@ import {ConfirmationDataType, UserInfoType} from "../../domain/types";
 import {UsersModelClass} from "../../models/database/UsersModelClass";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
+import {injectable} from "inversify";
 
+@injectable()
 export class AuthQueryRepository {
     async searchUserByCredentials(loginOrEmail: string): Promise<ResultDTO<UserInfoType>> {
-        const test = await UsersModelClass.find({}).lean()
         const user = await UsersModelClass.findOne().or([{login: loginOrEmail}, {email: loginOrEmail}]).lean();
         if (user) {
             return new ResultDTO(InternalCode.Success, {passwordHash: user.passwordHash, id: user._id.toString()});

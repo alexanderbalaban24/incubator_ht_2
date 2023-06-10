@@ -2,7 +2,9 @@ import {BlogsModelClass} from "../../models/database/BlogsModelClass";
 import {BlogDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
+import {injectable} from "inversify";
 
+@injectable()
 export class BlogsCommandRepository {
     async createBlog(newBlog: BlogDTO): Promise<ResultDTO<{ id: string }>> {
         const result = await new BlogsModelClass(newBlog).save();
