@@ -1,11 +1,19 @@
-import {BlogsModelClass} from "../../models/database/BlogsModelClass";
+import {BlogDB, BlogsModelClass} from "../../models/database/BlogsModelClass";
 import {BlogDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 import {injectable} from "inversify";
+import {HydratedDocument} from "mongoose";
 
 @injectable()
 export class BlogsCommandRepository {
+    async findBlogById(blogId: string): Promise<ResultDTO<HydratedDocument<BlogDB>>> {
+        const blogInstance = await BlogsModelClass.findById(blogId);
+        if (!blogInstance) return new ResultDTO(InternalCode.Not_Found);
+
+        return new ResultDTO(InternalCode.Success, blogInstance);
+    }
+
     async createBlog(newBlog: BlogDTO): Promise<ResultDTO<{ id: string }>> {
         const result = await new BlogsModelClass(newBlog).save();
 
@@ -23,7 +31,9 @@ export class BlogsCommandRepository {
         return new ResultDTO(InternalCode.Success, {isDeleted});
     }
 
-    async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<ResultDTO<{isUpdate: boolean}>> {
+    async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<ResultDTO<{
+        isUpdate: boolean
+    }>> {
         const blogInstances = await BlogsModelClass.findById(blogId);
         if (!blogInstances) return new ResultDTO(InternalCode.Not_Found);
 
@@ -35,22 +45,10 @@ export class BlogsCommandRepository {
 
         return new ResultDTO(InternalCode.Success, {isUpdate: true});
     }
+
+    async save(blog: HydratedDocument<BlogDB>): Promise<ResultDTO<{ id: string }>> {
+        const result = await blog.save();
+
+        return new ResultDTO(InternalCode.Success, {id: result._id.toString()})
+    }
 }
-
-
-/*async save(blog: HydratedDocument<BlogDB>) {
-        await blog.save();
-    }
-
-    async saveUser(user: UserEntity) {
-        const likes = user.likes
-        db.update(likes)
-        await blog.save();
-    }
-
-    async getBlogById(id: string): Promise<UserEntity> {
-        data = db.select()
-        //mapping
-        retrun new UserEntity(data)
-        return BlogsModelClass.findById(id);
-    } */

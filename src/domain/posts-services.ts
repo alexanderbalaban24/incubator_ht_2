@@ -1,6 +1,6 @@
 import {PostsCommandRepository} from "../repositories/posts/posts-command-repository";
 import {PostDTO} from "./dtos";
-import {ResultDTO} from "../shared/dto";
+import {ResultDTO, UserLikePostDTO} from "../shared/dto";
 import {InternalCode, LikeStatusEnum} from "../shared/enums";
 import {BlogsQueryRepository} from "../repositories/blogs/blogs-query-repository";
 import {inject, injectable} from "inversify";

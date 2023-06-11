@@ -1,8 +1,10 @@
 import {QueryDataType} from "./types";
 import {QueryBuildDTO, ResultDTO} from "./dto";
 import {Response} from "express";
-import {HTTPResponseStatusCodes, InternalCode} from "./enums";
+import {HTTPResponseStatusCodes, InternalCode, LikeStatusEnum, ReverseLike} from "./enums";
 import {injectable} from "inversify";
+import {likeSchema} from "../schemes/like-schema";
+import {UserLikeType} from "../models/database/PostsModelClass";
 
 export const queryHelper = {
     async findWithQuery<T, C>(queryData: QueryDataType, id?: string) {
@@ -60,4 +62,8 @@ export class ResponseHelper {
         }
 
     }
+}
+
+export const reverseLikeStatus = (likeStatus: LikeStatusEnum): LikeStatusEnum => {
+    return ReverseLike[likeStatus] as unknown as LikeStatusEnum;
 }

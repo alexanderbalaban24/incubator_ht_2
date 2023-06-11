@@ -1,13 +1,14 @@
-import {IWithMethod, PostDB, PostsModelClass} from "../../models/database/PostsModelClass";
+import { PostDB, PostsModelClass} from "../../models/database/PostsModelClass";
 import {PostDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 import {injectable} from "inversify";
 import {HydratedDocument} from "mongoose";
+import {IWithMethod} from "../../shared/interfaces";
 
 @injectable()
 export class PostsCommandRepository {
-    async findPostById(postId: string): Promise<ResultDTO<HydratedDocument<PostDB, IWithMethod>>> {
+    async findPostById(postId: string): Promise<ResultDTO<HydratedDocument<PostDB, IWithMethod<PostDB>>>> {
         const postInstances = await PostsModelClass.findById(postId);
         if (!postInstances) return new ResultDTO(InternalCode.Not_Found);
 

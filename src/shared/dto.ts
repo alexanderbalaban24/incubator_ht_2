@@ -1,4 +1,5 @@
-import {InternalCode} from "./enums";
+import {InternalCode, LikeStatusEnum} from "./enums";
+import {ObjectId} from "mongodb";
 
 export class ResultDTO<T> {
 
@@ -34,4 +35,22 @@ export class QueryBuildDTO<T, C> {
     map(cb: (val: T) => C) {
         this.items = this.#itemsDB.map(el => cb(el));
     }
+}
+
+export class UserLikePostDTO {
+
+    public likeStatus: LikeStatusEnum;
+    public user: ObjectId;
+    public addedAt: Date
+    constructor(userId: string, likeStatus: LikeStatusEnum, addedAt: Date) {
+        this.likeStatus = likeStatus;
+        this.user = new ObjectId(userId);
+        this.addedAt = addedAt
+    }
+
+}
+
+export class UserLikeCommentDTO {
+
+    constructor(public userId: string, public likeStatus: LikeStatusEnum) {}
 }

@@ -1,21 +1,11 @@
-import mongoose, {Document, HydratedDocument, Model, PopulatedDoc} from "mongoose";
+import mongoose, {Document, Model, PopulatedDoc} from "mongoose";
 import {QueryCustomMethods} from "../../shared/types";
 
-import {queryHelper} from "../../shared/helpers";
+import {queryHelper, reverseLikeStatus} from "../../shared/helpers";
 import {LikeStatusEnum} from "../../shared/enums";
 import {ObjectId} from "mongodb";
-
-export enum ReverseLike {
-    Like = "Dislike",
-    Dislike = "Like",
-    None = "None"
-}
-
-/*type UserLikeType = {
-    userId: string,
-    likeStatus: LikeStatusEnum,
-    addedAt: Date
-}*/
+import {IWithMethod} from "../../shared/interfaces";
+import {UserLikePostDTO} from "../../shared/dto";
 
 type UserInfoType = {
     login: string
@@ -40,15 +30,6 @@ export type PostDB = {
 
 }
 
-export interface IWithMethod extends PostDB, Document {
-    like(userId: string, likeStatus: LikeStatusEnum): HydratedDocument<PostDB>
-}
-
-/*const UserLikeSchema = new mongoose.Schema<UserLikeType>({
-    userId: {type: String, require: true},
-    likeStatus: {type: String, required: true},
-    addedAt: {type: Date, required: true}
-})*/
 
 const UserLikeSchema = new mongoose.Schema<UserLikeType>({
     user: {type: ObjectId, ref: "users"},
@@ -56,7 +37,7 @@ const UserLikeSchema = new mongoose.Schema<UserLikeType>({
     addedAt: {type: Date, required: true}
 })
 
-export const PostsSchema = new mongoose.Schema<PostDB, Model<PostDB, QueryCustomMethods, IWithMethod>, IWithMethod, QueryCustomMethods>({
+export const PostsSchema = new mongoose.Schema<PostDB, Model<PostDB, QueryCustomMethods, IWithMethod<PostDB>>, IWithMethod<PostDB>, QueryCustomMethods>({
     title: {type: String, required: true},
     shortDescription: {type: String, required: true},
     content: {type: String, required: true},
@@ -70,16 +51,13 @@ export const PostsSchema = new mongoose.Schema<PostDB, Model<PostDB, QueryCustom
 
 }});
 
+
 PostsSchema.method("like", function (userId: string, likeStatus: LikeStatusEnum) {
 
-    const ind = this.usersLikes.findIndex((like: any) => like.user._id.toString() === userId);
+    const ind: number = this.usersLikes.findIndex((like: UserLikeType) => like.user?._id!.toString() === userId);
 
     if (ind === -1) {
-        const newLike = {
-            user: new ObjectId(userId),
-            likeStatus,
-            addedAt: new Date()
-        }
+        const newLike = new UserLikePostDTO(userId,  likeStatus, new Date());
 
         if (likeStatus !== LikeStatusEnum.None) {
             if (likeStatus === LikeStatusEnum.Like && likeStatus) this.likesCount++;
@@ -96,7 +74,7 @@ PostsSchema.method("like", function (userId: string, likeStatus: LikeStatusEnum)
     }
 
     if (myLike.likeStatus !== LikeStatusEnum.None && likeStatus !== LikeStatusEnum.None) {
-        myLike.likeStatus = ReverseLike[myLike.likeStatus] as unknown as LikeStatusEnum;
+        myLike.likeStatus = reverseLikeStatus(myLike.likeStatus);
 
         if (likeStatus === LikeStatusEnum.Like) {
             this.likesCount++;
@@ -115,8 +93,6 @@ PostsSchema.method("like", function (userId: string, likeStatus: LikeStatusEnum)
     else this.dislikesCount--;
 
     return this;
-
-
 })
 
-export const PostsModelClass = mongoose.model<PostDB, Model<PostDB, QueryCustomMethods, IWithMethod>>("posts", PostsSchema);
+export const PostsModelClass = mongoose.model<PostDB, Model<PostDB, QueryCustomMethods, IWithMethod<PostDB>>>("posts", PostsSchema);

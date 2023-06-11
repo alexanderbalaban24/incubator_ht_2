@@ -1,13 +1,9 @@
-import mongoose, {HydratedDocument, Model} from "mongoose";
+import mongoose, {Model} from "mongoose";
 import {QueryCustomMethods} from "../../shared/types";
-import {queryHelper} from "../../shared/helpers";
+import {queryHelper, reverseLikeStatus} from "../../shared/helpers";
 import {LikeStatusEnum} from "../../shared/enums";
-
-export enum ReverseLike {
-    Like = "Dislike",
-    Dislike = "Like",
-    None = "None"
-}
+import {IWithMethod} from "../../shared/interfaces";
+import {UserLikeCommentDTO} from "../../shared/dto";
 
 type CommentatorInfoType = {
     userId: string
@@ -30,10 +26,6 @@ export interface CommentsDB {
 }
 
 
-export interface IWithMethod extends CommentsDB, Document {
-    like(userId: string, likeStatus: LikeStatusEnum): HydratedDocument<CommentsDB>
-}
-
 const CommentatorSchema = new mongoose.Schema<CommentatorInfoType>({
     userId: {type: String, required: true},
     userLogin: {type: String, required: true}
@@ -44,7 +36,7 @@ const UserLikesSchema = new mongoose.Schema<UserLikeType>({
     likeStatus: {type: String, enum: LikeStatusEnum, required: true}
 })
 
-export const CommentsSchema = new mongoose.Schema<CommentsDB, Model<CommentsDB, QueryCustomMethods, IWithMethod>, IWithMethod, QueryCustomMethods>({
+export const CommentsSchema = new mongoose.Schema<CommentsDB, Model<CommentsDB, QueryCustomMethods, IWithMethod<CommentsDB>>, IWithMethod<CommentsDB>, QueryCustomMethods>({
     postId: {type: String, required: true},
     content: {type: String, required: true},
     commentatorInfo: {
@@ -63,13 +55,12 @@ CommentsSchema.method("like", function (userId: string, likeStatus: LikeStatusEn
     const ind = this.usersLikes.findIndex((like: UserLikeType) => like.userId === userId);
 
     if (ind === -1) {
-        const newLike: UserLikeType = {
-            userId,
-            likeStatus
-        }
+        const newLike = new UserLikeCommentDTO(userId, likeStatus);
 
-        if (likeStatus === LikeStatusEnum.Like) this.likesCount++;
-        else this.dislikesCount++;
+        if (likeStatus !== LikeStatusEnum.None) {
+            if (likeStatus === LikeStatusEnum.Like) this.likesCount++;
+            else this.dislikesCount++;
+        }
 
         this.usersLikes.push(newLike);
         return this;
@@ -81,7 +72,7 @@ CommentsSchema.method("like", function (userId: string, likeStatus: LikeStatusEn
     }
 
     if (myLike.likeStatus !== LikeStatusEnum.None && likeStatus !== LikeStatusEnum.None) {
-        myLike.likeStatus = ReverseLike[myLike.likeStatus] as unknown as LikeStatusEnum;
+        myLike.likeStatus = reverseLikeStatus(myLike.likeStatus);
 
         if (likeStatus === LikeStatusEnum.Like) {
             this.likesCount++;
@@ -104,6 +95,6 @@ CommentsSchema.method("like", function (userId: string, likeStatus: LikeStatusEn
 
 })
 
-export const CommentsModelClass = mongoose.model<CommentsDB, Model<CommentsDB, QueryCustomMethods, IWithMethod>>("comments", CommentsSchema);
+export const CommentsModelClass = mongoose.model<CommentsDB, Model<CommentsDB, QueryCustomMethods, IWithMethod<CommentsDB>>>("comments", CommentsSchema);
 
 //const instance = new CommentsModelClass().like()

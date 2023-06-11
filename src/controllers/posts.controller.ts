@@ -35,7 +35,7 @@ export class PostsController extends ResponseHelper {
 
     async getAllPosts(req: RequestWithQueryParams<QueryParamsPostModel>, res: Response<ViewWithQueryPostModel | null>) {
         const postsResult = await this.postsQueryRepository.findPost(req.query, undefined, req.userId!);
-        console.log(postsResult)
+
         this.sendResponse<ViewWithQueryPostModel>(res, postsResult);
     }
 
@@ -59,7 +59,7 @@ export class PostsController extends ResponseHelper {
 
     async getPost(req: RequestWithParams<{ postId: string }>, res: Response<ViewPostModel | null>) {
         const postResult = await this.postsQueryRepository.findPostById(req.params.postId, req.userId!);
-        console.log(postResult)
+
         this.sendResponse<ViewPostModel>(res, postResult);
     }
 

@@ -8,8 +8,7 @@ import {inject, injectable} from "inversify";
 @injectable()
 export class SecurityServices {
 
-    constructor(@inject(DevicesCommandRepository) protected devicesCommandRepository: DevicesCommandRepository) {
-    }
+    constructor(@inject(DevicesCommandRepository) protected devicesCommandRepository: DevicesCommandRepository) {}
 
     async createDevice(userId: string, deviceName: string, ip: string, expiration: number): Promise<ResultDTO<{
         refreshToken: string

@@ -3,20 +3,16 @@ import {BlogDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
 import {InternalCode} from "../shared/enums";
 import {inject, injectable} from "inversify";
+import {BlogsModelClass, BlogsSchema} from "../models/database/BlogsModelClass";
 
 @injectable()
 export class BlogsServices {
 
     constructor(@inject(BlogsCommandRepository) protected blogsCommandRepository: BlogsCommandRepository){}
     async createBlog(name: string, description: string, websiteUrl: string): Promise<ResultDTO<{id: string} | null>> {
-        const newBlog = new BlogDTO(name, description, websiteUrl);
-        const blogResult = await this.blogsCommandRepository.createBlog(newBlog);
+        const newBlogInstance = BlogsModelClass.makeInstance(name, description, websiteUrl);
 
-        if(blogResult.success) {
-            return new ResultDTO(InternalCode.Created, blogResult.payload);
-        } else {
-            return new ResultDTO(InternalCode.Server_Error);
-        }
+        return await this.blogsCommandRepository.save(newBlogInstance);
     }
     async deleteBlogById(blogId: string): Promise<ResultDTO<{ isDeleted: boolean }>> {
         const deletedResult =  await this.blogsCommandRepository.deleteBlogById(blogId);
@@ -39,19 +35,3 @@ export class BlogsServices {
 
 
 }
-
-/*
-async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<boolean> {
-    const blogInstances = await this.blogsCommandRepository.getBlogById(blogId)
-    if (!blogInstances) throw new Error('')
-
-
-blogInstances.name = name;
-blogInstances.description = description;
-blogInstances.websiteUrl = websiteUrl;
-
-await this.blogsCommandRepository.save(blogInstances);
-
-return true;
-
-}*/
