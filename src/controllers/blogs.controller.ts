@@ -99,7 +99,7 @@ export class BlogsController extends ResponseHelper {
     async getPostsByBlogId(req: RequestWithQueryParamsAndURI<{
         blogId: string
     }, QueryParamsPostModel>, res: Response<ViewWithQueryPostModel | null>) {
-        const postsResult = await this.postsQueryRepository.findPost(req.query, req.params.blogId);
+        const postsResult = await this.postsQueryRepository.findPost(req.query, req.params.blogId, req.userId!);
 
         this.sendResponse<ViewWithQueryPostModel>(res, postsResult);
     }

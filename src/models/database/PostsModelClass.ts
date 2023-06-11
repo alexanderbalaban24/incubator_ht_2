@@ -72,7 +72,7 @@ export const PostsSchema = new mongoose.Schema<PostDB, Model<PostDB, QueryCustom
 
 PostsSchema.method("like", function (userId: string, likeStatus: LikeStatusEnum) {
 
-    const ind = this.usersLikes.findIndex((like: any) => like.user._id === userId);
+    const ind = this.usersLikes.findIndex((like: any) => like.user._id.toString() === userId);
 
     if (ind === -1) {
         const newLike = {
