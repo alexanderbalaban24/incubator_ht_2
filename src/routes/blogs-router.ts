@@ -6,6 +6,7 @@ import {postValidateSchema} from "../schemes/posts-schema";
 import {blogIdValidation} from "../middlewares/blogId-validation";
 import {container} from "../inversify.config";
 import {BlogsController} from "../controllers/blogs.controller";
+import {addUserId} from "../middlewares/add-user-id";
 
 
 export const blogsRouter = Router();
@@ -22,5 +23,5 @@ blogsRouter.route('/:blogId')
     .delete(basicAuthMiddleware, blogsController.deleteBlog);
 
 blogsRouter.route('/:blogId/posts')
-    .get(blogIdValidation, blogsController.getPostsByBlogId.bind(blogsController))
+    .get(addUserId, blogIdValidation, blogsController.getPostsByBlogId.bind(blogsController))
     .post(basicAuthMiddleware, blogIdValidation, postValidateSchema, inputValidationMiddleware, blogsController.createPostByBlogId.bind(blogsController));
