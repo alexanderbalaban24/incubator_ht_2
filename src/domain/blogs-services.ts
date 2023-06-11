@@ -14,12 +14,19 @@ export class BlogsServices {
         return await this.blogsCommandRepository.save(newBlogInstance);
     }
     async deleteBlogById(blogId: string): Promise<ResultDTO<{ isDeleted: boolean }>> {
-        const deletedResult =  await this.blogsCommandRepository.deleteBlogById(blogId);
+        const blogResult = await this.blogsCommandRepository.findBlogById(blogId);
+        if(!blogResult.success) return new ResultDTO(blogResult.code);
 
-        if(deletedResult.success) {
-            return new ResultDTO(InternalCode.No_Content, deletedResult.payload);
+        const blogInstance = blogResult.payload;
+
+        await blogInstance!.deleteOne();
+
+        const saveResult = await this.blogsCommandRepository.save(blogInstance!);
+
+        if(saveResult.success) {
+            return new ResultDTO(saveResult.code, {isDeleted: true});
         } else {
-            return new ResultDTO(deletedResult.code);
+            return new ResultDTO(saveResult.code);
         }
     }
     async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<ResultDTO<{isUpdate: boolean}>> {
