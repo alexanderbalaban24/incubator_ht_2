@@ -11,11 +11,16 @@ export type BlogDB = {
     isMembership: boolean
 }
 
-type BlogModelStaticType = Model<BlogDB, QueryCustomMethods, {}> & {
-    makeInstance(name: string, description: string, websiteUrl: string): HydratedDocument<BlogDB>;
+export interface BlogMethodType extends Document {
+    changeData(name: string, description: string, websiteUrl: string): void;
 }
 
-export const BlogsSchema = new mongoose.Schema<BlogDB, BlogModelStaticType, {}, QueryCustomMethods>({
+export type BlogModelStaticType = Model<BlogDB, QueryCustomMethods, BlogMethodType> & {
+    makeInstance(name: string, description: string, websiteUrl: string): HydratedDocument<BlogDB>;
+
+}
+
+export const BlogsSchema = new mongoose.Schema<BlogDB, BlogModelStaticType, BlogMethodType, QueryCustomMethods>({
     name: {type: String, required: true},
     description: {type: String, required: true},
     websiteUrl: {type: String, required: true},
@@ -26,5 +31,11 @@ BlogsSchema.static("makeInstance", function (name: string, description: string, 
     const newBlog = new BlogDTO(name, description, websiteUrl);
     return new this(newBlog);
 });
+
+BlogsSchema.method("changeData", function (name: string, description: string, websiteUrl: string) {
+    this.name = name;
+    this.description = description;
+    this.websiteUrl = websiteUrl;
+})
 
 export const BlogsModelClass = mongoose.model<BlogDB, BlogModelStaticType, QueryCustomMethods>("blogs", BlogsSchema);

@@ -1,13 +1,14 @@
-import {BlogDB, BlogsModelClass} from "../../models/database/BlogsModelClass";
+import {BlogDB, BlogMethodType, BlogsModelClass} from "../../models/database/BlogsModelClass";
 import {BlogDTO} from "../../domain/dtos";
 import {ResultDTO} from "../../shared/dto";
 import {InternalCode} from "../../shared/enums";
 import {injectable} from "inversify";
 import {HydratedDocument} from "mongoose";
+import {QueryCustomMethods} from "../../shared/types";
 
 @injectable()
 export class BlogsCommandRepository {
-    async findBlogById(blogId: string): Promise<ResultDTO<HydratedDocument<BlogDB>>> {
+    async findBlogById(blogId: string): Promise<ResultDTO<HydratedDocument<BlogDB, BlogMethodType>>> {
         const blogInstance = await BlogsModelClass.findById(blogId);
         if (!blogInstance) return new ResultDTO(InternalCode.Not_Found);
 

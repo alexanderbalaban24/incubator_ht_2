@@ -1,9 +1,8 @@
 import {BlogsCommandRepository} from "../repositories/blogs/blogs-command-repository";
-import {BlogDTO} from "./dtos";
 import {ResultDTO} from "../shared/dto";
 import {InternalCode} from "../shared/enums";
 import {inject, injectable} from "inversify";
-import {BlogsModelClass, BlogsSchema} from "../models/database/BlogsModelClass";
+import {BlogsModelClass} from "../models/database/BlogsModelClass";
 
 @injectable()
 export class BlogsServices {
@@ -24,12 +23,19 @@ export class BlogsServices {
         }
     }
     async updateBlog(blogId: string, name: string, description: string, websiteUrl: string): Promise<ResultDTO<{isUpdate: boolean}>> {
-        const updateResult = await this.blogsCommandRepository.updateBlog(blogId, name, description, websiteUrl);
+        const blogResult = await this.blogsCommandRepository.findBlogById(blogId);
+        if(!blogResult.success) return new ResultDTO(blogResult.code);
 
-        if(updateResult.success) {
-            return new ResultDTO(InternalCode.No_Content, updateResult.payload);
+        const blogInstance = blogResult.payload;
+
+        blogInstance!.changeData(name, description, websiteUrl);
+
+        const saveResult = await this.blogsCommandRepository.save(blogInstance!);
+
+        if(saveResult.success) {
+            return new ResultDTO(saveResult.code, {isUpdate: true});
         } else {
-            return new ResultDTO(updateResult.code);
+            return new ResultDTO(saveResult.code);
         }
     }
 
